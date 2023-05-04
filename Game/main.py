@@ -2,7 +2,7 @@ from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.keyboard import *
 
-janela = Window(1280, 720)
+janela = Window(1280, 721)
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
 blinky = Sprite("./Sprites/Blinky.png", 8)
