@@ -1,5 +1,6 @@
 from PPlay.window import *
 from PPlay.sprite import *
+from PPlay.keyboard import *
 
 janela = Window(1280, 720)
 
@@ -16,7 +17,7 @@ blinky.set_sequence_time(0, 8, 100, True)
 
 
 
-teclado = keyboard.Keyboard()
+teclado = Keyboard()
 facing = 'AFK'
 # Game-loop
 blinky.set_sequence(0, 1, True)
