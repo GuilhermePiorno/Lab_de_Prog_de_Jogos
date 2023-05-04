@@ -1,6 +1,7 @@
 from PPlay.window import *
 from PPlay.sprite import *
 from generator import *
+from PPlay.gameimage import *
 
 janela = Window(1920, 1080)
 
@@ -19,16 +20,19 @@ with open('maze.txt', mode='r', encoding='utf-8') as fin:
     for linha in fin:
         for j in range(len(linha)):
             if linha[j] == '|':
-                wall = Sprite("Sprites/Walls.png", 6)
-                wall.set_position(j * 34, i * 34)
-                level[i][j + 1] = wall
-                # level[i][j + 1] = '|'
+                level[i][j + 1] = 1
+            else:
+                level[i][j + 1] = 0
         i += 1
-    # Altera o sprite das paredes para fazerem sentido
-    #for i in range(30):
-    #    for j in range(33):
-    # 990 leituras fora as comparações... do I really want to do that..?
 
+    # Altera o sprite das paredes para fazerem sentido
+    for i in range(1, 32):  # linhas 0 e 32 estão sempre vazias
+        for j in range(1, 29):  # colunas 0 e 29 estão sempre vazias
+            if level[i][j] == 1:
+                wall = GameImage("Sprites/WallBlock.png")
+                # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
+                wall.set_position((j-1) * 32, (i-1) * 32)
+                level[i][j] = wall
 
 # O intervalo de frames parece funcionar fechado/aberto -> [Frame_Inicial, Frame Final)
 # ex: example.set_sequence_time(0, 1, _total_duration_, _loop_boolean_) mostra apenas o frame 0.
@@ -95,7 +99,7 @@ while True:
     # level[1][5].draw()
 
     for i in range(33):
-        for j in range(28):
+        for j in range(1, 29):
             if level[i][j] != 0:
                 level[i][j].draw()
     blinky.draw()
