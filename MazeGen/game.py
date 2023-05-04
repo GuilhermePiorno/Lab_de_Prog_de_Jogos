@@ -1,6 +1,6 @@
 from PPlay.window import *
 from PPlay.sprite import *
-from PPlay.keyboard import *
+from generator import *
 
 janela = Window(1280, 720)
 
@@ -25,6 +25,7 @@ blinky.set_sequence(0, 1, True)
 FPS = 0
 tempo = 0
 cont = 0
+createlevel()
 while True:
     # Leitura de Entradas
 
@@ -55,6 +56,18 @@ while True:
         tempo = 0
         FPS = cont
         cont = 0
+
+    # Exemplo equivalente ao de cima, mas utilizando for para ler as linhas do arquivo uma a uma.
+    with open('maze.txt', mode='r', encoding='utf-8') as fin:
+        i = 0
+        for linha in fin:
+            for j in range(len(linha)):
+                if linha[j] == '|':
+                    wall = Sprite("Sprites/Walls.png", 6)
+                    wall.set_position(i * 36, j * 36)
+
+            i += 1
+
 
 
 
