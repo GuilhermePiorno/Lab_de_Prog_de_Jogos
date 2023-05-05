@@ -54,10 +54,10 @@ with open('maze.txt', mode='r', encoding='utf-8') as fin:
                             elif k == 3:
                                 wall_direction = 'UL'
 
-                wall = GameImage("Sprites/Wall_" + wall_direction + ".png")
+                wall = GameImage("Sprites/MiniWalls/Wall_" + wall_direction + ".png")
                 # wall = GameImage("Sprites/Wall_RL.png")
                 # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
-                wall.set_position((j - 1) * 34, (i - 1) * 34)
+                wall.set_position((j - 1) * 17, (i - 1) * 17)
                 level[i][j] = wall
 
 # O intervalo de frames parece funcionar fechado/aberto -> [Frame_Inicial, Frame Final)
@@ -92,8 +92,8 @@ while True:
         blinky.set_sequence(0, 2, True)
 
     # Movimento básico para teste de animação, descomente para habilitar.
-    blinky.move_key_x(0.1)
-    blinky.move_key_y(0.1)
+    blinky.move_key_x(0.5)
+    blinky.move_key_y(0.5)
 
     # FPS
     tempo += janela.delta_time()
