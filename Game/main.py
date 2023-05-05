@@ -3,14 +3,15 @@ from PPlay.sprite import *
 from generator import *
 from PPlay.gameimage import *
 
-janela = Window(1920, 1080)
+
+janela = Window(1280, 720)
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
 blinky = Sprite("./Sprites/Blinky.png", 8)
 blinky.set_position(janela.width / 2 - blinky.width / 2, janela.height / 2 - blinky.height / 2)
 
 # Chama o maze generator e armazena o labirinto em maze.txt
-# createlevel()
+createlevel()
 
 # Acessa o labirinto criado e armazena os sprites criados em uma matriz para depois ser desenhada
 with open('maze.txt', mode='r', encoding='utf-8') as fin:
@@ -54,10 +55,12 @@ with open('maze.txt', mode='r', encoding='utf-8') as fin:
                             elif k == 3:
                                 wall_direction = 'UL'
 
-                wall = GameImage("Sprites/MiniWalls/Wall_" + wall_direction + ".png")
+                wall = GameImage("Sprites/MiniWalls2/Wall_" + wall_direction + ".png")
                 # wall = GameImage("Sprites/Wall_RL.png")
                 # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
-                wall.set_position((j - 1) * 17, (i - 1) * 17)
+                maze_x = janela.width/2 - 238 + (j - 1) * 20
+                maze_y = janela.height/2 - 263.5 + (i - 1) * 20
+                wall.set_position(maze_x, maze_y)
                 level[i][j] = wall
 
 # O intervalo de frames parece funcionar fechado/aberto -> [Frame_Inicial, Frame Final)
@@ -91,9 +94,66 @@ while True:
         facing = 'R'
         blinky.set_sequence(0, 2, True)
 
+#  |========================DEMO MAPS======DELETE ME AFTERWARDS
+    if not teclado.key_pressed("a"):
+        a = 0
+    if teclado.key_pressed("a") and not a:
+        a = 1
+        createlevel()
+        with open('maze.txt', mode='r', encoding='utf-8') as fin:
+            i = 0
+            # linha 0 e linha 32 são vazias.
+            level = [[0] * 30 for _ in range(33)]
+            for linha in fin:
+                for j in range(len(linha)):
+                    if linha[j] == '|':
+                        level[i][j + 1] = 1
+                    else:
+                        level[i][j + 1] = 0
+                i += 1
+
+            # Altera o sprite das paredes para fazerem sentido
+            deslocamento_xy = [-1, 0, 1, 0, -1]
+            deslocamento_diagonal = [-1, 1, 1, -1, -1]
+            for i in range(1, 32):  # linhas 0 e 32 estão sempre vazias
+                for j in range(1, 29):  # colunas 0 e 29 estão sempre vazias
+                    if level[i][j] == 1:
+                        wall_direction = ''
+                        for k in range(4):
+                            if level[i + deslocamento_xy[k]][j + deslocamento_xy[k + 1]] != 0:
+                                if k == 0:
+                                    wall_direction += 'U'
+                                elif k == 1:
+                                    wall_direction += 'R'
+                                elif k == 2:
+                                    wall_direction += 'D'
+                                elif k == 3:
+                                    wall_direction += 'L'
+                        if wall_direction == 'URDL':
+                            for k in range(4):
+                                if level[i + deslocamento_diagonal[k]][j + deslocamento_diagonal[k + 1]] == 0:
+                                    if k == 0:
+                                        wall_direction = 'UR'
+                                    elif k == 1:
+                                        wall_direction = 'RD'
+                                    elif k == 2:
+                                        wall_direction = 'DL'
+                                    elif k == 3:
+                                        wall_direction = 'UL'
+
+                        wall = GameImage("Sprites/MiniWalls2/Wall_" + wall_direction + ".png")
+                        # wall = GameImage("Sprites/Wall_RL.png")
+                        # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
+                        maze_x = janela.width / 2 - 238 + (j - 1) * 20
+                        maze_y = janela.height / 2 - 263.5 + (i - 1) * 20
+                        wall.set_position(maze_x, maze_y)
+                        level[i][j] = wall
+#  |========================DEMO MAPS======DELETE ME AFTERWARDS
+
+
     # Movimento básico para teste de animação, descomente para habilitar.
-    blinky.move_key_x(0.5)
-    blinky.move_key_y(0.5)
+    blinky.move_key_x(0.4)
+    blinky.move_key_y(0.4)
 
     # FPS
     tempo += janela.delta_time()
