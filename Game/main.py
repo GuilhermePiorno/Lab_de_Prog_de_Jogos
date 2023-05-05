@@ -58,8 +58,10 @@ with open('maze.txt', mode='r', encoding='utf-8') as fin:
                 wall = GameImage("Sprites/MiniWalls2/Wall_" + wall_direction + ".png")
                 # wall = GameImage("Sprites/Wall_RL.png")
                 # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
-                maze_x = janela.width/2 - 238 + (j - 1) * 20
-                maze_y = janela.height/2 - 263.5 + (i - 1) * 20
+                # TODO: adicionar variaveis para tamanho do padrao de pixel para simplificar mudanças futuras em
+                #  centralização e criação do mapa.
+                maze_x = janela.width / 2 - 280 + (j - 1) * 20  # pixel_x * 28 / 2
+                maze_y = janela.height / 2 - 310 + (i - 1) * 20  # pixe_y * 31 / 2
                 wall.set_position(maze_x, maze_y)
                 level[i][j] = wall
 
@@ -94,6 +96,7 @@ while True:
         facing = 'R'
         blinky.set_sequence(0, 2, True)
 
+# TODO: Remover ou modularizar esta funcionalidade de gerar mapas para teste.
 #  |========================DEMO MAPS======DELETE ME AFTERWARDS
     if not teclado.key_pressed("a"):
         a = 0
@@ -144,8 +147,8 @@ while True:
                         wall = GameImage("Sprites/MiniWalls2/Wall_" + wall_direction + ".png")
                         # wall = GameImage("Sprites/Wall_RL.png")
                         # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
-                        maze_x = janela.width / 2 - 238 + (j - 1) * 20
-                        maze_y = janela.height / 2 - 263.5 + (i - 1) * 20
+                        maze_x = janela.width / 2 - 280 + (j - 1) * 20  # pixel_x * 28 / 2
+                        maze_y = janela.height / 2 - 310 + (i - 1) * 20  # pixe_y * 31/2
                         wall.set_position(maze_x, maze_y)
                         level[i][j] = wall
 #  |========================DEMO MAPS======DELETE ME AFTERWARDS
