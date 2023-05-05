@@ -16,7 +16,7 @@ blinky.set_position(janela.width / 2 - blinky.width / 2, janela.height / 2 - bli
 with open('maze.txt', mode='r', encoding='utf-8') as fin:
     i = 0
     # linha 0 e linha 32 são vazias.
-    level = [[0]*30 for _ in range(33)]
+    level = [[0] * 30 for _ in range(33)]
     for linha in fin:
         for j in range(len(linha)):
             if linha[j] == '|':
@@ -26,12 +26,38 @@ with open('maze.txt', mode='r', encoding='utf-8') as fin:
         i += 1
 
     # Altera o sprite das paredes para fazerem sentido
+    deslocamento_xy = [-1, 0, 1, 0, -1]
+    deslocamento_diagonal = [-1, 1, 1, -1, -1]
     for i in range(1, 32):  # linhas 0 e 32 estão sempre vazias
         for j in range(1, 29):  # colunas 0 e 29 estão sempre vazias
             if level[i][j] == 1:
-                wall = GameImage("Sprites/WallBlock.png")
+                wall_direction = ''
+                for k in range(4):
+                    if level[i+deslocamento_xy[k]][j+deslocamento_xy[k+1]] != 0:
+                        if k == 0:
+                            wall_direction += 'U'
+                        elif k == 1:
+                            wall_direction += 'R'
+                        elif k == 2:
+                            wall_direction += 'D'
+                        elif k == 3:
+                            wall_direction += 'L'
+                if wall_direction == 'URDL':
+                    for k in range(4):
+                        if level[i + deslocamento_diagonal[k]][j + deslocamento_diagonal[k + 1]] == 0:
+                            if k == 0:
+                                wall_direction = 'UR'
+                            elif k == 1:
+                                wall_direction = 'RD'
+                            elif k == 2:
+                                wall_direction = 'DL'
+                            elif k == 3:
+                                wall_direction = 'UL'
+
+                wall = GameImage("Sprites/Wall_" + wall_direction + ".png")
+                # wall = GameImage("Sprites/Wall_RL.png")
                 # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
-                wall.set_position((j-1) * 32, (i-1) * 32)
+                wall.set_position((j - 1) * 34, (i - 1) * 34)
                 level[i][j] = wall
 
 # O intervalo de frames parece funcionar fechado/aberto -> [Frame_Inicial, Frame Final)
@@ -66,8 +92,8 @@ while True:
         blinky.set_sequence(0, 2, True)
 
     # Movimento básico para teste de animação, descomente para habilitar.
-    # blinky.move_key_x(0.1)
-    # blinky.move_key_y(0.1)
+    blinky.move_key_x(0.1)
+    blinky.move_key_y(0.1)
 
     # FPS
     tempo += janela.delta_time()
@@ -76,19 +102,6 @@ while True:
         tempo = 0
         FPS = cont
         cont = 0
-
-    # Exemplo equivalente ao de cima, mas utilizando for para ler as linhas do arquivo uma a uma.
-    """"
-    with open('maze.txt', mode='r', encoding='utf-8') as fin:
-        i = 0
-        for linha in fin:
-            for j in range(len(linha)):
-                if linha[j] == '|':
-                    wall = Sprite("Sprites/Walls.png", 6)
-                    wall.set_position(i * 36, j * 36)
-
-            i += 1
-    """
 
     # Inicialização de objetos
     janela.set_background_color((0, 0, 0))
