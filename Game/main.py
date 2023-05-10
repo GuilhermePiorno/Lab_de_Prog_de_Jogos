@@ -34,7 +34,7 @@ with open('maze.txt', mode='r', encoding='utf-8') as fin:
             if level[i][j] == 1:
                 wall_direction = ''
                 for k in range(4):
-                    if level[i+deslocamento_xy[k]][j+deslocamento_xy[k+1]] != 0:
+                    if level[i + deslocamento_xy[k]][j + deslocamento_xy[k + 1]] != 0:
                         if k == 0:
                             wall_direction += 'U'
                         elif k == 1:
@@ -55,13 +55,23 @@ with open('maze.txt', mode='r', encoding='utf-8') as fin:
                             elif k == 3:
                                 wall_direction = 'UL'
 
-                wall = GameImage("Sprites/MiniWalls2/Wall_" + wall_direction + ".png")
-                # wall = GameImage("Sprites/Wall_RL.png")
-                # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
-                # TODO: adicionar variaveis para tamanho do padrao de pixel para simplificar mudanças futuras em
-                #  centralização e criação do mapa.
-                maze_x = janela.width / 2 - 280 + (j - 1) * 20  # pixel_x * 28 / 2
-                maze_y = janela.height / 2 - 310 + (i - 1) * 20  # pixe_y * 31 / 2
+                wall = GameImage("Sprites/Walls/Curved_20_Matrix/Wall_" + wall_direction + ".png")
+                # wall.width and wall.height should be the same anyway (wall blocks are squares)
+
+
+                # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
+                half_maze_width = (len(level[0]) - 2)/2 * wall.width
+                # x offset for column (j) in the matrix
+                x_offset = (j - 1) * wall.width
+                maze_x = janela.width / 2 - half_maze_width + x_offset
+
+
+                # offset measurement for half of the matrix's PLOTTED height (lines - 2 == len(level["any"] - 2).
+                half_maze_height = (len(level) - 2)/2 * wall.height
+                # y offset for column (i) in the matrix
+                y_offset = (i - 1) * wall.height
+                maze_y = janela.height / 2 - half_maze_height + y_offset
+
                 wall.set_position(maze_x, maze_y)
                 level[i][j] = wall
 
@@ -144,11 +154,19 @@ while True:
                                     elif k == 3:
                                         wall_direction = 'UL'
 
-                        wall = GameImage("Sprites/MiniWalls2/Wall_" + wall_direction + ".png")
-                        # wall = GameImage("Sprites/Wall_RL.png")
-                        # Como cada bloco é 34x34, 32 garante a sobreposição do último pixel de cada lado.
-                        maze_x = janela.width / 2 - 280 + (j - 1) * 20  # pixel_x * 28 / 2
-                        maze_y = janela.height / 2 - 310 + (i - 1) * 20  # pixe_y * 31/2
+                        wall = GameImage("Sprites/Walls/Curved_20_Matrix/Wall_" + wall_direction + ".png")
+                        # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
+                        half_maze_width = (len(level[0]) - 2) / 2 * wall.width
+                        # x offset for column (j) in the matrix
+                        x_offset = (j - 1) * wall.width
+                        maze_x = janela.width / 2 - half_maze_width + x_offset
+
+                        # offset measurement for half of the matrix's PLOTTED height (lines - 2 == len(level["any"] - 2).
+                        half_maze_height = (len(level) - 2) / 2 * wall.height
+                        # y offset for column (i) in the matrix
+                        y_offset = (i - 1) * wall.height
+                        maze_y = janela.height / 2 - half_maze_height + y_offset
+
                         wall.set_position(maze_x, maze_y)
                         level[i][j] = wall
 #  |========================DEMO MAPS======DELETE ME AFTERWARDS
