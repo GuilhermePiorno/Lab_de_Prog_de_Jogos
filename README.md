@@ -1,5 +1,7 @@
 # Lab_de_Prog_de_Jogos
  Avaliação da disciplina de graduação.
+ Games Design Description: https://docs.google.com/document/d/1knbr7gsFqrLqKPQULukTBXYaEmuZd-0JTdwC8ZkX-xA/edit?usp=sharing
+ Games Object Description: https://docs.google.com/document/d/1WoXl3hxguNyCd47ZPLgeNfxuYguMK960SaHzaO1LmaU/edit?usp=sharing
 
 Links para referencia: 
 Dossier que descreve funcionamento geral do jogo original (Pac-Man): https://pacman.holenet.info/#ReferenceTables  
