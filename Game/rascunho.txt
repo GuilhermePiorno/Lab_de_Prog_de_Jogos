@@ -4,3 +4,98 @@
 0111
 0100
 0100
+
+
+level[int(new_x)][int(new_y + 1)]
+
+
+blinky_newaxis_x = blinky.x - (janela.width / 2 - half_maze_width) + blinky.width / 2
+blinky_newaxis_y = blinky.y - (janela.height / 2 - half_maze_height) + blinky.height / 2
+new_x = (blinky.x - (janela.width / 2 - half_maze_width) + blinky.width / 2) // wall.width + 1
+new_y = (blinky.y - (janela.height / 2 - half_maze_height) + blinky.height / 2) // wall.height + 1
+blinky_newaxis_x == (new_x - 0.5) * wall.width
+
+
+""" walltype variable changes the wall sprites
+Curved_20           - For curved walls 20x20
+Curved_20_Matrix    - For borders around wall to help debugging.
+"""
+
+
+
+#inicialização
+#game loop
+while(True):
+    #entrada de dados
+     #atualização de game objects
+     #desenho
+
+
+    # Movimento básico para teste de animação, descomente para habilitar.
+    '''if teclado.key_pressed("RIGHT"):
+        vel_x = 50
+        vel_y = 0
+    if teclado.key_pressed("LEFT"):
+        vel_x = -50
+        vel_y = 0
+    if teclado.key_pressed("UP"):
+        vel_x = 0
+        vel_y = -50
+    if teclado.key_pressed("DOWN"):
+        vel_x = 0
+        vel_y = 50
+    if teclado.key_pressed("S"):
+        vel_x = vel_y = 0'''
+
+
+
+            if cmd == 'd' and buffer < 1 and level[int(new_y + 1)][int(new_x)] == 0 \
+            and blinky_newaxis_x >= (new_x - 0.5) * wall.width and vel_x > 0 or cmd == 'd' \
+            and buffer < 1 and level[int(new_y + 1)][int(new_x)] == 0 \
+            and blinky_newaxis_x <= (new_x - 0.5) * wall.width and vel_x < 0:
+        cmd = ''
+        vel_x = 0
+        vel_y = 50
+
+
+
+
+    can_go_down = level[int(new_y + 1)][int(new_x)] == 0
+    can_go_up = level[int(new_y - 1)][int(new_x)] == 0
+    can_go_left = level[int(new_y)][int(new_x - 1)] == 0
+    can_go_right = level[int(new_y)][int(new_x + 1)] == 0
+
+
+        """# Debug de mudança de sistema de coordenadas.
+    # Posição real
+    # debug_text = "Posição: (" + str(f'{blinky.x:.2f}') + "; " + str(f'{blinky.y:.2f}') + ")"
+    # janela.draw_text(debug_text, 15, 15, size=25, color=(255, 255, 0))
+
+    # Posição em relação ao 0 da matriz
+    eixo_matriz_x = blinky.x - (janela.width / 2 - half_maze_width) + blinky.width / 2
+    eixo_matriz_y = blinky.y - (janela.height / 2 - half_maze_height) + blinky.height / 2
+    debug_text = "Eixo Matriz: (" + str(f'{eixo_matriz_x:.2f}') + "; " + str(f'{eixo_matriz_y:.2f}' + ")")
+    janela.draw_text(debug_text, 15, 45, size=25, color=(255, 255, 0))
+
+    # Posição em relação ao novo eixo a ser utilizado
+    # TODO: Analizar se é necessário usar math.trunc() para evitar coisas como -0.5//1 = -1!!
+    new_x = (blinky.x - (janela.width / 2 - half_maze_width) + blinky.width / 2) // wall.width + 1
+    new_y = (blinky.y - (janela.height / 2 - half_maze_height) + blinky.height / 2) // wall.height + 1
+    debug_text = "New Axis: (" + str(f'{new_x:.2f}') + "; " + str(f'{new_y:.2f}') + ")"
+    janela.draw_text(debug_text, 15, 75, size=25, color=(255, 255, 0))
+
+
+    debug_text = "What's below:" + str(level[int(new_y + 1)][int(new_x)])
+    janela.draw_text(debug_text, 15, 105, size=25, color=(255, 255, 0))
+
+    debug_text = "Buffer time:" + str(f'{buffer:.3f}')
+    janela.draw_text(debug_text, 15, 15, size=25, color=(255, 255, 0))
+
+    measure = (new_x - 0.5) * wall.width
+    debug_text = "Measure to equal:" + str(f'{measure:.2f}')
+    janela.draw_text(debug_text, 15, 130, size=25, color=(255, 255, 0))"""
+
+
+
+
+
