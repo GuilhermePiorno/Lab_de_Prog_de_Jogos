@@ -70,4 +70,21 @@ def fill_level(walltype, janela):
 
                     wall.set_position(maze_x, maze_y)
                     level[i][j] = wall
+                    if i == 14 and j == 1:
+                        wall = GameImage("./Sprites/Walls/" + walltype + "/Wall_UL.png")
+                        wall.set_position(maze_x, maze_y)
+                    elif i == 14 and j == 28:
+                        wall = GameImage("./Sprites/Walls/" + walltype + "/Wall_UR.png")
+                        wall.set_position(maze_x, maze_y)
+
+                    if i == 16 and j == 1:
+                        wall = GameImage("./Sprites/Walls/" + walltype + "/Wall_DL.png")
+                        wall.set_position(maze_x, maze_y)
+                    elif i == 16 and j == 28:
+                        wall = GameImage("./Sprites/Walls/" + walltype + "/Wall_RD.png")
+                        wall.set_position(maze_x, maze_y)
+                    level[i][j] = wall
+
+    level[15][1] = 0
+    level[15][28] = 0
     return level

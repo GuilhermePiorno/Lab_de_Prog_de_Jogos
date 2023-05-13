@@ -96,6 +96,12 @@ while(True):
     janela.draw_text(debug_text, 15, 130, size=25, color=(255, 255, 0))"""
 
 
+    # Coordenadas do blinky em relação ao 0 da fase
+    blinky_newaxis_x = blinky.x - (janela.width / 2 - half_maze_width) + blinky.width / 2
+    blinky_newaxis_y = blinky.y - (janela.height / 2 - half_maze_height) + blinky.height / 2
 
+    # Versão discretizada das coordenadas com ajuste (+1) para correspondencia a matriz "level".
+    new_x = blinky_newaxis_x // wall.width + 1
+    new_y = blinky_newaxis_y // wall.height + 1
 
 
