@@ -12,7 +12,7 @@ def fill_level(walltype, janela):
     """
 
     # Acessa o labirinto criado e armazena os sprites criados em uma matriz para depois ser desenhada
-    with open('maze.txt', mode='r', encoding='utf-8') as fin:
+    with open('./EatThis/maze.txt', mode='r', encoding='utf-8') as fin:
         i = 0
         # linha 0 e linha 32 são vazias.
         level = [[0] * 30 for _ in range(33)]
