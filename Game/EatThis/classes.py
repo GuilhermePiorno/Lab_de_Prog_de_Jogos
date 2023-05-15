@@ -13,6 +13,33 @@ class Player(sprite.Sprite):
         self.ax = 0
         self.ay = 0
 
+    # Ignorar as 2 property e setter abaixo, apenas testando uma forma de incorporar a atualização de parâmetros
+    # como blinky_newaxis_x, blinky_newaxis_y, new_x e new_y dentro do próprio objeto player.
+    # Funciona, mas isto é uma otimização para mais tarde.
+    # TODO: Incorporar parâmetros externos relacionados a classe jogador.
+
+    # Quando objeto.x é chamado, a classe retorna o parametro interno _x.
+    @property
+    def x(self):
+        return self._x
+
+    # Quando blinky.map_x é chamado, ele retorna o valor do parametro interno ._map_x
+    @property
+    def map_x(self):
+        return self._map_x
+
+    # Quando é atribuido um valor a x, ex: blinky.x = 10
+    # o valor é atribuido ao parâmetro interno _x e o parametro _map_x recebe o valor deslocado.
+    @x.setter
+    def x(self, value):
+        self._x = value
+        self._map_x = self.x - (1280/2 - 28*20/2) + 13
+
+    # Observação: Ainda não sei exatamente os limites e funcionamento interno do @obj.setter e @property
+    # aprendi hoje que se chamam "decoradores". Mas parecem cumprir com objetivo. (limpar o código)
+    # Porém não é necessário para o funcionamento, então será deixado para mais tarde; vide o "to do" acima.
+
+
 #   Criar uma classe para todos os elementos do mapa para tirar vantagem
 #   para utilizar um atributo e obter melhores comparações.
 

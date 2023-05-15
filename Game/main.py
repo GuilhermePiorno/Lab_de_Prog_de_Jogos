@@ -5,23 +5,10 @@ from EatThis.procedural_map import *
 from EatThis.map_fill import *
 from EatThis.classes import *
 
-
-# TODO: Criar uma superclasse chamada jogador, assim é possível instanciar blinky através de:
-#  blinky = Player("./Sprites/Blinky.png", 8) e utilizar atributos novos como blinky.vx, blinky.vy e etc.
-
-"""
-class Player(sprite.Sprite):
-    def __init__(self, image_file, frames=1):
-        # Chama construtor da classe "pai" (sprite).
-        sprite.Sprite.__init__(self, image_file, frames)
-
-        # Modificadores de movimento
-        self.base_speed = 100
-        self.vx = 0
-        self.vy = 0
-        self.ax = 0
-        self.ay = 0
-"""
+print("Hotkeys:")
+print("        A - Gera mapa novo")
+print("        G - Liga/Desliga Grid")
+print("        M - Liga/Desliga Música")
 
 # Inicialização.
 janela = Window(1280, 720)
@@ -31,6 +18,7 @@ TesteDebugMapa = False
 buffer = 0  # Buffer para pressionar botão direcional.
 cmd = ''
 grid_toggle = False
+BGM_Toggle = True
 
 # Background Music.
 bgm = Sound("music/Unreal Super Hero 3 by Kenet & Rez.mp3")
@@ -93,7 +81,7 @@ while True:
         blinky.set_sequence(0, 2, True)
 
     # Código para a geração do mapa para testes.
-    if not teclado.key_pressed("A") and not teclado.key_pressed("G"):
+    if not teclado.key_pressed("A") and not teclado.key_pressed("G") and not teclado.key_pressed("M"):
         TesteDebugMapa = False
     if teclado.key_pressed("A") and not TesteDebugMapa:
         createlevel()
@@ -109,6 +97,16 @@ while True:
             walltype += '_Matrix'
         TesteDebugMapa = True
         level = fill_level(walltype, janela)
+
+    if teclado.key_pressed("M") and not TesteDebugMapa:
+        if BGM_Toggle:
+            BGM_Toggle = False
+            bgm.pause()
+        else:
+            BGM_Toggle = True
+            bgm.unpause()
+        TesteDebugMapa = True
+
 
     # Atualiza buffer de inputs
     buffer += janela.delta_time()
@@ -184,6 +182,7 @@ while True:
         blinky.vx = 0
     if not can_go_left and blinky.vx < 0 and blinky_newaxis_x <= (new_x - 0.5) * wall.width:
         blinky.vx = 0
+    # Move blinky de acordo com sua velocidade no eixo x
     blinky.x += blinky.vx * janela.delta_time()
 
     # Checa condição de colisão de blinky com parede em y
@@ -191,6 +190,7 @@ while True:
         blinky.vy = 0
     if not can_go_down and blinky.vy > 0 and blinky_newaxis_y >= (new_y - 0.5) * wall.height:
         blinky.vy = 0
+    # Move blinky de acordo com sua velocidade no eixo y
     blinky.y += blinky.vy * janela.delta_time()
 
     # Checa colisão de blinky com portal esquerdo.
