@@ -12,6 +12,7 @@ print("        M - Liga/Desliga Música")
 
 # Inicialização.
 janela = Window(1280, 720)
+janela.set_title("Eat This!")
 teclado = Window.get_keyboard()
 walltype = 'Curved_20'
 TesteDebugMapa = False

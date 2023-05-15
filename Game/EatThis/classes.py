@@ -51,3 +51,14 @@ class Player(sprite.Sprite):
 #   A partir daí podemos definir 1 para "walkable", 2 para "wall", 3 para "ponto normal", 4 para "power-up"
 #   e comparar simples através de algo tipo: if level[arg1][arg2].type == 1 or para saber se é um espaço vazio.
 
+class NormalPoint():
+    def __init__(self):
+        pass
+
+class PowerUp():
+    def __init__(self):
+        pass
+
+class Shot():
+    def __init__(self):
+        pass
