@@ -1,5 +1,3 @@
-Trocar o uso de janela.delta_time() por um dt definido no inicio do loop.
-
 Acertar as consequências da troca.
 
 Create SuperClass for Enemies.

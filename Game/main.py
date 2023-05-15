@@ -66,6 +66,9 @@ cont = 0
 # Game-loop
 while True:
     # Leitura de Entradas
+
+    dt = janela.delta_time()
+
     # Mudança de animação de Blinky nas 4 direções cardinais.
     if blinky.vy < 0 and facing != 'U':
         facing = 'U'
@@ -109,7 +112,7 @@ while True:
 
 
     # Atualiza buffer de inputs
-    buffer += janela.delta_time()
+    buffer += dt
 
     if teclado.key_pressed("UP"):
         buffer = 0
@@ -183,7 +186,7 @@ while True:
     if not can_go_left and blinky.vx < 0 and blinky_newaxis_x <= (new_x - 0.5) * wall.width:
         blinky.vx = 0
     # Move blinky de acordo com sua velocidade no eixo x
-    blinky.x += blinky.vx * janela.delta_time()
+    blinky.x += blinky.vx * dt
 
     # Checa condição de colisão de blinky com parede em y
     if not can_go_up and blinky.vy < 0 and blinky_newaxis_y <= (new_y - 0.5) * wall.height:
@@ -191,7 +194,7 @@ while True:
     if not can_go_down and blinky.vy > 0 and blinky_newaxis_y >= (new_y - 0.5) * wall.height:
         blinky.vy = 0
     # Move blinky de acordo com sua velocidade no eixo y
-    blinky.y += blinky.vy * janela.delta_time()
+    blinky.y += blinky.vy * dt
 
     # Checa colisão de blinky com portal esquerdo.
     if blinky_newaxis_x < 0 + wall.width / 2:  # aka: 0 + 20/2 = 10
@@ -202,7 +205,7 @@ while True:
         blinky.x -= 2 * half_maze_width - wall.width
 
     # FPS
-    tempo += janela.delta_time()
+    tempo += dt
     cont += 1
     if tempo >= 1:
         tempo = 0
