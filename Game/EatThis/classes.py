@@ -56,7 +56,7 @@ class Enemy(sprite.Sprite):
     def __init__(self, image_file, frames=1):
         super().__init__(image_file, frames)
 
-        self.base_speed = 150
+        self.base_speed = 50
         self.vx = 0
         self.vy = 0
         self.ax = 0

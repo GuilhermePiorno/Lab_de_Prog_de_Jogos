@@ -198,8 +198,11 @@ while True:
                 cmd = ''
                 blinky.vx = -blinky.base_speed
                 blinky.vy = 0
-
+    
+    #movimento do pacman
     pacman.move(pacman.relative_position_of_target(blinky))
+    pacman.x += pacman.vx * dt
+    pacman.y += pacman.vy * dt
 
     # Para debug (S to stop)
     if teclado.key_pressed("P"):
