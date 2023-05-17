@@ -4,8 +4,6 @@ Create SuperClass for Enemies.
 
 Spawn points for pacman to collect
 
-Pacman Sprites
-
 Pacman points interaction (collisions or matrix lookup, probably collisions idk)
 
 Pacman AI

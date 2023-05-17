@@ -51,9 +51,49 @@ class Player(sprite.Sprite):
 #   A partir daí podemos definir 1 para "walkable", 2 para "wall", 3 para "ponto normal", 4 para "power-up"
 #   e comparar simples através de algo tipo: if level[arg1][arg2].type == 1 or para saber se é um espaço vazio.
 
-class NormalPoint():
-    def __init__(self):
-        pass
+
+class Enemy(sprite.Sprite):
+    def __init__(self, image_file, frames=1):
+        super().__init__(image_file, frames)
+
+        self.base_speed = 150
+        self.vx = 0
+        self.vy = 0
+        self.ax = 0
+        self.ay = 0
+    
+    def relative_position_of_target(self, target):
+        relative_position_x = target.x - self.x
+        relative_position_y = target.y - self.y
+        return (relative_position_x, relative_position_y)
+        
+    def move(self, relative_position):
+        if(abs(relative_position[0]) > abs(relative_position[1])):
+            # se movimentará na direção horizontal
+            if(relative_position[0]>0):
+                #vai para a direita
+                self.vx = self.base_speed
+                self.vy = 0
+            else:
+                #vai para a esquerda
+                self.vx = -self.base_speed
+                self.vy = 0
+        else:
+            #se movimentará na direção vertical
+            if(relative_position[1]>0):
+                #vai para baixo
+                self.vx = 0
+                self.vy = self.base_speed
+            else:
+                #vai para cima
+                self.vx = 0
+                self.vy = -self.base_speed
+
+
+class Point(sprite.Sprite):
+    def __init__(self, image_file, frames=1):
+        # Chama construtor da classe "pai" (sprite).
+        sprite.Sprite.__init__(self, image_file, frames)
 
 class PowerUp():
     def __init__(self):

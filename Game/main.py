@@ -5,15 +5,19 @@ from EatThis.procedural_map import *
 from EatThis.map_fill import *
 from EatThis.classes import *
 
+def move_pacman(pacman, blinky, mapa):
+    pass
+
+
 print("Hotkeys:")
-print("        A - Gera mapa novo")
+print("        N - Gera mapa novo")
 print("        G - Liga/Desliga Grid")
 print("        M - Liga/Desliga Música")
 
 # Inicialização.
 janela = Window(1280, 720)
 janela.set_title("Eat This!")
-teclado = Window.get_keyboard()
+teclado = janela.get_keyboard()
 walltype = 'Curved_20'
 TesteDebugMapa = False
 buffer = 0  # Buffer para pressionar botão direcional.
@@ -45,6 +49,14 @@ blinky.set_position(janela.width / 2 - half_maze_width + (wall.width * 1.5 - bli
 blinky.set_sequence_time(0, 8, 100, True)
 blinky.set_sequence(0, 1, True)
 facing = 'AFK'
+
+# Cria o sprite de Pacman e define o número de frames de sua animação.
+pacman = Enemy("./Sprites/pacman.png", 8)
+pacman.set_position(janela.width / 2 + half_maze_width - (wall.width * 1.5 + pacman.width / 2),
+                    janela.height / 2 + half_maze_height - (wall.height * 1.5 + pacman.height / 2))
+pacman.set_sequence_time(0, 8, 100, True)
+pacman.set_sequence(0, 1, True)
+pacman_facing = 'AFK'
 
 # Portal_Esquerdo
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -84,10 +96,24 @@ while True:
         facing = 'R'
         blinky.set_sequence(0, 2, True)
 
+    # Mudança de animação de pacman nas 4 direções cardinais.
+    if pacman.vy < 0 and pacman_facing != 'U':
+        pacman_facing = 'U'
+        pacman.set_sequence(6, 8, True)
+    if pacman.vy > 0 and pacman_facing != 'D':
+        pacman_facing = 'D'
+        pacman.set_sequence(4, 6, True)
+    if pacman.vx < 0 and pacman_facing != 'L':
+        pacman_facing = 'L'
+        pacman.set_sequence(2, 4, True)
+    if pacman.vx > 0 and pacman_facing != 'R':
+        pacman_facing = 'R'
+        pacman.set_sequence(0, 2, True)
+
     # Código para a geração do mapa para testes.
-    if not teclado.key_pressed("A") and not teclado.key_pressed("G") and not teclado.key_pressed("M"):
+    if not teclado.key_pressed("N") and not teclado.key_pressed("G") and not teclado.key_pressed("M"):
         TesteDebugMapa = False
-    if teclado.key_pressed("A") and not TesteDebugMapa:
+    if teclado.key_pressed("N") and not TesteDebugMapa:
         createlevel()
         level = fill_level(walltype, janela)
         TesteDebugMapa = True
@@ -173,8 +199,10 @@ while True:
                 blinky.vx = -blinky.base_speed
                 blinky.vy = 0
 
+    pacman.move(pacman.relative_position_of_target(blinky))
+
     # Para debug (S to stop)
-    if teclado.key_pressed("S"):
+    if teclado.key_pressed("P"):
         blinky.vx = blinky.vy = 0
 
     # TODO: As vezes blinky anda demais antes de sua velocidade ser reduzida a zero,
@@ -223,6 +251,8 @@ while True:
 
     blinky.draw()
     blinky.update()
+    pacman.draw()
+    pacman.update()
     portal_esquerdo.draw()
     portal_esquerdo.update()
     portal_direito.draw()
