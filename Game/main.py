@@ -5,9 +5,6 @@ from EatThis.procedural_map import *
 from EatThis.map_fill import *
 from EatThis.classes import *
 
-def move_pacman(pacman, blinky, mapa):
-    pass
-
 
 print("Hotkeys:")
 print("        N - Gera mapa novo")
@@ -51,7 +48,7 @@ blinky.set_sequence(0, 1, True)
 facing = 'AFK'
 
 # Cria o sprite de Pacman e define o número de frames de sua animação.
-pacman = Enemy("./Sprites/pacman.png", 8)
+pacman = Enemy(janela, level, "./Sprites/pacman.png", 8)
 pacman.set_position(janela.width / 2 + half_maze_width - (wall.width * 1.5 + pacman.width / 2),
                     janela.height / 2 + half_maze_height - (wall.height * 1.5 + pacman.height / 2))
 pacman.set_sequence_time(0, 8, 100, True)
@@ -95,20 +92,6 @@ while True:
     if blinky.vx > 0 and facing != 'R':
         facing = 'R'
         blinky.set_sequence(0, 2, True)
-
-    # Mudança de animação de pacman nas 4 direções cardinais.
-    if pacman.vy < 0 and pacman_facing != 'U':
-        pacman_facing = 'U'
-        pacman.set_sequence(6, 8, True)
-    if pacman.vy > 0 and pacman_facing != 'D':
-        pacman_facing = 'D'
-        pacman.set_sequence(4, 6, True)
-    if pacman.vx < 0 and pacman_facing != 'L':
-        pacman_facing = 'L'
-        pacman.set_sequence(2, 4, True)
-    if pacman.vx > 0 and pacman_facing != 'R':
-        pacman_facing = 'R'
-        pacman.set_sequence(0, 2, True)
 
     # Código para a geração do mapa para testes.
     if not teclado.key_pressed("N") and not teclado.key_pressed("G") and not teclado.key_pressed("M"):
@@ -161,7 +144,7 @@ while True:
     blinky_newaxis_x = blinky.x - (janela.width / 2 - half_maze_width) + blinky.width / 2
     blinky_newaxis_y = blinky.y - (janela.height / 2 - half_maze_height) + blinky.height / 2
 
-    # Versão discretizada das coordenadas com ajuste (+1) para correspondencia a matriz "level".
+    # Versão discretizada das coordenadas do blinky com ajuste (+1) para correspondencia a matriz "level".
     new_x = blinky_newaxis_x // wall.width + 1
     new_y = blinky_newaxis_y // wall.height + 1
 
@@ -198,11 +181,7 @@ while True:
                 cmd = ''
                 blinky.vx = -blinky.base_speed
                 blinky.vy = 0
-    
-    #movimento do pacman
-    pacman.move(pacman.relative_position_of_target(blinky))
-    pacman.x += pacman.vx * dt
-    pacman.y += pacman.vy * dt
+
 
     # Para debug (S to stop)
     if teclado.key_pressed("P"):
@@ -227,6 +206,11 @@ while True:
         blinky.vy = 0
     # Move blinky de acordo com sua velocidade no eixo y
     blinky.y += blinky.vy * dt
+
+    #movimento do pacman
+    pacman.move(blinky)
+    pacman.x += pacman.vx * dt
+    pacman.y += pacman.vy * dt
 
     # Checa colisão de blinky com portal esquerdo.
     if blinky_newaxis_x < 0 + wall.width / 2:  # aka: 0 + 20/2 = 10
@@ -260,4 +244,12 @@ while True:
     portal_esquerdo.update()
     portal_direito.draw()
     portal_direito.update()
+    janela.draw_text(str(pacman.cmd), 30, 30, 30, color=(255,0,0))
+    janela.draw_text(str(pacman.can_go_down), 30, 60, 30, color=(255,0,0))
+    janela.draw_text(str(pacman.can_go_left), 30, 90, 30, color=(255,0,0))
+    janela.draw_text(str(pacman.can_go_right), 30, 120, 30, color=(255,0,0))
+    janela.draw_text(str(pacman.can_go_left), 30, 150, 30, color=(255,0,0))
+    janela.draw_text(str(pacman.vx), 30, 180, 30, color=(255,0,0))
+    janela.draw_text(str(pacman.vy), 30, 210, 30, color=(255,0,0))
+    
     janela.update()
