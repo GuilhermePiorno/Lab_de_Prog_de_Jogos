@@ -66,5 +66,5 @@ def pacman_move_list(maze, pacman_matrix_position, blinky_matrix_position):
                        (put[-1] == "U" and put[-2] != "D") or (put[-1] == "D" and put[-2] != "U")):
                         paths.put(put)
     
-        if(len(put) == 12):
+        if(len(put) == 2):
             return put
