@@ -45,18 +45,15 @@ def valid(maze, moves):
 
         if not((2 <= i <= 30) and (2 <= j <= 27)):
             return False
-        elif(maze[i][j] == 1):
+        elif(maze[i][j] != 0):
             return False
         
     return True
 
-
-start = time.time()
-
 createlevel()
 maze = [[1]*30 for _ in range(33)]
 
-with open('maze1.txt', mode='r', encoding='utf-8') as fin:
+with open('maze.txt', mode='r', encoding='utf-8') as fin:
     fin.readline() #pula a primeira linha vazia
     for i in range(31):
         linha = fin.readline()
@@ -64,12 +61,14 @@ with open('maze1.txt', mode='r', encoding='utf-8') as fin:
             if(linha[j] != "|"):
                 maze[i+1][j+1] = 0
 
+start = time.time()
+
 # posiciona por enquanto blinky e pacman nos extremos opostos do mapa. Posteriormente essas posições serão variáveis e serão importadas ou 
 # de main.py ou dos objetos blinky e pacman
 blinky_x_index = 2
 blinky_y_index = 2
-pacman_x_index = 12
-pacman_y_index = 11
+pacman_x_index = 30
+pacman_y_index = 27
 
 paths = queue.Queue()
 paths.put("")
@@ -82,12 +81,16 @@ while not foundTarget(maze, add):
         if valid(maze, put):
             if len(put) < 3:
                 paths.put(put)
-                print(put)
+                #print(put)
             else:
                 if((put[-1] == "L" and put[-2] != "R") or (put[-1] == "R" and put[-2] != "L") or 
                    (put[-1] == "U" and put[-2] != "D") or (put[-1] == "D" and put[-2] != "U")):
                     paths.put(put)
-                    print(put)
+                    #print(put)
+    
+    if(len(put) == 12):
+        print(put)
+        break
 
 end = time.time()
 print(end-start)

@@ -6,6 +6,89 @@ from EatThis.map_fill import *
 from EatThis.classes import *
 
 
+def ia_pacman1():
+    # Coordenadas do pacman em relação ao 0 da fase
+    pacman_newaxis_x = pacman.x - (janela.width / 2 - half_maze_width) + pacman.width / 2
+    pacman_newaxis_y = pacman.y - (janela.height / 2 - half_maze_height) + pacman.height / 2
+
+    # Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
+    pacman_new_x = pacman_newaxis_x // wall.width + 1
+    pacman_new_y = pacman_newaxis_y // wall.height + 1
+
+    pacman_can_go_down = level[int(pacman_new_y + 1)][int(pacman_new_x)] == 0
+    pacman_can_go_up = level[int(pacman_new_y - 1)][int(pacman_new_x)] == 0
+    pacman_can_go_left = level[int(pacman_new_y)][int(pacman_new_x - 1)] == 0
+    pacman_can_go_right = level[int(pacman_new_y)][int(pacman_new_x + 1)] == 0
+
+    relative_x_pacman_blinky = blinky.x - pacman.x
+    relative_y_pacman_blinky = blinky.y - pacman.y
+
+    #ia 'burra' do pacman
+    #com essa lógica de movimentação, o pacman fica frequentemente 'preso' correndo contra paredes. Talvez implementar
+    #alguma funcionalidade que impeça ele de ficar correndo contra uma parede por mais de algum tempo máximo
+    if(abs(relative_x_pacman_blinky) > abs(relative_y_pacman_blinky)):
+        # se movimentará na direção horizontal
+        if(relative_x_pacman_blinky>0):
+            #vai para a direita
+            pacman_cmd = 'r'
+        else:
+            #vai para a esquerda
+            pacman_cmd = 'l'
+    else:
+        #se movimentará na direção vertical
+        if(relative_y_pacman_blinky>0):
+            #vai para baixo
+            pacman_cmd = 'd'
+        else:
+            #vai para cima
+            pacman_cmd = 'u'
+    
+    # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
+    delta_x = 1
+    delta_y = 1
+    x_window = (pacman_new_x - 0.5) * wall.width - delta_x < pacman_newaxis_x < (pacman_new_x - 0.5) * wall.width + delta_x
+    y_window = (pacman_new_y - 0.5) * wall.height - delta_y < pacman_newaxis_y < (pacman_new_y - 0.5) * wall.height + delta_y
+    # Movimento VERTICAL (REQUERIMENTO DE POSIÇÃO HORIZONTAL)
+    if x_window:
+        if pacman_cmd == 'd' and pacman_can_go_down:
+            pacman_cmd = ''
+            pacman_vx = 0
+            pacman_vy = pacman_base_speed
+        if pacman_cmd == 'u' and pacman_can_go_up:
+            pacman_cmd = ''
+            pacman_vx = 0
+            pacman_vy = -pacman_base_speed
+
+    # Movimento HORIZONTAL (REQUERIMENTO DE POSIÇÃO VERTICAL)
+    if y_window:
+        if pacman_cmd == 'r' and pacman_can_go_right:
+            pacman_cmd = ''
+            pacman_vx = pacman_base_speed
+            pacman_vy = 0
+        if pacman_cmd == 'l' and pacman_can_go_left:
+            pacman_cmd = ''
+            pacman_vx = -pacman_base_speed
+            pacman_vy = 0
+
+    # Checa condição de colisão de pacman com parede em x
+    if not pacman_can_go_right and pacman_vx > 0 and pacman_newaxis_x >= (pacman_new_x - 0.5) * wall.width:
+        pacman_vx = 0
+    if not pacman_can_go_left and pacman_vx < 0 and pacman_newaxis_x <= (pacman_new_x - 0.5) * wall.width:
+        pacman_vx = 0
+    pacman.x += pacman_vx * dt
+
+    # Checa condição de colisão de pacman com parede em y
+    if not pacman_can_go_up and pacman_vy < 0 and pacman_newaxis_y <= (pacman_new_y - 0.5) * wall.height:
+        pacman_vy = 0
+    if not pacman_can_go_down and pacman_vy > 0 and pacman_newaxis_y >= (pacman_new_y - 0.5) * wall.height:
+        pacman_vy = 0
+    pacman.y += pacman_vy * dt
+
+
+def ia_pacman2():
+    pass
+
+
 print("Hotkeys:")
 print("        N - Gera mapa novo")
 print("        G - Liga/Desliga Grid")
@@ -58,6 +141,7 @@ pacman_facing = 'AFK'
 pacman_vx = 0
 pacman_vy = 0
 pacman_base_speed = 120
+is_pacman_move_list_empty = False
 
 # Portal_Esquerdo
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -206,6 +290,9 @@ while True:
         else:
             #vai para cima
             pacman_cmd = 'u'
+
+    # ia do pacman baseado on algoritmo breadth first, mas 'truncado' para 12 comandos por vez
+
 
     # Determina as tolerâncias de movimento (até quantos pixels errados blinky aceita para fazer curva)
     delta_x = 1
