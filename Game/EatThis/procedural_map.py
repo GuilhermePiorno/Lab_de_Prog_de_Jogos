@@ -435,9 +435,10 @@ def createlevel():
         pass
 
     # reflect the first 14 columns to print the map
-    with open('./EatThis/maze.txt', mode='w', encoding='utf-8') as fout:
+    with open('maze.txt', mode='w', encoding='utf-8') as fout:
         for line in str(tileMap).splitlines():
             s = line[:14]
             fout.write(f'{s + s[::-1]}\n')
             # print(s + s[::-1])
 
+# lembrar de alterar de volta para './EatThis/maze.txt' na linha 438
