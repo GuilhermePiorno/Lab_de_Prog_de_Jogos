@@ -2,6 +2,7 @@
 
 import queue
 from procedural_map import *
+import time
 
 
 def foundTarget(maze, moves):
@@ -22,7 +23,7 @@ def foundTarget(maze, moves):
             i += 1
 
     if(i == k and j == l):
-        print("Foundo: " + moves)
+        print("Found: " + moves)
         return True
     
     return False
@@ -50,11 +51,12 @@ def valid(maze, moves):
     return True
 
 
+start = time.time()
 
 createlevel()
 maze = [[1]*30 for _ in range(33)]
 
-with open('maze.txt', mode='r', encoding='utf-8') as fin:
+with open('maze1.txt', mode='r', encoding='utf-8') as fin:
     fin.readline() #pula a primeira linha vazia
     for i in range(31):
         linha = fin.readline()
@@ -66,8 +68,8 @@ with open('maze.txt', mode='r', encoding='utf-8') as fin:
 # de main.py ou dos objetos blinky e pacman
 blinky_x_index = 2
 blinky_y_index = 2
-pacman_x_index = 2
-pacman_y_index = 20
+pacman_x_index = 12
+pacman_y_index = 11
 
 paths = queue.Queue()
 paths.put("")
@@ -78,5 +80,14 @@ while not foundTarget(maze, add):
     for j in ["L", "R", "D", "U"]:
         put =  add + j
         if valid(maze, put):
-            paths.put(put)
-            print(put)
+            if len(put) < 3:
+                paths.put(put)
+                print(put)
+            else:
+                if((put[-1] == "L" and put[-2] != "R") or (put[-1] == "R" and put[-2] != "L") or 
+                   (put[-1] == "U" and put[-2] != "D") or (put[-1] == "D" and put[-2] != "U")):
+                    paths.put(put)
+                    print(put)
+
+end = time.time()
+print(end-start)
