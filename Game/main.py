@@ -3,9 +3,10 @@ from PPlay.sprite import *
 from PPlay.sound import *
 from EatThis.procedural_map import *
 from EatThis.map_fill import *
-from EatThis.classes import *
+from EatThis.Classes.classes import *
 from EatThis.pacman_moves import *
 import random
+from EatThis.Classes.Level import *
 
 def ia_pacman1():
 
@@ -13,6 +14,7 @@ def ia_pacman1():
     global pacman_vy
     global pacman_facing
     global pacman_cmd
+    global maze
 
     # Mudança de animação de Blinky nas 4 direções cardinais.
     if pacman_vy < 0 and pacman_facing != 'U':
@@ -29,17 +31,17 @@ def ia_pacman1():
         pacman.set_sequence(0, 2, True)
 
     # Coordenadas do pacman em relação ao 0 da fase
-    pacman_newaxis_x = pacman.x - (janela.width / 2 - half_maze_width) + pacman.width / 2
-    pacman_newaxis_y = pacman.y - (janela.height / 2 - half_maze_height) + pacman.height / 2
+    pacman_newaxis_x = pacman.x - (janela.width / 2 - maze.half_maze_width) + pacman.width / 2
+    pacman_newaxis_y = pacman.y - (janela.height / 2 - maze.half_maze_height) + pacman.height / 2
 
     # Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
-    pacman_new_x = pacman_newaxis_x // wall.width + 1
-    pacman_new_y = pacman_newaxis_y // wall.height + 1
+    pacman_new_x = pacman_newaxis_x // maze.wall.width + 1
+    pacman_new_y = pacman_newaxis_y // maze.wall.height + 1
 
-    pacman_can_go_down = level[int(pacman_new_y + 1)][int(pacman_new_x)] == 0
-    pacman_can_go_up = level[int(pacman_new_y - 1)][int(pacman_new_x)] == 0
-    pacman_can_go_left = level[int(pacman_new_y)][int(pacman_new_x - 1)] == 0
-    pacman_can_go_right = level[int(pacman_new_y)][int(pacman_new_x + 1)] == 0
+    pacman_can_go_down = maze.level[int(pacman_new_y + 1)][int(pacman_new_x)] == 0
+    pacman_can_go_up = maze.level[int(pacman_new_y - 1)][int(pacman_new_x)] == 0
+    pacman_can_go_left = maze.level[int(pacman_new_y)][int(pacman_new_x - 1)] == 0
+    pacman_can_go_right = maze.level[int(pacman_new_y)][int(pacman_new_x + 1)] == 0
 
     relative_x_pacman_blinky = blinky.x - pacman.x
     relative_y_pacman_blinky = blinky.y - pacman.y
@@ -67,8 +69,8 @@ def ia_pacman1():
     # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
     delta_x = 1
     delta_y = 1
-    x_window = (pacman_new_x - 0.5) * wall.width - delta_x < pacman_newaxis_x < (pacman_new_x - 0.5) * wall.width + delta_x
-    y_window = (pacman_new_y - 0.5) * wall.height - delta_y < pacman_newaxis_y < (pacman_new_y - 0.5) * wall.height + delta_y
+    x_window = (pacman_new_x - 0.5) * maze.wall.width - delta_x < pacman_newaxis_x < (pacman_new_x - 0.5) * maze.wall.width + delta_x
+    y_window = (pacman_new_y - 0.5) * maze.wall.height - delta_y < pacman_newaxis_y < (pacman_new_y - 0.5) * maze.wall.height + delta_y
     # Movimento VERTICAL (REQUERIMENTO DE POSIÇÃO HORIZONTAL)
     if x_window:
         if pacman_cmd == 'd' and pacman_can_go_down:
@@ -92,16 +94,16 @@ def ia_pacman1():
             pacman_vy = 0
 
     # Checa condição de colisão de pacman com parede em x
-    if not pacman_can_go_right and pacman_vx > 0 and pacman_newaxis_x >= (pacman_new_x - 0.5) * wall.width:
+    if not pacman_can_go_right and pacman_vx > 0 and pacman_newaxis_x >= (pacman_new_x - 0.5) * maze.wall.width:
         pacman_vx = 0
-    if not pacman_can_go_left and pacman_vx < 0 and pacman_newaxis_x <= (pacman_new_x - 0.5) * wall.width:
+    if not pacman_can_go_left and pacman_vx < 0 and pacman_newaxis_x <= (pacman_new_x - 0.5) * maze.wall.width:
         pacman_vx = 0
     pacman.x += pacman_vx * dt
 
     # Checa condição de colisão de pacman com parede em y
-    if not pacman_can_go_up and pacman_vy < 0 and pacman_newaxis_y <= (pacman_new_y - 0.5) * wall.height:
+    if not pacman_can_go_up and pacman_vy < 0 and pacman_newaxis_y <= (pacman_new_y - 0.5) * maze.wall.height:
         pacman_vy = 0
-    if not pacman_can_go_down and pacman_vy > 0 and pacman_newaxis_y >= (pacman_new_y - 0.5) * wall.height:
+    if not pacman_can_go_down and pacman_vy > 0 and pacman_newaxis_y >= (pacman_new_y - 0.5) * maze.wall.height:
         pacman_vy = 0
     pacman.y += pacman_vy * dt
 
@@ -228,29 +230,22 @@ bgm.set_volume(5)
 bgm.set_repeat(True)
 bgm.play()
 
-# Criação da fase inicial
-createlevel()
-level = fill_level(walltype, janela)
-
-# Extrai tamanho do bloco de parede a partir da variável walltype.
-# TODO: Arrumar um jeito de não iniciar blocos e variáveis "atoa".
-wall = GameImage("Sprites/Walls/" + walltype + "/Wall_URDL.png")
-half_maze_width = (28 * wall.width) / 2
-half_maze_height = (31 * wall.height) / 2
+# cria o objeto maze
+maze = Level(walltype, janela)
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
 # blinky = Sprite("./Sprites/Blinky.png", 8)
 blinky = Player("./Sprites/Blinky.png", 8)
-blinky.set_position(janela.width / 2 - half_maze_width + (wall.width * 1.5 - blinky.width / 2),
-                    janela.height / 2 - half_maze_height + (wall.height * 1.5 - blinky.height / 2))
+blinky.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width * 1.5 - blinky.width / 2),
+                    janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - blinky.height / 2))
 blinky.set_sequence_time(0, 8, 100, True)
 blinky.set_sequence(0, 1, True)
 facing = 'AFK'
 
 # Cria o sprite de Pacman e define o número de frames de sua animação.
 pacman = Sprite("./Sprites/pacman.png", 8)
-pacman.set_position(janela.width / 2 + half_maze_width - (wall.width * 1.5 + pacman.width / 2),
-                    janela.height / 2 + half_maze_height - (wall.height * 1.5 + pacman.height / 2))
+pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
+                    janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
 pacman.set_sequence_time(0, 8, 100, True)
 pacman.set_sequence(0, 1, True)
 pacman_facing = 'AFK'
@@ -264,15 +259,15 @@ moves = ""
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
 portal_esquerdo.set_sequence_time(0, 3, 100, True)
 portal_esquerdo.set_sequence(0, 3, True)
-portal_esquerdo.set_position(janela.width / 2 - half_maze_width - wall.width,
-                             janela.height / 2 - half_maze_height + 13.5 * wall.height - 1)
+portal_esquerdo.set_position(janela.width / 2 - maze.half_maze_width - maze.wall.width,
+                             janela.height / 2 - maze.half_maze_height + 13.5 * maze.wall.height - 1)
 
 # Portal_Direito
 portal_direito = Sprite("Sprites/Walls/" + walltype + "/Portal_D.png", 3)
 portal_direito.set_sequence_time(0, 3, 100, True)
 portal_direito.set_sequence(0, 3, True)
-portal_direito.set_position(janela.width / 2 + half_maze_width,
-                            janela.height / 2 - half_maze_height + 13.5 * wall.height - 1)
+portal_direito.set_position(janela.width / 2 + maze.half_maze_width,
+                            janela.height / 2 - maze.half_maze_height + 13.5 * maze.wall.height - 1)
 
 # Inicia variáveis para o FPS.
 FPS = 0
@@ -347,29 +342,29 @@ while True:
         cmd = 'l'
 
     # Coordenadas do blinky em relação ao 0 da fase
-    blinky_newaxis_x = blinky.x - (janela.width / 2 - half_maze_width) + blinky.width / 2
-    blinky_newaxis_y = blinky.y - (janela.height / 2 - half_maze_height) + blinky.height / 2
+    blinky_newaxis_x = blinky.x - (janela.width / 2 - maze.half_maze_width) + blinky.width / 2
+    blinky_newaxis_y = blinky.y - (janela.height / 2 - maze.half_maze_height) + blinky.height / 2
 
     # Versão discretizada das coordenadas do blinky com ajuste (+1) para correspondencia a matriz "level".
-    new_x = blinky_newaxis_x // wall.width + 1
-    new_y = blinky_newaxis_y // wall.height + 1
+    new_x = blinky_newaxis_x // maze.wall.width + 1
+    new_y = blinky_newaxis_y // maze.wall.height + 1
 
-    can_go_down = level[int(new_y + 1)][int(new_x)] == 0
-    can_go_up = level[int(new_y - 1)][int(new_x)] == 0
-    can_go_left = level[int(new_y)][int(new_x - 1)] == 0
-    can_go_right = level[int(new_y)][int(new_x + 1)] == 0
+    can_go_down = maze.level[int(new_y + 1)][int(new_x)] == 0
+    can_go_up = maze.level[int(new_y - 1)][int(new_x)] == 0
+    can_go_left = maze.level[int(new_y)][int(new_x - 1)] == 0
+    can_go_right = maze.level[int(new_y)][int(new_x + 1)] == 0
 
     # ia do pacman baseada na posição relativa do blinky em relação ao pacman
-    #ia_pacman1()
+    ia_pacman1()
 
-    # ia do pacman baseado on algoritmo breadth first, mas 'truncado' para 12 comandos por vez
-    ia_pacman2()
+    # ia do pacman baseado on algoritmo breadth first, mas 'truncado' para 12 comandos por vez (TRAVA O PROGRAMA)
+    #ia_pacman2()
 
     # Determina as tolerâncias de movimento (até quantos pixels errados blinky aceita para fazer curva)
     delta_x = 1
     delta_y = 1
-    x_window = (new_x - 0.5) * wall.width - delta_x < blinky_newaxis_x < (new_x - 0.5) * wall.width + delta_x
-    y_window = (new_y - 0.5) * wall.height - delta_y < blinky_newaxis_y < (new_y - 0.5) * wall.height + delta_y
+    x_window = (new_x - 0.5) * maze.wall.width - delta_x < blinky_newaxis_x < (new_x - 0.5) * maze.wall.width + delta_x
+    y_window = (new_y - 0.5) * maze.wall.height - delta_y < blinky_newaxis_y < (new_y - 0.5) * maze.wall.height + delta_y
     # Condição para aceitar qualquer input de movimento.
     if buffer < 0.5:
         # Movimento VERTICAL (REQUERIMENTO DE POSIÇÃO HORIZONTAL)
@@ -403,28 +398,28 @@ while True:
     #  após o check de reset e devido as velocidades baixas, mas caso a velocidade suba acima de 350 o problema retorna.
     #  Velocidades acima de 350 são ruins de jogar, então o problema foi temporariamente ignorado.
     # Checa condição de colisão de blinky com parede em x
-    if not can_go_right and blinky.vx > 0 and blinky_newaxis_x >= (new_x - 0.5) * wall.width:
+    if not can_go_right and blinky.vx > 0 and blinky_newaxis_x >= (new_x - 0.5) * maze.wall.width:
         blinky.vx = 0
-    if not can_go_left and blinky.vx < 0 and blinky_newaxis_x <= (new_x - 0.5) * wall.width:
+    if not can_go_left and blinky.vx < 0 and blinky_newaxis_x <= (new_x - 0.5) * maze.wall.width:
         blinky.vx = 0
     # Move blinky de acordo com sua velocidade no eixo x
     blinky.x += blinky.vx * dt
 
     # Checa condição de colisão de blinky com parede em y
-    if not can_go_up and blinky.vy < 0 and blinky_newaxis_y <= (new_y - 0.5) * wall.height:
+    if not can_go_up and blinky.vy < 0 and blinky_newaxis_y <= (new_y - 0.5) * maze.wall.height:
         blinky.vy = 0
-    if not can_go_down and blinky.vy > 0 and blinky_newaxis_y >= (new_y - 0.5) * wall.height:
+    if not can_go_down and blinky.vy > 0 and blinky_newaxis_y >= (new_y - 0.5) * maze.wall.height:
         blinky.vy = 0
     # Move blinky de acordo com sua velocidade no eixo y
     blinky.y += blinky.vy * dt
 
     # Checa colisão de blinky com portal esquerdo.
-    if blinky_newaxis_x < 0 + wall.width / 2:  # aka: 0 + 20/2 = 10
-        blinky.x += 2 * half_maze_width - wall.width
+    if blinky_newaxis_x < 0 + maze.wall.width / 2:  # aka: 0 + 20/2 = 10
+        blinky.x += 2 * maze.half_maze_width - maze.wall.width
 
     # Checa colisão de blinky com portal direito.
-    if blinky_newaxis_x > 28 * wall.width - wall.width / 2:  # aka: 28*20 - 20/2 550
-        blinky.x -= 2 * half_maze_width - wall.width
+    if blinky_newaxis_x > 28 * maze.wall.width - maze.wall.width / 2:  # aka: 28*20 - 20/2 550
+        blinky.x -= 2 * maze.half_maze_width - maze.wall.width
 
     # FPS
     tempo += dt
@@ -436,12 +431,7 @@ while True:
 
     janela.set_background_color((0, 0, 0))
     janela.draw_text(str(FPS), 10, janela.height - 50, size=25, color=(255, 255, 0))
-
-    for i in range(33):
-        for j in range(1, 29):
-            if level[i][j] != 0:
-                level[i][j].draw()
-
+    maze.draw()
     blinky.draw()
     blinky.update()
     pacman.draw()

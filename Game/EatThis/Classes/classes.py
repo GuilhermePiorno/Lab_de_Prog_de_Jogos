@@ -58,7 +58,6 @@ class Player(Sprite):
 class Enemy(Sprite):
     def __init__(self, janela, level, image_file, frames=1):
         super().__init__(image_file, frames)
-
         self.base_speed = 50
         self.vx = 0
         self.vy = 0
@@ -174,6 +173,10 @@ class Enemy(Sprite):
             self.vy = 0
         # Move blinky de acordo com sua velocidade no eixo y
         # self.y += self.vy * dt
+
+
+class Map():
+    pass
 
 
 class Point(Sprite):
