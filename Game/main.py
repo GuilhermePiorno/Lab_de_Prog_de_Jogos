@@ -3,10 +3,11 @@ from PPlay.sprite import *
 from PPlay.sound import *
 from EatThis.procedural_map import *
 from EatThis.map_fill import *
-from EatThis.Classes.classes import *
+from EatThis.Classes.classes import Player
 from EatThis.pacman_moves import *
 import random
 from EatThis.Classes.Level import *
+from EatThis.Classes.Enemy import *
 
 def ia_pacman1():
 
@@ -243,17 +244,17 @@ blinky.set_sequence(0, 1, True)
 facing = 'AFK'
 
 # Cria o sprite de Pacman e define o número de frames de sua animação.
-pacman = Sprite("./Sprites/pacman.png", 8)
+pacman = Enemy(janela, maze, "./Sprites/pacman.png", 8)
 pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
                     janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
 pacman.set_sequence_time(0, 8, 100, True)
 pacman.set_sequence(0, 1, True)
-pacman_facing = 'AFK'
-pacman_vx = 0
-pacman_vy = 0
-pacman_base_speed = 120
-pacman_move_list_is_empty = True
-moves = ""
+#pacman_facing = 'AFK'
+#pacman_vx = 0
+#pacman_vy = 0
+#pacman_base_speed = 120
+#pacman_move_list_is_empty = True
+#moves = ""
 
 # Portal_Esquerdo
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -298,8 +299,7 @@ while True:
     if not teclado.key_pressed("N") and not teclado.key_pressed("G") and not teclado.key_pressed("M"):
         TesteDebugMapa = False
     if teclado.key_pressed("N") and not TesteDebugMapa:
-        createlevel()
-        level = fill_level(walltype, janela)
+        maze = Level(walltype, janela)
         TesteDebugMapa = True
 
     if teclado.key_pressed("G") and not TesteDebugMapa:
@@ -310,7 +310,7 @@ while True:
             grid_toggle = True
             walltype += '_Matrix'
         TesteDebugMapa = True
-        level = fill_level(walltype, janela)
+        maze = Level(walltype, janela)
 
     if teclado.key_pressed("M") and not TesteDebugMapa:
         if BGM_Toggle:
@@ -355,7 +355,7 @@ while True:
     can_go_right = maze.level[int(new_y)][int(new_x + 1)] == 0
 
     # ia do pacman baseada na posição relativa do blinky em relação ao pacman
-    ia_pacman1()
+    #ia_pacman1()
 
     # ia do pacman baseado on algoritmo breadth first, mas 'truncado' para 12 comandos por vez (TRAVA O PROGRAMA)
     #ia_pacman2()
@@ -412,6 +412,10 @@ while True:
         blinky.vy = 0
     # Move blinky de acordo com sua velocidade no eixo y
     blinky.y += blinky.vy * dt
+
+    pacman.move1(blinky)
+    pacman.x += pacman.vx * dt
+    pacman.y += pacman.vy * dt
 
     # Checa colisão de blinky com portal esquerdo.
     if blinky_newaxis_x < 0 + maze.wall.width / 2:  # aka: 0 + 20/2 = 10

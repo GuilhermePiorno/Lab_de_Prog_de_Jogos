@@ -5,6 +5,7 @@ from EatThis.procedural_map import *
 class Level():
     def __init__(self, walltype, window):
         self.window = window
+        self.keyboard = self.window.get_keyboard()
         self.walltype = walltype
         self.wall = GameImage("Sprites/Walls/" + self.walltype + "/Wall_URDL.png")
         self.half_maze_height = (self.wall.height * 31) / 2
