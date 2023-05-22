@@ -82,6 +82,8 @@ while True:
         TesteDebugMapa = False
     if teclado.key_pressed("N") and not TesteDebugMapa:
         maze = Level(walltype, janela)
+        blinky.level = maze  # Atualiza o level do blinky
+        pacman.level = maze  # Atualiza o level do pacman
         TesteDebugMapa = True
 
     if teclado.key_pressed("G") and not TesteDebugMapa:
@@ -92,7 +94,8 @@ while True:
             grid_toggle = True
             walltype += '_Matrix'
         TesteDebugMapa = True
-        maze = Level(walltype, janela)
+        maze.walltype = walltype  # Atualiza o walltype do maze
+        maze.level = maze.fill_level()  # Atualiza o level do maze para incluir a walltype nova
 
     if teclado.key_pressed("M") and not TesteDebugMapa:
         if BGM_Toggle:
