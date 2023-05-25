@@ -11,19 +11,16 @@ def fill_level(walltype, janela):
     :return: matrix[31][28]
     """
 
-    # Acessa o labirinto criado e armazena os sprites criados em uma matriz para depois ser desenhada
-    with open('./EatThis/maze.txt', mode='r', encoding='utf-8') as fin:
-        i = 0
-        # linha 0 e linha 32 são vazias.
-        level = [[0] * 30 for _ in range(33)]
-        for linha in fin:
-            for j in range(len(linha)):
-                if linha[j] == '|':
-                    level[i][j + 1] = 1
-                else:
-                    level[i][j + 1] = 0
-            i += 1
+    level = [[1]*30 for _ in range(33)]
 
+    with open('maze.txt', mode='r', encoding='utf-8') as fin:
+        fin.readline() #pula a primeira linha vazia
+        for i in range(31):
+            linha = fin.readline()
+            for j in range(28):
+                if(linha[j] != "|"):
+                    level[i+1][j+1] = 0
+    
         # Altera o sprite das paredes para fazerem sentido
         deslocamento_xy = [-1, 0, 1, 0, -1]
         deslocamento_diagonal = [-1, 1, 1, -1, -1]
