@@ -41,27 +41,10 @@ class Enemy(Sprite):
         can_go_left = (self.level.level[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] == 0)
         can_go_right = (self.level.level[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] == 0)
 
-        relative_x_pacman_blinky, relative_y_pacman_blinky = self.relative_position_of_target(target)
+        # ia do pacman baseada na posição relativa
+        self.ia_pacman_1(target)
 
-        #ia 'burra' do pacman
-        #com essa lógica de movimentação, o pacman fica frequentemente 'preso' correndo contra paredes. Talvez implementar
-        #alguma funcionalidade que impeça ele de ficar correndo contra uma parede por mais de algum tempo máximo
-        if(abs(relative_x_pacman_blinky) > abs(relative_y_pacman_blinky)):
-            # se movimentará na direção horizontal
-            if(relative_x_pacman_blinky>0):
-                #vai para a direita
-                self.cmd = 'r'
-            else:
-                #vai para a esquerda
-                self.cmd = 'l'
-        else:
-            #se movimentará na direção vertical
-            if(relative_y_pacman_blinky>0):
-                #vai para baixo
-                self.cmd = 'd'
-            else:
-                #vai para cima
-                self.cmd = 'u'
+        # ia do pacman baseada no algoritmo a*
     
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1
@@ -101,6 +84,29 @@ class Enemy(Sprite):
             self.vy = 0
         if not can_go_down and self.vy > 0 and self.maze_axis[1] >= (self.matrix_position[1] - 0.5) * self.level.wall.height:
             self.vy = 0
+
+    def ia_pacman_1(self, target):
+        relative_x_pacman_blinky, relative_y_pacman_blinky = self.relative_position_of_target(target)
+
+        #ia 'burra' do pacman
+        #com essa lógica de movimentação, o pacman fica frequentemente 'preso' correndo contra paredes. Talvez implementar
+        #alguma funcionalidade que impeça ele de ficar correndo contra uma parede por mais de algum tempo máximo
+        if(abs(relative_x_pacman_blinky) > abs(relative_y_pacman_blinky)):
+            # se movimentará na direção horizontal
+            if(relative_x_pacman_blinky>0):
+                #vai para a direita
+                self.cmd = 'r'
+            else:
+                #vai para a esquerda
+                self.cmd = 'l'
+        else:
+            #se movimentará na direção vertical
+            if(relative_y_pacman_blinky>0):
+                #vai para baixo
+                self.cmd = 'd'
+            else:
+                #vai para cima
+                self.cmd = 'u'
 
     def relative_position_of_target(self, target):
         return (target.x - self.x, target.y - self.y)
