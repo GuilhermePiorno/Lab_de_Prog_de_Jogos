@@ -9,6 +9,7 @@ import random
 from EatThis.Classes.Level import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
+import time
 
 
 print("Hotkeys:")
@@ -44,7 +45,7 @@ blinky.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width *
                     janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - blinky.height / 2))
 blinky.set_sequence_time(0, 8, 100, True)
 blinky.set_sequence(0, 1, True)
-#facing = 'AFK'
+# facing = 'AFK'
 
 # Cria o sprite de Pacman e define o número de frames de sua animação.
 pacman = Enemy(janela, maze, "./Sprites/pacman.png", 8)
@@ -96,11 +97,20 @@ while True:
         TesteDebugMapa = True
         maze.walltype = walltype  # Atualiza o walltype do maze
         maze.level = maze.fill_level()  # Atualiza o level do maze para incluir a walltype nova
-
+    blinky.get_flow_field()
+    # print(blinky.sinkmatrix[int(pacman.matrix_position[1])][int(pacman.matrix_position[0])])
+    # print(blinky.matrix_position)
+    # print(blinky.sinkmatrix)
+    print(pacman.matrix_position)
     if teclado.key_pressed("M") and not TesteDebugMapa:
         if BGM_Toggle:
             BGM_Toggle = False
             bgm.pause()
+            s = time.time()
+            blinky.get_flow_field()
+            f = time.time()
+            # 0.0004994869232177734
+            print(f-s)
         else:
             BGM_Toggle = True
             bgm.unpause()

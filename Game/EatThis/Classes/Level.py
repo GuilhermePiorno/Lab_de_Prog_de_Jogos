@@ -1,6 +1,22 @@
 from PPlay.gameimage import *
 from EatThis.procedural_map import *
 
+# Auxilia na criação da matriz pathing (apenas 0 e 1)
+# Provavelmente é possível criar esta matriz durante a execução de fill_level() em vez de criar uma função separada.
+def create_path_matrix():
+    with open('./EatThis/maze.txt', mode='r', encoding='utf-8') as fin:
+        i = 0
+        # linha 0 e linha 32 são vazias.
+        level = [[0] * 30 for _ in range(33)]
+        for linha in fin:
+            for j in range(len(linha)):
+                if linha[j] == '|':
+                    level[i][j + 1] = 1
+                else:
+                    level[i][j + 1] = 0
+            i += 1
+    return level
+
 
 class Level():
     def __init__(self, walltype, window):
@@ -12,6 +28,7 @@ class Level():
         self.half_maze_width = (self.wall.width * 28) / 2
         createlevel()
         self.level = self.fill_level()
+        self.pathing = create_path_matrix()
 
     def fill_level(self):
         """ Preenche a matriz com os objectos de paredes de pontos. \n
@@ -100,9 +117,9 @@ class Level():
         level[15][1] = 0
         level[15][28] = 0
         return level
-    
+
     def draw(self):
         for i in range(33):
             for j in range(1, 29):
-                if self.level[i][j] != 0:
+                if isinstance(self.level[i][j], GameImage):
                     self.level[i][j].draw()

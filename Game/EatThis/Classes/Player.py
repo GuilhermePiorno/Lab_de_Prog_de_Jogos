@@ -1,4 +1,5 @@
 from PPlay.sprite import *
+from copy import deepcopy
 
 class Player(Sprite):
     def __init__(self, window, level, image_file, frames=1):
@@ -10,9 +11,11 @@ class Player(Sprite):
         self.window = window
         self.keyboard = self.window.get_keyboard()
         self.level = level
+        # self.sinkmatrix = self.level.pathing.copy()
+        self.sinkmatrix = deepcopy(self.level.pathing)
         self.buffer = 0
         self.facing = 'AFK'
-        self.maze_axis = (self.x - (window.width / 2 - level.half_maze_width) + self.width / 2, 
+        self.maze_axis = (self.x - (window.width / 2 - level.half_maze_width) + self.width / 2,
                           self.y - (window.height / 2 - level.half_maze_height) + self.height / 2)
         self.matrix_position = (self.maze_axis[0] // level.wall.width + 1, self.maze_axis[1] // level.wall.width + 1)
 
@@ -30,7 +33,7 @@ class Player(Sprite):
         if self.vx > 0 and self.facing != 'R':
             self.facing = 'R'
             self.set_sequence(0, 2, True)
-            
+
         if self.keyboard.key_pressed("UP"):
             self.buffer = 0
             self.cmd = 'u'
@@ -46,20 +49,22 @@ class Player(Sprite):
 
         # Coordenadas do pacman em relação ao 0 da fase
         self.maze_axis = self.get_maze_axis()
-        
-        #Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
+
+        # Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
         self.matrix_position = self.get_matrix_position()
-        
-        can_go_down = (self.level.level[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] == 0)
-        can_go_up = (self.level.level[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] == 0)
-        can_go_left = (self.level.level[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] == 0)
-        can_go_right = (self.level.level[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] == 0)
+
+        can_go_down = (self.level.pathing[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] <= 0)
+        can_go_up = (self.level.pathing[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] <= 0)
+        can_go_left = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] <= 0)
+        can_go_right = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] <= 0)
 
         # Determina as tolerâncias de movimento (até quantos pixels errados blinky aceita para fazer curva)
         delta_x = 1
         delta_y = 1
-        x_window = (self.matrix_position[0] - 0.5) * self.level.wall.width - delta_x < self.maze_axis[0] < (self.matrix_position[0] - 0.5) * self.level.wall.width + delta_x
-        y_window = (self.matrix_position[1] - 0.5) * self.level.wall.height - delta_y < self.maze_axis[1] < (self.matrix_position[1] - 0.5) * self.level.wall.height + delta_y
+        x_window = (self.matrix_position[0] - 0.5) * self.level.wall.width - delta_x < self.maze_axis[0] < (
+                    self.matrix_position[0] - 0.5) * self.level.wall.width + delta_x
+        y_window = (self.matrix_position[1] - 0.5) * self.level.wall.height - delta_y < self.maze_axis[1] < (
+                    self.matrix_position[1] - 0.5) * self.level.wall.height + delta_y
         # Condição para aceitar qualquer input de movimento.
         if self.buffer < 0.5:
             # Movimento VERTICAL (REQUERIMENTO DE POSIÇÃO HORIZONTAL)
@@ -88,17 +93,21 @@ class Player(Sprite):
         #  similar ao problema de deslizamento do pong. Este problema foi remediado colocando a atualização de posição
         #  após o check de reset e devido as velocidades baixas, mas caso a velocidade suba acima de 350 o problema retorna.
         #  Velocidades acima de 350 são ruins de jogar, então o problema foi temporariamente ignorado.
-        
+
         # Checa condição de colisão com parede em x
-        if not can_go_right and self.vx > 0 and self.maze_axis[0] >= (self.matrix_position[0] - 0.5) * self.level.wall.width:
+        if not can_go_right and self.vx > 0 and self.maze_axis[0] >= (
+                self.matrix_position[0] - 0.5) * self.level.wall.width:
             self.vx = 0
-        if not can_go_left and self.vx < 0 and self.maze_axis[0] <= (self.matrix_position[0] - 0.5) * self.level.wall.width:
+        if not can_go_left and self.vx < 0 and self.maze_axis[0] <= (
+                self.matrix_position[0] - 0.5) * self.level.wall.width:
             self.vx = 0
 
         # Checa condição de colisão com parede em y
-        if not can_go_up and self.vy < 0 and self.maze_axis[1] <= (self.matrix_position[1] - 0.5) * self.level.wall.height:
+        if not can_go_up and self.vy < 0 and self.maze_axis[1] <= (
+                self.matrix_position[1] - 0.5) * self.level.wall.height:
             self.vy = 0
-        if not can_go_down and self.vy > 0 and self.maze_axis[1] >= (self.matrix_position[1] - 0.5) * self.level.wall.height:
+        if not can_go_down and self.vy > 0 and self.maze_axis[1] >= (
+                self.matrix_position[1] - 0.5) * self.level.wall.height:
             self.vy = 0
 
         # Checa colisão de blinky com portal esquerdo.
@@ -110,15 +119,46 @@ class Player(Sprite):
             self.x -= 2 * self.level.half_maze_width - self.level.wall.width
 
     def get_maze_axis(self):
-        return (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2, 
+        return (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2,
                 self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2)
 
     def get_matrix_position(self):
-        return ((self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1, 
-                (self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1)
+        return (
+        (int(self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1),
+        (int(self.y - (
+                    self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1))
 
     def set_maze_axis(self):
         pass
 
     def set_matrix_position(self):
         pass
+
+    def get_flow_field(self, lista=None):
+        cardinallookups = [[-1, 0], [0, 1], [1, 0], [0, -1]]
+        if lista is None:
+            # aux = deepcopy(self.sinkmatrix)
+            # self.sinkmatrix = deepcopy(self.level.pathing)
+            self.sinkmatrix = deepcopy(self.level.pathing)
+            # print("New sink")
+            targetstart = self.get_matrix_position()
+            lista = [[targetstart[0], targetstart[1]]]
+            self.sinkmatrix[lista[0][0]][lista[0][1]] = -900
+
+        nexttargets = []
+        for i in range(len(lista)):
+            for j in range(4):
+                linha = lista[i][0] + cardinallookups[j][0]
+                coluna = lista[i][1] + cardinallookups[j][1]
+                if isinstance(self.sinkmatrix[linha][coluna], int) and self.sinkmatrix[linha][coluna] == 0:
+                    self.sinkmatrix[linha][coluna] = self.sinkmatrix[lista[i][0]][lista[i][1]] + 1
+                    nexttargets.append([linha, coluna])
+        # print(nexttargets)
+        if len(nexttargets) == 0:
+            # self.level.pathing = self.sinkmatrix
+            # self.sinkmatrix = aux
+            return
+        self.get_flow_field(nexttargets)
+        return
+
+

@@ -33,35 +33,42 @@ class Enemy(Sprite):
         # Coordenadas do pacman em relação ao 0 da fase
         self.maze_axis = self.get_maze_axis()
         
-        #Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
+        # Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
         self.matrix_position = self.get_matrix_position()
         
-        can_go_down = (self.level.level[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] == 0)
-        can_go_up = (self.level.level[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] == 0)
-        can_go_left = (self.level.level[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] == 0)
-        can_go_right = (self.level.level[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] == 0)
+        can_go_down = (self.level.pathing[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] <= 0)
+        can_go_up = (self.level.pathing[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] <= 0)
+        can_go_left = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] <= 0)
+        can_go_right = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] <= 0)
 
         relative_x_pacman_blinky, relative_y_pacman_blinky = self.relative_position_of_target(target)
 
         #ia 'burra' do pacman
         #com essa lógica de movimentação, o pacman fica frequentemente 'preso' correndo contra paredes. Talvez implementar
         #alguma funcionalidade que impeça ele de ficar correndo contra uma parede por mais de algum tempo máximo
-        if(abs(relative_x_pacman_blinky) > abs(relative_y_pacman_blinky)):
-            # se movimentará na direção horizontal
-            if(relative_x_pacman_blinky>0):
-                #vai para a direita
-                self.cmd = 'r'
-            else:
-                #vai para a esquerda
-                self.cmd = 'l'
-        else:
-            #se movimentará na direção vertical
-            if(relative_y_pacman_blinky>0):
-                #vai para baixo
-                self.cmd = 'd'
-            else:
-                #vai para cima
-                self.cmd = 'u'
+
+
+
+        # print(f"{self.matrix_position}: {self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]}")
+        """ 
+       if self.level.pathing[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] < self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'd'
+        if self.level.pathing[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] < self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'u'
+        if self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] < self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'l'
+        if self.level.pathing[int(self.matrix_position[1] + 1)][int(self.matrix_position[0] + 1)] < self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'r'
+        """
+
+        if target.sinkmatrix[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'd'
+        if target.sinkmatrix[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'u'
+        if target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'l'
+        if target.sinkmatrix[int(self.matrix_position[1] + 1)][int(self.matrix_position[0] + 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'r'
     
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1
