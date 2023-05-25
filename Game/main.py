@@ -6,7 +6,7 @@ from EatThis.map_fill import *
 #from EatThis.Classes.classes import Player
 from EatThis.pacman_moves import *
 import random
-from EatThis.Classes.Level import *
+from EatThis.Classes.Maze import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
 
@@ -35,7 +35,7 @@ bgm.set_repeat(True)
 bgm.play()
 
 # cria o objeto maze
-maze = Level(walltype, janela)
+maze = Maze(walltype, janela)
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
 # blinky = Sprite("./Sprites/Blinky.png", 8)
@@ -81,7 +81,7 @@ while True:
     if not teclado.key_pressed("N") and not teclado.key_pressed("G") and not teclado.key_pressed("M"):
         TesteDebugMapa = False
     if teclado.key_pressed("N") and not TesteDebugMapa:
-        maze = Level(walltype, janela)
+        maze = Maze(walltype, janela)
         blinky.level = maze  # Atualiza o level do blinky
         pacman.level = maze  # Atualiza o level do pacman
         TesteDebugMapa = True
