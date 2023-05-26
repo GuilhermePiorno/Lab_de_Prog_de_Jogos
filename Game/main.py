@@ -168,11 +168,11 @@ while True:
 
     janela.draw_text("pacman_cmd: " + str(pacman.cmd), 30, 30, 30, color=(255,0,0))
 
-    janela.draw_text("pacman line: " + str(pacman.get_matrix_coordinates()[0]), 30, 60, 30, color=(255,0,0))
-    janela.draw_text("pacman col: " + str(pacman.get_matrix_coordinates()[1]), 30, 90, 30, color=(255,0,0))
+    #janela.draw_text("pacman line: " + str(pacman.get_matrix_coordinates()[0]), 30, 60, 30, color=(255,0,0))
+    #janela.draw_text("pacman col: " + str(pacman.get_matrix_coordinates()[1]), 30, 90, 30, color=(255,0,0))
 
-    janela.draw_text("blinky line: " + str(blinky.get_matrix_coordinates()[0]), 30, 120, 30, color=(255,0,0))
-    janela.draw_text("blinky col: " + str(blinky.get_matrix_coordinates()[1]), 30, 150, 30, color=(255,0,0))
+    #janela.draw_text("blinky line: " + str(blinky.get_matrix_coordinates()[0]), 30, 120, 30, color=(255,0,0))
+    #janela.draw_text("blinky col: " + str(blinky.get_matrix_coordinates()[1]), 30, 150, 30, color=(255,0,0))
     
     #janela.draw_text("pacman x: " + str(pacman.x), 30, 120, 30, color=(255,0,0))
     #janela.draw_text("pacman y: " + str(pacman.y), 30, 150, 30, color=(255,0,0))

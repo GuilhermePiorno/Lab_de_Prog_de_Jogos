@@ -130,15 +130,16 @@ class Enemy(Sprite):
         graph_path.append(target.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
         #print(graph_path)
         self.cmdstr = matrix_path(graph_path, self.get_matrix_coordinates())
-        print(self.cmdstr)
-        print(self.cmd)
+        self.cmd = self.cmdstr[0].lower()
+        #print(self.cmdstr)
+        #print(self.cmd)
 
         #print('cmdstr: ' + cmdstr)
         #print('self.cmdstr: ' + self.cmdstr)
         #print(self.cmdstr == cmdstr)
-        if(self.changed_cell or (self.cmdstr == cmdstr)):
-            self.cmd = self.get_cmd_from_cmdstack(cmdstr)
-        self.changed_cell = False
+        #if(self.changed_cell or (self.cmdstr == cmdstr)):
+            #self.cmd = self.get_cmd_from_cmdstack(cmdstr)
+        #self.changed_cell = False
         #print(self.cmd)
 
     def ia_pacman_testes(self):
