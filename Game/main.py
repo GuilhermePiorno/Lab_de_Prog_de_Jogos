@@ -9,6 +9,8 @@ import random
 from EatThis.Classes.Maze import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
+from EatThis.Classes.MazeGraph import *
+from EatThis.a_star import *
 
 
 print("Hotkeys:")
@@ -36,6 +38,11 @@ bgm.play()
 
 # cria o objeto maze
 maze = Maze(walltype, janela)
+# cria o grafo a partir desse maze
+maze_graph = MazeGraph(maze.level)
+maze_graph.create_graph()
+#print(maze_graph)
+#print(maze_graph.graph)
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
 # blinky = Sprite("./Sprites/Blinky.png", 8)
@@ -52,6 +59,16 @@ pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width *
                     janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
 pacman.set_sequence_time(0, 8, 100, True)
 pacman.set_sequence(0, 1, True)
+
+# cria o caminho (no grafo) do pacman até o blinky
+#graph_path = a_star(maze_graph, pacman.get_matrix_position(), blinky.get_matrix_position())
+#graph_path.append(blinky.get_matrix_position()) # gambiarra: deve dar pra fazer isso dentro da função
+#print(graph_path)
+graph_path = a_star(maze_graph, (30,27), (2, 2))
+graph_path.append((2, 2)) # gambiarra: deve dar pra fazer isso dentro da função
+print(graph_path)
+pacman_cmds = matrix_path(graph_path, (30, 27))
+print(pacman_cmds)
 
 # Portal_Esquerdo
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -114,7 +131,7 @@ while True:
     blinky.x += blinky.vx * dt
     blinky.y += blinky.vy * dt
 
-    pacman.move1(blinky)
+    pacman.move1(blinky, pacman_cmds)
     pacman.x += pacman.vx * dt
     pacman.y += pacman.vy * dt
 
@@ -138,4 +155,6 @@ while True:
     portal_direito.draw()
     portal_direito.update()    
     janela.draw_text("pacman_cmd: " + str(pacman.cmd), 30, 30, 30, color=(255,0,0))
+    janela.draw_text("pacman line: " + str(pacman.get_matrix_position()[0]), 30, 60, 30, color=(255,0,0))
+    janela.draw_text("pacman_col: " + str(pacman.get_matrix_position()[1]), 30, 90, 30, color=(255,0,0))
     janela.update()

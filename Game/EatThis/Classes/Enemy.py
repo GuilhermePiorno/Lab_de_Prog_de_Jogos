@@ -1,5 +1,5 @@
 from PPlay.sprite import *
-
+from queue import LifoQueue
 
 class Enemy(Sprite):
     def __init__(self, window, level, image_file, frames=1):
@@ -14,8 +14,10 @@ class Enemy(Sprite):
         self.maze_axis = (self.x - (window.width / 2 - level.half_maze_width) + self.width / 2, 
                           self.y - (window.height / 2 - level.half_maze_height) + self.height / 2)
         self.matrix_position = (self.maze_axis[0] // level.wall.width + 1, self.maze_axis[1] // level.wall.width + 1)
+        self.cmdstr = ''
+        self.cmd_stack = LifoQueue()
 
-    def move1(self, target):
+    def move1(self, target, cmds):
         # Mudança de animação de Blinky nas 4 direções cardinais.
         if self.vy < 0 and self.facing != 'U':
             self.facing = 'U'
@@ -42,9 +44,10 @@ class Enemy(Sprite):
         can_go_right = (self.level.level[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] == 0)
 
         # ia do pacman baseada na posição relativa
-        self.ia_pacman_1(target)
+        #self.ia_pacman_1(target)
 
         # ia do pacman baseada no algoritmo a*
+        self.ia_pacman_2(target, cmds)
     
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1
@@ -108,8 +111,29 @@ class Enemy(Sprite):
                 #vai para cima
                 self.cmd = 'u'
 
+    def ia_pacman_2(self, target, cmdstr):
+        pass
+
+    def get_cmd_from_cmdstr(self, cmdstr):
+        if(self.cmdstr != cmdstr):
+            self.cmdstr = cmdstr
+            self.cmd_stack = LifoQueue()
+            for i in range(-1, (-1)*len(cmdstr)-1, -1):
+                self.cmd_stack.put(cmdstr[i])
+            return self.cmd_stack.get()
+        else:
+            if len(self.cmd_stack != 0):
+                return self.cmd_stack.get()
+
+
     def relative_position_of_target(self, target):
         return (target.x - self.x, target.y - self.y)
+    
+    def moved_one_matrix_cell(self, last_matrix_position):
+        if(last_matrix_position != self.get_matrix_position()):
+            return True
+        else:
+            return False
 
     def get_maze_axis(self):
         return (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2, 
