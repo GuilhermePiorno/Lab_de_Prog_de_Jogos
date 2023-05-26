@@ -17,7 +17,7 @@ class Enemy(Sprite):
         self.cmdstr = ''
         self.cmd_stack = LifoQueue()
 
-    def move1(self, target, cmds):
+    def move1(self, target, cmdstr):
         # Mudança de animação de Blinky nas 4 direções cardinais.
         if self.vy < 0 and self.facing != 'U':
             self.facing = 'U'
@@ -47,7 +47,7 @@ class Enemy(Sprite):
         #self.ia_pacman_1(target)
 
         # ia do pacman baseada no algoritmo a*
-        self.ia_pacman_2(target, cmds)
+        self.ia_pacman_2(target, cmdstr)
     
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1
@@ -112,24 +112,33 @@ class Enemy(Sprite):
                 self.cmd = 'u'
 
     def ia_pacman_2(self, target, cmdstr):
-        pass
+        #print('cmdstr: ' + cmdstr)
+        #print('self.cmdstr: ' + self.cmdstr)
+        #print(self.cmdstr == cmdstr)
+        self.cmd = self.get_cmd_from_cmdstack(cmdstr)
+        print(self.cmd)
 
-    def get_cmd_from_cmdstr(self, cmdstr):
+    def get_cmd_from_cmdstack(self, cmdstr):
+        if(self.cmd_stack.empty()):
+            for i in range(-1, (-1)*len(cmdstr)-1, -1):
+                self.cmd_stack.put(cmdstr[i])
+
         if(self.cmdstr != cmdstr):
             self.cmdstr = cmdstr
             self.cmd_stack = LifoQueue()
             for i in range(-1, (-1)*len(cmdstr)-1, -1):
                 self.cmd_stack.put(cmdstr[i])
-            return self.cmd_stack.get()
+            teste = self.cmd_stack.get()
+            return teste
         else:
-            if len(self.cmd_stack != 0):
-                return self.cmd_stack.get()
-
+            if self.cmd_stack.qsize() != 0:
+                teste = self.cmd_stack.get()
+                return teste
 
     def relative_position_of_target(self, target):
         return (target.x - self.x, target.y - self.y)
     
-    def moved_one_matrix_cell(self, last_matrix_position):
+    def changed_matrix_cell(self, last_matrix_position):
         if(last_matrix_position != self.get_matrix_position()):
             return True
         else:

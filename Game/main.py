@@ -11,6 +11,7 @@ from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
 from EatThis.Classes.MazeGraph import *
 from EatThis.a_star import *
+import time
 
 
 print("Hotkeys:")
@@ -30,11 +31,13 @@ pacman_cmd = ''
 grid_toggle = False
 BGM_Toggle = True
 
+"""
 # Background Music.
 bgm = Sound("music/Unreal Super Hero 3 by Kenet & Rez.mp3")
 bgm.set_volume(5)
 bgm.set_repeat(True)
 bgm.play()
+"""
 
 # cria o objeto maze
 maze = Maze(walltype, janela)
@@ -66,9 +69,10 @@ pacman.set_sequence(0, 1, True)
 #print(graph_path)
 graph_path = a_star(maze_graph, (30,27), (2, 2))
 graph_path.append((2, 2)) # gambiarra: deve dar pra fazer isso dentro da função
-print(graph_path)
+#print(graph_path)
 pacman_cmds = matrix_path(graph_path, (30, 27))
-print(pacman_cmds)
+#print(pacman_cmds)
+pacman.cmdstr = pacman_cmds
 
 # Portal_Esquerdo
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -93,7 +97,7 @@ while True:
     # Leitura de Entradas
 
     dt = janela.delta_time()
-
+    """
     # Código para a geração do mapa para testes.
     if not teclado.key_pressed("N") and not teclado.key_pressed("G") and not teclado.key_pressed("M"):
         TesteDebugMapa = False
@@ -122,7 +126,7 @@ while True:
             BGM_Toggle = True
             bgm.unpause()
         TesteDebugMapa = True
-
+    """
 
     # Atualiza buffer de inputs
     blinky.buffer += dt
