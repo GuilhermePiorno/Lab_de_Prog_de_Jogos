@@ -16,6 +16,7 @@ class Enemy(Sprite):
         self.matrix_position = (self.maze_axis[0] // level.wall.width + 1, self.maze_axis[1] // level.wall.width + 1)
         self.cmdstr = ''
         self.cmd_stack = LifoQueue()
+        self.changed_cell = False
 
     def move1(self, target, cmdstr):
         # Mudança de animação de Blinky nas 4 direções cardinais.
@@ -115,8 +116,10 @@ class Enemy(Sprite):
         #print('cmdstr: ' + cmdstr)
         #print('self.cmdstr: ' + self.cmdstr)
         #print(self.cmdstr == cmdstr)
-        self.cmd = self.get_cmd_from_cmdstack(cmdstr)
-        print(self.cmd)
+        if(self.changed_cell or (self.cmdstr == cmdstr)):
+            self.cmd = self.get_cmd_from_cmdstack(cmdstr)
+        self.changed_cell = False
+        #print(self.cmd)
 
     def get_cmd_from_cmdstack(self, cmdstr):
         if(self.cmd_stack.empty()):
@@ -128,12 +131,10 @@ class Enemy(Sprite):
             self.cmd_stack = LifoQueue()
             for i in range(-1, (-1)*len(cmdstr)-1, -1):
                 self.cmd_stack.put(cmdstr[i])
-            teste = self.cmd_stack.get()
-            return teste
+            return self.cmd_stack.get().lower()
         else:
             if self.cmd_stack.qsize() != 0:
-                teste = self.cmd_stack.get()
-                return teste
+                return self.cmd_stack.get().lower()
 
     def relative_position_of_target(self, target):
         return (target.x - self.x, target.y - self.y)

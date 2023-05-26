@@ -135,9 +135,16 @@ while True:
     blinky.x += blinky.vx * dt
     blinky.y += blinky.vy * dt
 
+    p1 = pacman.get_matrix_position()
     pacman.move1(blinky, pacman_cmds)
     pacman.x += pacman.vx * dt
     pacman.y += pacman.vy * dt
+    p2 = pacman.get_matrix_position()
+
+    #print(f"p1: {p1}")
+    #print(f"p2: {p2}")
+    if (p2 != p1):
+        pacman.changed_cell = True
 
     # FPS
     tempo += dt
