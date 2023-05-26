@@ -7,7 +7,7 @@ class Enemy(Sprite):
         super().__init__(image_file, frames)
         self.vx = 0
         self.vy = 0
-        self.base_speed = 100
+        self.base_speed = 110
         self.cmd = ''
         self.window = window
         self.level = level
@@ -130,7 +130,11 @@ class Enemy(Sprite):
         graph_path.append(target.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
         #print(graph_path)
         self.cmdstr = matrix_path(graph_path, self.get_matrix_coordinates())
-        self.cmd = self.cmdstr[0].lower()
+        if(len(self.cmdstr) != 0):
+            self.cmd = self.cmdstr[0].lower()
+        else:
+            self.vx = 0
+            self.vy = 0
         #print(self.cmdstr)
         #print(self.cmd)
 
