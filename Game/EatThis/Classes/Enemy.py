@@ -52,7 +52,7 @@ class Enemy(Sprite):
         #self.ia_pacman_1(target)
 
         # ia do pacman baseada no algoritmo a*
-        self.ia_pacman_2(target, maze_graph)
+        # self.ia_pacman_2(target, maze_graph)
 
         # ia do pacman baseada no algoritmo flowfield
         self.ia_pacman_follow(target)

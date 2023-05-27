@@ -1,14 +1,6 @@
-Acertar as consequências da troca.
-
-Create SuperClass for Enemies.
-
 Spawn points for pacman to collect
 
 Pacman points interaction (collisions or matrix lookup, probably collisions idk)
-
-Pacman AI
-
-Support for multiple Pacman AIs (for harder later levels)
 
 Transitions when level has been beaten (portal change)
 
