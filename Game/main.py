@@ -88,6 +88,9 @@ while True:
         TesteDebugMapa = False
     if teclado.key_pressed("N") and not TesteDebugMapa:
         maze = Maze(walltype, janela)
+        # cria o grafo a partir desse maze
+        maze_graph = MazeGraph(maze.level)
+        maze_graph.create_graph()
         blinky.level = maze  # Atualiza o level do blinky
         pacman.level = maze  # Atualiza o level do pacman
         TesteDebugMapa = True
