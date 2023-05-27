@@ -20,7 +20,7 @@ def create_path_matrix(): # Cria uma matriz com 0 e 1 para auxiliar na criação
     return mat
 
 
-class Level():
+class Maze:
     def __init__(self, walltype, window):
         self.window = window
         self.keyboard = self.window.get_keyboard()

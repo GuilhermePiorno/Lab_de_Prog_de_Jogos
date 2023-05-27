@@ -41,17 +41,7 @@ class Enemy(Sprite):
         can_go_left = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] <= 0)
         can_go_right = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] <= 0)
 
-
-        # Consulta a "sinkmatrix" para determinar a direção de movimento.
-        # A matriz sink é uma matriz de mesma dimensão que a matriz "level" que contém valores de "distancia" de cada célula até o blinky.
-        if target.sinkmatrix[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
-            self.cmd = 'd'
-        if target.sinkmatrix[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
-            self.cmd = 'u'
-        if target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
-            self.cmd = 'l'
-        if target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
-            self.cmd = 'r'
+        self.ia_pacman_follow(target)
     
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1
@@ -117,3 +107,15 @@ class Enemy(Sprite):
 
     def set_matrix_position(self):
         pass
+
+    def ia_pacman_follow(self, target):
+        # Consulta a "sinkmatrix" para determinar a direção de movimento.
+        # A matriz sink é uma matriz de mesma dimensão que a matriz "level" que contém valores de "distancia" de cada célula até o blinky.
+        if target.sinkmatrix[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'd'
+        if target.sinkmatrix[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'u'
+        if target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'l'
+        if target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+            self.cmd = 'r'
