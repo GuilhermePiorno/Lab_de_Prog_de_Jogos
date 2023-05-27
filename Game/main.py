@@ -9,6 +9,7 @@ import random
 from EatThis.Classes.Level import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
+import random
 import time
 
 
@@ -30,7 +31,15 @@ grid_toggle = False
 BGM_Toggle = True
 
 # Background Music.
-bgm = Sound("music/Unreal Super Hero 3 by Kenet & Rez.mp3")
+sorteio = random.random()
+if sorteio < 0.25:
+    bgm = Sound("music/Unreal Super Hero 3 by Kenet & Rez.mp3")
+elif sorteio < 0.5:
+    bgm = Sound("music/FLCTR4 (feat. Zabutom).mp3")
+elif sorteio < 0.75:
+    bgm = Sound("music/The Arcane Golem.mp3")
+else:
+    bgm = Sound("music/The Bat Matriarch.mp3")
 bgm.set_volume(5)
 bgm.set_repeat(True)
 bgm.play()
@@ -53,6 +62,12 @@ pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width *
                     janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
 pacman.set_sequence_time(0, 8, 100, True)
 pacman.set_sequence(0, 1, True)
+
+# pacman2 = Enemy(janela, maze, "./Sprites/pacman.png", 8)
+# pacman2.set_position(janela.width / 2 + maze.half_maze_width/2 - (maze.wall.width * 1.5 + pacman.width / 2),
+#                     janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
+# pacman2.set_sequence_time(0, 8, 100, True)
+# pacman2.set_sequence(0, 1, True)
 
 # Portal_Esquerdo
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -85,6 +100,7 @@ while True:
         maze = Level(walltype, janela)
         blinky.level = maze  # Atualiza o level do blinky
         pacman.level = maze  # Atualiza o level do pacman
+        # pacman2.level = maze  # Atualiza o level do pacman2
         TesteDebugMapa = True
 
     if teclado.key_pressed("G") and not TesteDebugMapa:
@@ -97,20 +113,12 @@ while True:
         TesteDebugMapa = True
         maze.walltype = walltype  # Atualiza o walltype do maze
         maze.level = maze.fill_level()  # Atualiza o level do maze para incluir a walltype nova
-    blinky.get_flow_field()
-    # print(blinky.sinkmatrix[int(pacman.matrix_position[1])][int(pacman.matrix_position[0])])
-    # print(blinky.matrix_position)
-    # print(blinky.sinkmatrix)
-    print(pacman.matrix_position)
+
+
     if teclado.key_pressed("M") and not TesteDebugMapa:
         if BGM_Toggle:
             BGM_Toggle = False
             bgm.pause()
-            s = time.time()
-            blinky.get_flow_field()
-            f = time.time()
-            # 0.0004994869232177734
-            print(f-s)
         else:
             BGM_Toggle = True
             bgm.unpause()
@@ -128,6 +136,10 @@ while True:
     pacman.x += pacman.vx * dt
     pacman.y += pacman.vy * dt
 
+    # pacman2.move1(blinky)
+    # pacman2.x += pacman2.vx * dt
+    # pacman2.y += pacman2.vy * dt
+
     # FPS
     tempo += dt
     cont += 1
@@ -143,9 +155,10 @@ while True:
     blinky.update()
     pacman.draw()
     pacman.update()
+    # pacman2.draw()
+    # pacman2.update()
     portal_esquerdo.draw()
     portal_esquerdo.update()
     portal_direito.draw()
-    portal_direito.update()    
-    janela.draw_text("pacman_cmd: " + str(pacman.cmd), 30, 30, 30, color=(255,0,0))
+    portal_direito.update()
     janela.update()

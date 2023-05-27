@@ -3,19 +3,21 @@ from EatThis.procedural_map import *
 
 # Auxilia na criação da matriz pathing (apenas 0 e 1)
 # Provavelmente é possível criar esta matriz durante a execução de fill_level() em vez de criar uma função separada.
-def create_path_matrix():
+def create_path_matrix(): # Cria uma matriz com 0 e 1 para auxiliar na criação do pathing
     with open('./EatThis/maze.txt', mode='r', encoding='utf-8') as fin:
         i = 0
         # linha 0 e linha 32 são vazias.
-        level = [[0] * 30 for _ in range(33)]
+        mat = [[0] * 30 for _ in range(33)]
         for linha in fin:
             for j in range(len(linha)):
                 if linha[j] == '|':
-                    level[i][j + 1] = 1
+                    mat[i][j + 1] = 1
                 else:
-                    level[i][j + 1] = 0
+                    mat[i][j + 1] = 0
             i += 1
-    return level
+        mat[15][1] = 0    # Remove a parede para posicionamento do portal esquerdo
+        mat[15][28] = 0   # Remove a parede para posicionamento do portal direito
+    return mat
 
 
 class Level():
@@ -28,7 +30,8 @@ class Level():
         self.half_maze_width = (self.wall.width * 28) / 2
         createlevel()
         self.level = self.fill_level()
-        self.pathing = create_path_matrix()
+        self.pathing = create_path_matrix() # Cria uma matriz com 0s e 1s para auxiliar na criação das sinkmatrix
+                                            # level não pode ser usada pois ela contém os sprites das paredes e pontos.
 
     def fill_level(self):
         """ Preenche a matriz com os objectos de paredes de pontos. \n
@@ -114,8 +117,8 @@ class Level():
                             wall.set_position(maze_x, maze_y)
                         level[i][j] = wall
 
-        level[15][1] = 0
-        level[15][28] = 0
+        level[15][1] = 0    # Remove a parede para posicionamento do portal esquerdo
+        level[15][28] = 0   # Remove a parede para posicionamento do portal direito
         return level
 
     def draw(self):

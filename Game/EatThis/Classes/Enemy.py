@@ -41,33 +41,16 @@ class Enemy(Sprite):
         can_go_left = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] <= 0)
         can_go_right = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] <= 0)
 
-        relative_x_pacman_blinky, relative_y_pacman_blinky = self.relative_position_of_target(target)
 
-        #ia 'burra' do pacman
-        #com essa lógica de movimentação, o pacman fica frequentemente 'preso' correndo contra paredes. Talvez implementar
-        #alguma funcionalidade que impeça ele de ficar correndo contra uma parede por mais de algum tempo máximo
-
-
-
-        # print(f"{self.matrix_position}: {self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]}")
-        """ 
-       if self.level.pathing[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] < self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]:
-            self.cmd = 'd'
-        if self.level.pathing[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] < self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]:
-            self.cmd = 'u'
-        if self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] < self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]:
-            self.cmd = 'l'
-        if self.level.pathing[int(self.matrix_position[1] + 1)][int(self.matrix_position[0] + 1)] < self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0])]:
-            self.cmd = 'r'
-        """
-
+        # Consulta a "sinkmatrix" para determinar a direção de movimento.
+        # A matriz sink é uma matriz de mesma dimensão que a matriz "level" que contém valores de "distancia" de cada célula até o blinky.
         if target.sinkmatrix[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
             self.cmd = 'd'
         if target.sinkmatrix[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
             self.cmd = 'u'
         if target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
             self.cmd = 'l'
-        if target.sinkmatrix[int(self.matrix_position[1] + 1)][int(self.matrix_position[0] + 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
+        if target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] < target.sinkmatrix[int(self.matrix_position[1])][int(self.matrix_position[0])]:
             self.cmd = 'r'
     
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
@@ -109,8 +92,17 @@ class Enemy(Sprite):
         if not can_go_down and self.vy > 0 and self.maze_axis[1] >= (self.matrix_position[1] - 0.5) * self.level.wall.height:
             self.vy = 0
 
+        # Checa colisão de com portal esquerdo.
+        if self.maze_axis[0] < 0 + self.level.wall.width / 2:  # aka: 0 + 20/2 = 10
+            self.x += 2 * self.level.half_maze_width - self.level.wall.width
+
+        # Checa colisão de com portal direito.
+        if self.maze_axis[0] > 28 * self.level.wall.width - self.level.wall.width / 2:  # aka: 28*20 - 20/2 550
+            self.x -= 2 * self.level.half_maze_width - self.level.wall.width
+
+
     def relative_position_of_target(self, target):
-        return (target.x - self.x, target.y - self.y)
+        return target.x - self.x, target.y - self.y
 
     def get_maze_axis(self):
         return (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2, 
