@@ -3,15 +3,12 @@ from PPlay.sprite import *
 from PPlay.sound import *
 from EatThis.procedural_map import *
 from EatThis.map_fill import *
-#from EatThis.Classes.classes import Player
 from EatThis.pacman_moves import *
-import random
 from EatThis.Classes.Maze import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
 from EatThis.Classes.MazeGraph import *
 from EatThis.a_star import *
-import time
 
 
 print("Hotkeys:")
@@ -26,8 +23,6 @@ teclado = janela.get_keyboard()
 walltype = 'Curved_20'
 TesteDebugMapa = False
 buffer = 0  # Buffer para pressionar botão direcional.
-cmd = ''
-pacman_cmd = ''
 grid_toggle = False
 BGM_Toggle = True
 
@@ -42,8 +37,6 @@ maze = Maze(walltype, janela)
 # cria o grafo a partir desse maze
 maze_graph = MazeGraph(maze.level)
 maze_graph.create_graph()
-#print(maze_graph)
-#print(maze_graph.graph)
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
 # blinky = Sprite("./Sprites/Blinky.png", 8)
@@ -52,7 +45,6 @@ blinky.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width *
                     janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - blinky.height / 2))
 blinky.set_sequence_time(0, 8, 100, True)
 blinky.set_sequence(0, 1, True)
-#facing = 'AFK'
 
 # Cria o sprite de Pacman e define o número de frames de sua animação.
 pacman = Enemy(janela, maze, "./Sprites/pacman.png", 8)
@@ -61,18 +53,10 @@ pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width *
 pacman.set_sequence_time(0, 8, 100, True)
 pacman.set_sequence(0, 1, True)
 
-#print(pacman.get_matrix_coordinates())
-#print(blinky.get_matrix_coordinates())
-
 # cria o caminho (no grafo) do pacman até o blinky
-#graph_path = a_star(maze_graph, pacman.get_matrix_position(), blinky.get_matrix_position())
-#graph_path.append(blinky.get_matrix_position()) # gambiarra: deve dar pra fazer isso dentro da função
-#print(graph_path)
 graph_path = a_star(maze_graph, pacman.get_matrix_coordinates(), blinky.get_matrix_coordinates())
 graph_path.append(blinky.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
-#print(graph_path)
 pacman_cmds = matrix_path(graph_path, pacman.get_matrix_coordinates())
-#print(pacman_cmds)
 pacman.cmdstr = pacman_cmds
 
 # Portal_Esquerdo
@@ -135,16 +119,9 @@ while True:
     blinky.x += blinky.vx * dt
     blinky.y += blinky.vy * dt
 
-    p1 = pacman.get_matrix_coordinates()
     pacman.move1(blinky, pacman_cmds, maze_graph)
     pacman.x += pacman.vx * dt
     pacman.y += pacman.vy * dt
-    p2 = pacman.get_matrix_coordinates()
-
-    #print(f"p1: {p1}")
-    #print(f"p2: {p2}")
-    if (p2 != p1):
-        pacman.changed_cell = True
 
     # FPS
     tempo += dt
@@ -165,19 +142,5 @@ while True:
     portal_esquerdo.update()
     portal_direito.draw()
     portal_direito.update()
-
     janela.draw_text("pacman_cmd: " + str(pacman.cmd), 30, 30, 30, color=(255,0,0))
-
-    #janela.draw_text("pacman line: " + str(pacman.get_matrix_coordinates()[0]), 30, 60, 30, color=(255,0,0))
-    #janela.draw_text("pacman col: " + str(pacman.get_matrix_coordinates()[1]), 30, 90, 30, color=(255,0,0))
-
-    #janela.draw_text("blinky line: " + str(blinky.get_matrix_coordinates()[0]), 30, 120, 30, color=(255,0,0))
-    #janela.draw_text("blinky col: " + str(blinky.get_matrix_coordinates()[1]), 30, 150, 30, color=(255,0,0))
-    
-    #janela.draw_text("pacman x: " + str(pacman.x), 30, 120, 30, color=(255,0,0))
-    #janela.draw_text("pacman y: " + str(pacman.y), 30, 150, 30, color=(255,0,0))
-    
-    #janela.draw_text("pacman maze x: " + str(pacman.maze_axis[0]), 30, 180, 30, color=(255,0,0))
-    #janela.draw_text("pacman maze y: " + str(pacman.maze_axis[1]), 30, 210, 30, color=(255,0,0))
-
     janela.update()

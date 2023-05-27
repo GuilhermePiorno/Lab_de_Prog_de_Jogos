@@ -1,5 +1,4 @@
 from PPlay.sprite import *
-from queue import LifoQueue
 from EatThis.a_star import *
 
 class Enemy(Sprite):
@@ -7,7 +6,7 @@ class Enemy(Sprite):
         super().__init__(image_file, frames)
         self.vx = 0
         self.vy = 0
-        self.base_speed = 110
+        self.base_speed = 100
         self.cmd = ''
         self.window = window
         self.level = level
@@ -19,8 +18,6 @@ class Enemy(Sprite):
             (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1
             )
         self.cmdstr = ''
-        self.cmd_stack = LifoQueue()
-        self.changed_cell = False
         self.keyboard = self.window.get_keyboard()
 
     def move1(self, target, cmdstr, maze_graph):
@@ -53,7 +50,7 @@ class Enemy(Sprite):
         #self.ia_pacman_1(target)
 
         # ia do pacman baseada no algoritmo a*
-        self.ia_pacman_2(target, cmdstr, maze_graph)
+        self.ia_pacman_2(target, maze_graph)
 
         # pacman controlado pelo jogador, para testes
         #self.ia_pacman_testes()
@@ -120,31 +117,17 @@ class Enemy(Sprite):
                 #vai para cima
                 self.cmd = 'u'
 
-    def ia_pacman_2(self, target, cmdstr, maze_graph):
+    def ia_pacman_2(self, target, maze_graph):
 
         # cria o caminho (no grafo) do pacman até o blinky
-        #graph_path = a_star(maze_graph, pacman.get_matrix_position(), blinky.get_matrix_position())
-        #graph_path.append(blinky.get_matrix_position()) # gambiarra: deve dar pra fazer isso dentro da função
-        #print(graph_path)
         graph_path = a_star(maze_graph, self.get_matrix_coordinates(), target.get_matrix_coordinates())
         graph_path.append(target.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
-        #print(graph_path)
         self.cmdstr = matrix_path(graph_path, self.get_matrix_coordinates())
         if(len(self.cmdstr) != 0):
             self.cmd = self.cmdstr[0].lower()
         else:
             self.vx = 0
             self.vy = 0
-        #print(self.cmdstr)
-        #print(self.cmd)
-
-        #print('cmdstr: ' + cmdstr)
-        #print('self.cmdstr: ' + self.cmdstr)
-        #print(self.cmdstr == cmdstr)
-        #if(self.changed_cell or (self.cmdstr == cmdstr)):
-            #self.cmd = self.get_cmd_from_cmdstack(cmdstr)
-        #self.changed_cell = False
-        #print(self.cmd)
 
     def ia_pacman_testes(self):
         if self.keyboard.key_pressed("W"):
@@ -156,29 +139,8 @@ class Enemy(Sprite):
         if self.keyboard.key_pressed("A"):
             self.cmd = 'l'
 
-    def get_cmd_from_cmdstack(self, cmdstr):
-        if(self.cmd_stack.empty()):
-            for i in range(-1, (-1)*len(cmdstr)-1, -1):
-                self.cmd_stack.put(cmdstr[i])
-
-        if(self.cmdstr != cmdstr):
-            self.cmdstr = cmdstr
-            self.cmd_stack = LifoQueue()
-            for i in range(-1, (-1)*len(cmdstr)-1, -1):
-                self.cmd_stack.put(cmdstr[i])
-            return self.cmd_stack.get().lower()
-        else:
-            if self.cmd_stack.qsize() != 0:
-                return self.cmd_stack.get().lower()
-
     def relative_position_of_target(self, target):
         return (target.x - self.x, target.y - self.y)
-    
-    def changed_matrix_cell(self, last_matrix_position):
-        if(last_matrix_position != self.get_matrix_coordinates()):
-            return True
-        else:
-            return False
 
     def get_maze_axis(self):
         return (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2, 
@@ -189,9 +151,3 @@ class Enemy(Sprite):
             int((self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1),
             int((self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1)
             )
-
-    def set_maze_axis(self):
-        pass
-
-    def set_matrix_position(self):
-        pass
