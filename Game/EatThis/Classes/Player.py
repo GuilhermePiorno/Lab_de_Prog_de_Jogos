@@ -17,7 +17,10 @@ class Player(Sprite):
         self.facing = 'AFK'
         self.maze_axis = (self.x - (window.width / 2 - level.half_maze_width) + self.width / 2,
                           self.y - (window.height / 2 - level.half_maze_height) + self.height / 2)
-        self.matrix_position = (self.maze_axis[0] // level.wall.width + 1, self.maze_axis[1] // level.wall.width + 1)
+        self.matrix_coordinates = (
+            (self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1,
+            (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1
+            )
 
     def move1(self):
         # Como primeira ação blinky atualiza sua sinkmatrix/flowfield.
@@ -53,21 +56,24 @@ class Player(Sprite):
         # Coordenadas do pacman em relação ao 0 da fase
         self.maze_axis = self.get_maze_axis()
 
-        # Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
-        self.matrix_position = self.get_matrix_position()
+        #Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
+        self.matrix_coordinates = self.get_matrix_coordinates()
+        
+        can_go_down = (self.level.level[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_up = (self.level.level[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_left = (self.level.level[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
+        can_go_right = (self.level.level[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
 
-        can_go_down = (self.level.pathing[int(self.matrix_position[1] + 1)][int(self.matrix_position[0])] <= 0)
-        can_go_up = (self.level.pathing[int(self.matrix_position[1] - 1)][int(self.matrix_position[0])] <= 0)
-        can_go_left = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] - 1)] <= 0)
-        can_go_right = (self.level.pathing[int(self.matrix_position[1])][int(self.matrix_position[0] + 1)] <= 0)
 
         # Determina as tolerâncias de movimento (até quantos pixels errados blinky aceita para fazer curva)
         delta_x = 1
         delta_y = 1
-        x_window = (self.matrix_position[0] - 0.5) * self.level.wall.width - delta_x < self.maze_axis[0] < (
-                    self.matrix_position[0] - 0.5) * self.level.wall.width + delta_x
-        y_window = (self.matrix_position[1] - 0.5) * self.level.wall.height - delta_y < self.maze_axis[1] < (
-                    self.matrix_position[1] - 0.5) * self.level.wall.height + delta_y
+
+        x_window = (self.matrix_coordinates[1] - 0.5) * self.level.wall.width - delta_x < self.maze_axis[0] < (
+                self.matrix_coordinates[1] - 0.5) * self.level.wall.width + delta_x
+        y_window = (self.matrix_coordinates[0] - 0.5) * self.level.wall.height - delta_y < self.maze_axis[1] < (
+                self.matrix_coordinates[0] - 0.5) * self.level.wall.height + delta_y
+
         # Condição para aceitar qualquer input de movimento.
         if self.buffer < 0.5:
             # Movimento VERTICAL (REQUERIMENTO DE POSIÇÃO HORIZONTAL)
@@ -99,18 +105,18 @@ class Player(Sprite):
 
         # Checa condição de colisão com parede em x
         if not can_go_right and self.vx > 0 and self.maze_axis[0] >= (
-                self.matrix_position[0] - 0.5) * self.level.wall.width:
+                self.matrix_coordinates[1] - 0.5) * self.level.wall.width:
             self.vx = 0
         if not can_go_left and self.vx < 0 and self.maze_axis[0] <= (
-                self.matrix_position[0] - 0.5) * self.level.wall.width:
+                self.matrix_coordinates[1] - 0.5) * self.level.wall.width:
             self.vx = 0
 
         # Checa condição de colisão com parede em y
         if not can_go_up and self.vy < 0 and self.maze_axis[1] <= (
-                self.matrix_position[1] - 0.5) * self.level.wall.height:
+                self.matrix_coordinates[0] - 0.5) * self.level.wall.height:
             self.vy = 0
         if not can_go_down and self.vy > 0 and self.maze_axis[1] >= (
-                self.matrix_position[1] - 0.5) * self.level.wall.height:
+                self.matrix_coordinates[0] - 0.5) * self.level.wall.height:
             self.vy = 0
 
         # Checa colisão de blinky com portal esquerdo.
@@ -125,11 +131,12 @@ class Player(Sprite):
         return (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2,
                 self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2)
 
-    def get_matrix_position(self):
-        return (
-        (int(self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1),
-        (int(self.y - (
-                    self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1))
+
+    def get_matrix_coordinates(self):
+        return ( 
+            int((self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1),
+            int((self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1)
+            )
 
     def set_maze_axis(self):
         pass
@@ -148,12 +155,12 @@ class Player(Sprite):
             # sinkmatrix é uma deepcopy de levelpathing, levelpathing é a matriz de paredes (0s) e caminhos (1s)
             # levelpathing (level.pathing) apenas existe para facilitar a criação de sinkmatrixes.
             self.sinkmatrix = deepcopy(self.level.pathing)
-            targetstart = self.get_matrix_position()
+            targetstart = self.get_matrix_coordinates()
             # coloca as coordenadas de blinky na lista neste formato: [[y, x]] aka: [[linha, coluna]]
             # é importante a criação de uma lista para que a função recursiva funcione.
             # durante a recursão a lista é alterada para [[y0, x0], [y1, x1], [y2, x2], ...] que são as coordenadas
             # de cada ponto que está sendo analisado.
-            lista = [[targetstart[1], targetstart[0]]]
+            lista = [[targetstart[0], targetstart[1]]]
             # seta a posição de blinky na sinkmatrix para -900
             self.sinkmatrix[lista[0][0]][lista[0][1]] = -900
         # nexttargets é o argumento que será utilizado na recursão. ou seja é a lista de coordenadas que serão analisadas.
