@@ -38,8 +38,8 @@ bgm.play()
 # cria o objeto maze
 maze = Maze(walltype, janela)
 # cria o grafo a partir desse maze
-maze_graph = MazeGraph(maze.level)
-maze_graph.create_graph()
+#maze_graph = MazeGraph(maze.level)
+#maze_graph.create_graph()
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
 # blinky = Sprite("./Sprites/Blinky.png", 8)
@@ -65,10 +65,10 @@ pacman.set_sequence(0, 1, True)
 # pacman2.set_sequence(0, 1, True)
 
 # cria o caminho (no grafo) do pacman até o blinky
-graph_path = a_star(maze_graph, pacman.get_matrix_coordinates(), blinky.get_matrix_coordinates())
-graph_path.append(blinky.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
-pacman_cmds = matrix_path(graph_path, pacman.get_matrix_coordinates())
-pacman.cmdstr = pacman_cmds
+#graph_path = a_star(maze_graph, pacman.get_matrix_coordinates(), blinky.get_matrix_coordinates())
+#graph_path.append(blinky.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
+#pacman_cmds = matrix_path(graph_path, pacman.get_matrix_coordinates())
+#pacman.cmdstr = pacman_cmds
 
 
 # Portal_Esquerdo
@@ -102,8 +102,8 @@ while True:
         maze = Maze(walltype, janela)
 
         # cria o grafo a partir desse maze
-        maze_graph = MazeGraph(maze.level)
-        maze_graph.create_graph()
+        #maze_graph = MazeGraph(maze.level)
+        #maze_graph.create_graph()
         blinky.level = maze  # Atualiza o level do blinky
         pacman.level = maze  # Atualiza o level do pacman
         # pacman2.level = maze  # Atualiza o level do pacman2
@@ -137,7 +137,7 @@ while True:
     blinky.x += blinky.vx * dt
     blinky.y += blinky.vy * dt
 
-    pacman.move1(blinky, pacman_cmds, maze_graph)
+    pacman.move1(blinky)
     pacman.x += pacman.vx * dt
     pacman.y += pacman.vy * dt
 
@@ -166,5 +166,7 @@ while True:
     portal_esquerdo.update()
     portal_direito.draw()
     portal_direito.update()
+    janela.draw_text("blinky cmd: " + str(blinky.cmd), 30, 30, 30, color=(255, 255, 0))
+    janela.draw_text("pacman cmd: " + str(pacman.cmd), 30, 60, 30, color=(255, 255, 0))
 
     janela.update()

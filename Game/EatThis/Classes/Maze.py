@@ -1,5 +1,6 @@
 from PPlay.gameimage import *
 from EatThis.procedural_map import *
+from EatThis.Classes.Point import *
 
 # Auxilia na criação da matriz pathing (apenas 0 e 1)
 # Provavelmente é possível criar esta matriz durante a execução de fill_level() em vez de criar uma função separada.
@@ -107,6 +108,27 @@ class Maze:
                             wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_RD.png")
                             wall.set_position(maze_x, maze_y)
                         level[i][j] = wall
+                    
+                    else:
+
+                        point = Point("Sprites/ponto.png", (i, j))
+
+                        # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
+                        self.half_maze_width = (len(level[0]) - 2) / 2 * wall.width
+                        # x offset for column (j) in the matrix
+                        x_offset = (j - 1) * wall.width
+                        maze_x = self.window.width / 2 - self.half_maze_width + x_offset
+
+                        # offset measurement for half of the matrix's PLOTTED height (lines - 2 == len(level["any"] - 2).
+                        self.half_maze_height = (len(level) - 2) / 2 * wall.height
+                        # y offset for column (i) in the matrix
+                        y_offset = (i - 1) * wall.height
+                        maze_y = self.window.height / 2 - self.half_maze_height + y_offset
+
+                        point.set_position(maze_x, maze_y)
+                        level[i][j] = point
+
+
 
         level[15][1] = 0    # Remove a parede para posicionamento do portal esquerdo
         level[15][28] = 0   # Remove a parede para posicionamento do portal direito

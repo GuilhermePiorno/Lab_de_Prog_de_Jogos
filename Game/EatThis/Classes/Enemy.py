@@ -20,7 +20,7 @@ class Enemy(Sprite):
         self.cmdstr = ''
         self.keyboard = self.window.get_keyboard()
 
-    def move1(self, target, cmdstr, maze_graph):
+    def move1(self, target):
         # Mudança de animação de Blinky nas 4 direções cardinais.
         if self.vy < 0 and self.facing != 'U':
             self.facing = 'U'
