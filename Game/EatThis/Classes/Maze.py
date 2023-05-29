@@ -56,7 +56,7 @@ class Maze:
                     if level[i][j] == 1:
                         wall_direction = ''
                         for k in range(4):
-                            if level[i + deslocamento_xy[k]][j + deslocamento_xy[k + 1]] != 0:
+                            if level[i + deslocamento_xy[k]][j + deslocamento_xy[k + 1]] != 0 and not isinstance(level[i + deslocamento_xy[k]][j + deslocamento_xy[k + 1]], Point):
                                 if k == 0:
                                     wall_direction += 'U'
                                 elif k == 1:
@@ -67,7 +67,7 @@ class Maze:
                                     wall_direction += 'L'
                         if wall_direction == 'URDL':
                             for k in range(4):
-                                if level[i + deslocamento_diagonal[k]][j + deslocamento_diagonal[k + 1]] == 0:
+                                if level[i + deslocamento_diagonal[k]][j + deslocamento_diagonal[k + 1]] == 0 or isinstance(level[i + deslocamento_diagonal[k]][j + deslocamento_diagonal[k + 1]], Point):
                                     if k == 0:
                                         wall_direction = 'UR'
                                     elif k == 1:
@@ -117,13 +117,13 @@ class Maze:
                         self.half_maze_width = (len(level[0]) - 2) / 2 * wall.width
                         # x offset for column (j) in the matrix
                         x_offset = (j - 1) * wall.width
-                        maze_x = self.window.width / 2 - self.half_maze_width + x_offset
+                        maze_x = self.window.width / 2 - self.half_maze_width + x_offset - 5
 
                         # offset measurement for half of the matrix's PLOTTED height (lines - 2 == len(level["any"] - 2).
                         self.half_maze_height = (len(level) - 2) / 2 * wall.height
                         # y offset for column (i) in the matrix
                         y_offset = (i - 1) * wall.height
-                        maze_y = self.window.height / 2 - self.half_maze_height + y_offset
+                        maze_y = self.window.height / 2 - self.half_maze_height + y_offset - 5
 
                         point.set_position(maze_x, maze_y)
                         level[i][j] = point
