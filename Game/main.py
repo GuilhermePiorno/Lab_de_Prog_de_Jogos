@@ -166,7 +166,6 @@ while True:
     portal_esquerdo.update()
     portal_direito.draw()
     portal_direito.update()
-    janela.draw_text("blinky cmd: " + str(blinky.cmd), 30, 30, 30, color=(255, 255, 0))
-    janela.draw_text("pacman cmd: " + str(pacman.cmd), 30, 60, 30, color=(255, 255, 0))
+
 
     janela.update()
