@@ -20,7 +20,7 @@ class Enemy(Sprite):
         self.cmdstr = ''
         self.keyboard = self.window.get_keyboard()
 
-    def move1(self, target, cmdstr, maze_graph):
+    def move1(self, target, cmdstr=0, maze_graph=0):
         # Mudança de animação de Blinky nas 4 direções cardinais.
         if self.vy < 0 and self.facing != 'U':
             self.facing = 'U'
@@ -43,10 +43,10 @@ class Enemy(Sprite):
         # antigo self.matrix_position e self.get_matrix_position()
         self.matrix_coordinates = self.get_matrix_coordinates()
         
-        can_go_down = (self.level.level[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
-        can_go_up = (self.level.level[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
-        can_go_left = (self.level.level[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
-        can_go_right = (self.level.level[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
+        can_go_down = (self.level.pathing[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_up = (self.level.pathing[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_left = (self.level.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
+        can_go_right = (self.level.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
 
         # ia do pacman baseada na posição relativa
         #self.ia_pacman_1(target)

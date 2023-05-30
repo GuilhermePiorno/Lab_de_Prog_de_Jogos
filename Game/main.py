@@ -24,13 +24,16 @@ BGM_Toggle = True
 # Background Music.
 sorteio = random.random()
 if sorteio < 0.25:
-    bgm = Sound("music/Unreal Super Hero 3 by Kenet & Rez.mp3")
+    song = "music/Unreal Super Hero 3 by Kenet & Rez.mp3"
 elif sorteio < 0.5:
-    bgm = Sound("music/FLCTR4 (feat. Zabutom).mp3")
+    song = "music/FLCTR4 (feat. Zabutom).mp3"
 elif sorteio < 0.75:
-    bgm = Sound("music/The Arcane Golem.mp3")
+    song = "music/The Arcane Golem.mp3"
 else:
-    bgm = Sound("music/The Bat Matriarch.mp3")
+    song = "music/The Bat Matriarch.mp3"
+
+bgm = Sound(song)
+print(f"\nPlaying: {song[6:len(song) - 4]} \n")
 bgm.set_volume(5)
 bgm.set_repeat(True)
 bgm.play()
@@ -65,11 +68,12 @@ pacman.set_sequence(0, 1, True)
 # pacman2.set_sequence(0, 1, True)
 
 # cria o caminho (no grafo) do pacman até o blinky
+"""
 graph_path = a_star(maze_graph, pacman.get_matrix_coordinates(), blinky.get_matrix_coordinates())
 graph_path.append(blinky.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
 pacman_cmds = matrix_path(graph_path, pacman.get_matrix_coordinates())
 pacman.cmdstr = pacman_cmds
-
+"""
 
 # Portal_Esquerdo
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -136,8 +140,11 @@ while True:
     blinky.move1()
     blinky.x += blinky.vx * dt
     blinky.y += blinky.vy * dt
-
+    """
     pacman.move1(blinky, pacman_cmds, maze_graph)
+    """
+    pacman.move1(blinky)
+
     pacman.x += pacman.vx * dt
     pacman.y += pacman.vy * dt
 

@@ -59,10 +59,10 @@ class Player(Sprite):
         #Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
         self.matrix_coordinates = self.get_matrix_coordinates()
         
-        can_go_down = (self.level.level[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
-        can_go_up = (self.level.level[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
-        can_go_left = (self.level.level[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
-        can_go_right = (self.level.level[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
+        can_go_down = (self.level.pathing[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_up = (self.level.pathing[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_left = (self.level.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
+        can_go_right = (self.level.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
 
 
         # Determina as tolerâncias de movimento (até quantos pixels errados blinky aceita para fazer curva)
