@@ -1,6 +1,8 @@
 from PPlay.gameimage import *
 from EatThis.procedural_map import *
 from EatThis.Classes.Point import *
+from EatThis.Classes.PowerUp import *
+import random
 
 # Auxilia na criação da matriz pathing (apenas 0 e 1)
 # Provavelmente é possível criar esta matriz durante a execução de fill_level() em vez de criar uma função separada.
@@ -31,6 +33,8 @@ class Maze:
         self.half_maze_width = (self.wall.width * 28) / 2
         createlevel()
         self.level = self.fill_level()
+        self.create_powerups(10)
+
         self.pathing = create_path_matrix() # Cria uma matriz com 0s e 1s para auxiliar na criação das sinkmatrix
                                             # level não pode ser usada pois ela contém os sprites das paredes e pontos.
 
@@ -139,6 +143,18 @@ class Maze:
             for j in range(1, 29):
                 if isinstance(self.level[i][j], GameImage):
                     self.level[i][j].draw()
+
+    def create_powerups(self, num):
+        powerup_count = 0
+        while(powerup_count < num):
+            i = random.randint(2, len(self.level)-2)
+            j = random.randint(2, len(self.level[0])-2)
+            if(isinstance(self.level[i][j], Point)):
+                point = self.level[i][j]
+                powerup = PowerUp("Sprites/powerup.png", (i, j))
+                powerup.set_position(point.x, point.y)
+                self.level[i][j] = powerup
+                powerup_count += 1
 
     # fill_level adaptado para grafos
     def fill_level2(self):

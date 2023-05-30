@@ -1,6 +1,7 @@
 from PPlay.sprite import *
 from EatThis.a_star import *
 from EatThis.Classes.Point import *
+from EatThis.Classes.PowerUp import *
 
 class Enemy(Sprite):
     def __init__(self, window, level, image_file, frames=1):
@@ -36,6 +37,15 @@ class Enemy(Sprite):
             self.facing = 'R'
             self.set_sequence(0, 2, True)
         
+        # pacman comendo os pontos normais
+        if(isinstance(self.level.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], Point)):
+            self.level.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0
+
+        # pacman comendo os powerups
+        if(isinstance(self.level.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], PowerUp)):
+            self.level.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0
+            # mudar estado do pacman e do blinky
+
         # Coordenadas do pacman em relação ao 0 da fase
         self.maze_axis = self.get_maze_axis()
         
