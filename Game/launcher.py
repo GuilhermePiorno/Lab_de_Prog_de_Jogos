@@ -3,17 +3,19 @@ from PPlay.sound import *
 from EatThis.Classes.cinematic_classes import *
 from math import sin
 
+
 def ship_func(actor, dt, time):
     if time > 3:  # 3 segundos de delay para a nave aparecer
         if actor.vx > 0:
+            actor.x += actor.vx * dt + (actor.ax * dt ** 2) / 2
             actor.vx += actor.ax * dt
-            actor.x += actor.vx * dt
         else:
             actor.vx = 0
             actor.ax = 0
 
     amplitude = 500 / time
     ship.y = janela.height / 2 - ship.height / 2 + amplitude * sin(time)
+
 
 def dust_func(actor, dt, time):
     actor.x += actor.vx * dt
@@ -30,6 +32,7 @@ def move_actor(actor, dt, time):
     else:
         actor.f(actor, dt, time)
 
+
 def update_actors(actor_list, dt, time):
     for i in range(len(actor_list)):
         if type(actor_list[i]) == list:
@@ -37,8 +40,6 @@ def update_actors(actor_list, dt, time):
                 move_actor(actor_list[i][j], dt, time)
         else:
             move_actor(actor_list[i], dt, time)
-
-
 
 
 janela = Window(1280, 720)
@@ -73,53 +74,49 @@ actor_list.append(ship)
 
 song = "music/FTL - Lanius (Explore).mp3"
 
-
 # Music
 bgm = Sound(song)
 print(f"\nPlaying: {song[6:len(song) - 4]} \n")
 bgm.set_volume(50)
 bgm.play()
-time = 0.000001 # Evita divisão por 0 no cálculo da posição y da nave.
+time = 0.000001  # Evita divisão por 0 no cálculo da posição y da nave.
 on_menu = True
-
+tempo = 0
+cont = 0
+FPS = 0
 while on_menu:
     dt = janela.delta_time()
     time += dt
 
-    # Background drift
-    #-background.x += background.vx * dt
-    # Stars' drift
-    #-stars.x += stars.vx * dt
-    # Dust's drift
-    #-dust[0].x += dust[0].vx * dt
-    #-dust[1].x += dust[1].vx * dt
-    #-if dust[0].x < - dust[0].width:
-    #-    dust[0].x = dust[0].width
-    #-if dust[1].x < - dust[1].width:
-    #-    dust[1].x = dust[1].width
-
-    # Ship's horizontal movement
-    #-if time > 3:   # 3 segundos de delay para a nave aparecer
-    #-    if ship.vx > 0:
-    #-        ship.vx += ship.ax * dt
-    #-        ship.x += ship.vx * dt
-    #-    else:
-    #-        ship.vx = 0
-    #-        ship.ax = 0
+    str1 = "looooooo-abcdefghijklkmlniopquertoqpoiueralkfdhzcv^oooooooooooooooooooooong"
+    # str1 = "MUITO TEXTO"
+    # str2 = "MUITO TEXTO"
+    # str3 = "MUITO TEXTO"
+    # str4 = "MUITO TEXTO"
+    # str5 = "MUITO TEXTO"
 
 
-    # Ship's floaty bounce
-    #-amplitude = 500 / time
-    # Posição da nave é centralizada + oscilação senoidal com amplitude assintótica para 0.
-    #-ship.y = janela.height / 2 - ship.height / 2 + amplitude * sin(time)
 
+    # FPS
+    tempo += dt
+    cont += 1
+    if tempo >= 1:
+        tempo = 0
+        FPS = cont
+        cont = 0
 
     update_actors(actor_list, dt, time)
-
-
     background.draw()
     stars.draw()
     ship.draw()
     dust[0].draw()
     dust[1].draw()
+    janela.draw_text(str(FPS), 10, janela.height - 50, size=25, color=(255, 255, 0))
+    janela.draw_text(str1, 10, 50, size=25, color=(255, 255, 0))
+    # janela.draw_text(str2, 10, 100, size=25, color=(255, 255, 0))
+    # janela.draw_text(str3, 10, 150, size=25, color=(255, 255, 0))
+    # janela.draw_text(str4, 10, 200, size=25, color=(255, 255, 0))
+    # janela.draw_text(str5, 10, 250, size=25, color=(255, 255, 0))
     janela.update()
+
+
