@@ -33,7 +33,8 @@ class Maze:
         self.half_maze_width = (self.wall.width * 28) / 2
         createlevel()
         self.level = self.fill_level()
-        self.create_powerups(10)
+        self.powerup_num = 10
+        self.create_powerups()
 
         self.pathing = create_path_matrix() # Cria uma matriz com 0s e 1s para auxiliar na criação das sinkmatrix
                                             # level não pode ser usada pois ela contém os sprites das paredes e pontos.
@@ -144,9 +145,9 @@ class Maze:
                 if isinstance(self.level[i][j], GameImage):
                     self.level[i][j].draw()
 
-    def create_powerups(self, num):
+    def create_powerups(self):
         powerup_count = 0
-        while(powerup_count < num):
+        while(powerup_count < self.powerup_num):
             i = random.randint(2, len(self.level)-2)
             j = random.randint(2, len(self.level[0])-2)
             if(isinstance(self.level[i][j], Point)):
