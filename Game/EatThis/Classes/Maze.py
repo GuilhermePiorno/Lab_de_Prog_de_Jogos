@@ -116,19 +116,19 @@ class Maze:
                     
                     else:
 
-                        point = Point("Sprites/ponto.png", (i, j))
+                        point = Point("Sprites/ponto_20_255_255_153_menor.png", (i, j))
 
                         # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
                         self.half_maze_width = (len(level[0]) - 2) / 2 * wall.width
                         # x offset for column (j) in the matrix
                         x_offset = (j - 1) * wall.width
-                        maze_x = self.window.width / 2 - self.half_maze_width + x_offset - 5
+                        maze_x = self.window.width / 2 - self.half_maze_width + x_offset
 
                         # offset measurement for half of the matrix's PLOTTED height (lines - 2 == len(level["any"] - 2).
                         self.half_maze_height = (len(level) - 2) / 2 * wall.height
                         # y offset for column (i) in the matrix
                         y_offset = (i - 1) * wall.height
-                        maze_y = self.window.height / 2 - self.half_maze_height + y_offset - 5
+                        maze_y = self.window.height / 2 - self.half_maze_height + y_offset
 
                         point.set_position(maze_x, maze_y)
                         level[i][j] = point
@@ -152,7 +152,7 @@ class Maze:
             j = random.randint(2, len(self.level[0])-2)
             if(isinstance(self.level[i][j], Point)):
                 point = self.level[i][j]
-                powerup = PowerUp("Sprites/powerup.png", (i, j))
+                powerup = PowerUp("Sprites/powerup_20_255_215_0.png", (i, j))
                 powerup.set_position(point.x, point.y)
                 self.level[i][j] = powerup
                 powerup_count += 1
