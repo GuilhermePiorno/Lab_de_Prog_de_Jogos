@@ -38,7 +38,7 @@ bgm.play()
 # cria o objeto maze
 maze = Maze(walltype, janela)
 # cria o grafo a partir desse maze
-#maze_graph = MazeGraph(maze.level)
+maze_graph = MazeGraph(maze.level)
 #maze_graph.create_graph()
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
@@ -51,7 +51,7 @@ blinky.set_sequence(0, 1, True)
 
 
 # Cria o sprite de Pacman e define o número de frames de sua animação.
-pacman = Enemy(janela, maze, "./Sprites/pacman.png", 8)
+pacman = Enemy(janela, maze, "./Sprites/pacman_movimento_e_morte.png", 22)
 pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
                     janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
 pacman.set_sequence_time(0, 8, 100, True)
@@ -104,8 +104,8 @@ while True:
         # cria o grafo a partir desse maze
         #maze_graph = MazeGraph(maze.level)
         #maze_graph.create_graph()
-        blinky.maze = maze  # Atualiza o level do blinky
-        pacman.maze = maze  # Atualiza o level do pacman
+        blinky.level = maze  # Atualiza o level do blinky
+        pacman.level = maze  # Atualiza o level do pacman
         # pacman2.level = maze  # Atualiza o level do pacman2
         TesteDebugMapa = True
 
@@ -166,6 +166,5 @@ while True:
     portal_esquerdo.update()
     portal_direito.draw()
     portal_direito.update()
-
 
     janela.update()

@@ -2,6 +2,7 @@ from PPlay.sprite import *
 from EatThis.a_star import *
 from EatThis.Classes.Point import *
 from EatThis.Classes.PowerUp import *
+import time
 
 class Enemy(Sprite):
     def __init__(self, window, maze, image_file, frames=1):
@@ -21,21 +22,11 @@ class Enemy(Sprite):
             )
         self.cmdstr = ''
         self.keyboard = self.window.get_keyboard()
+        self.image_file = image_file
+        self.is_dead = False
+        self.death_instant = 0
 
     def move1(self, target):
-        # Mudança de animação de Blinky nas 4 direções cardinais.
-        if self.vy < 0 and self.facing != 'U':
-            self.facing = 'U'
-            self.set_sequence(6, 8, True)
-        if self.vy > 0 and self.facing != 'D':
-            self.facing = 'D'
-            self.set_sequence(4, 6, True)
-        if self.vx < 0 and self.facing != 'L':
-            self.facing = 'L'
-            self.set_sequence(2, 4, True)
-        if self.vx > 0 and self.facing != 'R':
-            self.facing = 'R'
-            self.set_sequence(0, 2, True)
         
         # pacman comendo os pontos normais
         if(isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], Point)):
@@ -48,8 +39,8 @@ class Enemy(Sprite):
             print("Comeu powerup")
             self.maze.powerup_num -= 1
             if(self.maze.powerup_num == 0):
-                #pacman apelão
-                pass
+                #teste morte do pacman
+                self.die()
             print(self.maze.powerup_num)
 
         # Coordenadas do pacman em relação ao 0 da fase
@@ -74,7 +65,13 @@ class Enemy(Sprite):
         # self.ia_pacman_2(target, maze_graph)
 
         # ia do pacman baseada no algoritmo flowfield
-        self.ia_pacman_follow(target)
+        if(not self.is_dead):
+            self.animate()
+            self.ia_pacman_follow(target)
+        else:
+            if(time.time() - self.death_instant >= 10):
+                self.hide()
+
 
         # pacman controlado pelo jogador, para testes
         #self.ia_pacman_testes()
@@ -173,7 +170,28 @@ class Enemy(Sprite):
             self.cmd = 'r'
         if self.keyboard.key_pressed("A"):
             self.cmd = 'l'
+    
+    def animate(self):
+        # Mudança de animação de Blinky nas 4 direções cardinais.
+        if self.vy < 0 and self.facing != 'U':
+            self.facing = 'U'
+            self.set_sequence(6, 8, True)
+        if self.vy > 0 and self.facing != 'D':
+            self.facing = 'D'
+            self.set_sequence(4, 6, True)
+        if self.vx < 0 and self.facing != 'L':
+            self.facing = 'L'
+            self.set_sequence(2, 4, True)
+        if self.vx > 0 and self.facing != 'R':
+            self.facing = 'R'
+            self.set_sequence(0, 2, True)
 
+    def die(self):
+        self.death_instant = time.time()
+        self.is_dead = True
+        self.vx = 0
+        self.vy = 0
+        self.set_sequence_time(9, 22, 200, False)
 
     def relative_position_of_target(self, target):
         return target.x - self.x, target.y - self.y
