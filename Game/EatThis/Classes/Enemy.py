@@ -48,7 +48,7 @@ class Enemy(Sprite):
             print("Comeu powerup")
             self.maze.powerup_num -= 1
             if(self.maze.powerup_num == 0):
-                #pacman invencível
+                #pacman apelão
                 pass
             print(self.maze.powerup_num)
 

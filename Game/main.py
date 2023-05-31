@@ -104,7 +104,7 @@ while True:
         # cria o grafo a partir desse maze
         #maze_graph = MazeGraph(maze.level)
         #maze_graph.create_graph()
-        blinky.level = maze  # Atualiza o level do blinky
+        blinky.maze = maze  # Atualiza o level do blinky
         pacman.maze = maze  # Atualiza o level do pacman
         # pacman2.level = maze  # Atualiza o level do pacman2
         TesteDebugMapa = True
