@@ -20,6 +20,7 @@ TesteDebugMapa = False
 buffer = 0  # Buffer para pressionar botão direcional.
 grid_toggle = False
 BGM_Toggle = True
+pause = False
 
 # Background Music.
 sorteio = random.random()
@@ -57,12 +58,17 @@ pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width *
 pacman.set_sequence_time(0, 8, 100, True)
 pacman.set_sequence(0, 1, True)
 
+pacman2 = Enemy(janela, maze, "./Sprites/pacman.png", 8)
+pacman2.set_position(janela.width / 2 - maze.half_maze_width/2 - (maze.wall.width * 1.5 + pacman.width / 2),
+                     janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
+pacman2.set_sequence_time(0, 8, 100, True)
+pacman2.set_sequence(0, 1, True)
 
-# pacman2 = Enemy(janela, maze, "./Sprites/pacman.png", 8)
-# pacman2.set_position(janela.width / 2 + maze.half_maze_width/2 - (maze.wall.width * 1.5 + pacman.width / 2),
-#                     janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
-# pacman2.set_sequence_time(0, 8, 100, True)
-# pacman2.set_sequence(0, 1, True)
+pacman3 = Enemy(janela, maze, "./Sprites/pacman.png", 8)
+pacman3.set_position(janela.width / 2 + maze.half_maze_width/2 - (maze.wall.width * 1.5 + pacman.width / 2),
+                     janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - pacman.height / 2))
+pacman3.set_sequence_time(0, 8, 100, True)
+pacman3.set_sequence(0, 1, True)
 
 # cria o caminho (no grafo) do pacman até o blinky
 #graph_path = a_star(maze_graph, pacman.get_matrix_coordinates(), blinky.get_matrix_coordinates())
@@ -104,9 +110,10 @@ while True:
         # cria o grafo a partir desse maze
         #maze_graph = MazeGraph(maze.level)
         #maze_graph.create_graph()
-        blinky.level = maze  # Atualiza o level do blinky
-        pacman.level = maze  # Atualiza o level do pacman
-        # pacman2.level = maze  # Atualiza o level do pacman2
+        blinky.maze = maze  # Atualiza o level do blinky
+        pacman.maze = maze  # Atualiza o level do pacman
+        pacman2.maze = maze  # Atualiza o level do pacman2
+        pacman3.maze = maze  # Atualiza o level do pacman3
         TesteDebugMapa = True
 
     if teclado.key_pressed("G") and not TesteDebugMapa:
@@ -133,17 +140,25 @@ while True:
     # Atualiza buffer de inputs
     blinky.buffer += dt
     
-    blinky.move1()
-    blinky.x += blinky.vx * dt
-    blinky.y += blinky.vy * dt
+    if(not pause):
+        blinky.move1()
+        blinky.x += blinky.vx * dt
+        blinky.y += blinky.vy * dt
 
-    pacman.move1(blinky)
-    pacman.x += pacman.vx * dt
-    pacman.y += pacman.vy * dt
+        pacman.move1(blinky)
+        pacman.x += pacman.vx * dt
+        pacman.y += pacman.vy * dt
 
-    # pacman2.move1(blinky)
-    # pacman2.x += pacman2.vx * dt
-    # pacman2.y += pacman2.vy * dt
+        pacman2.move1(blinky)
+        pacman2.x += pacman2.vx * dt
+        pacman2.y += pacman2.vy * dt
+
+        pacman3.move1(blinky)
+        pacman3.x += pacman3.vx * dt
+        pacman3.y += pacman3.vy * dt
+
+    if(teclado.key_pressed("P")):
+        pause = not pause
 
     # FPS
     tempo += dt
@@ -160,8 +175,10 @@ while True:
     blinky.update()
     pacman.draw()
     pacman.update()
-    # pacman2.draw()
-    # pacman2.update()
+    pacman2.draw()
+    pacman2.update()
+    pacman3.draw()
+    pacman3.update()
     portal_esquerdo.draw()
     portal_esquerdo.update()
     portal_direito.draw()
