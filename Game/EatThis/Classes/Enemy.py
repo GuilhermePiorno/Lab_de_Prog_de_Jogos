@@ -1,40 +1,50 @@
 from PPlay.sprite import *
 from EatThis.a_star import *
+from EatThis.Classes.Point import *
+from EatThis.Classes.PowerUp import *
+import time
 
 class Enemy(Sprite):
-    def __init__(self, window, level, image_file, frames=1):
+    def __init__(self, window, maze, image_file, frames=1):
         super().__init__(image_file, frames)
         self.vx = 0
         self.vy = 0
         self.base_speed = 100
         self.cmd = ''
         self.window = window
-        self.level = level
+        self.maze = maze
         self.facing = 'AFK'
-        self.maze_axis = (self.x - (window.width / 2 - level.half_maze_width) + self.width / 2, 
-                          self.y - (window.height / 2 - level.half_maze_height) + self.height / 2)
+        self.maze_axis = (self.x - (window.width / 2 - maze.half_maze_width) + self.width / 2, 
+                          self.y - (window.height / 2 - maze.half_maze_height) + self.height / 2)
         self.matrix_coordinates = (
-            (self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1,
-            (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1
+            (self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1,
+            (self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1
             )
         self.cmdstr = ''
         self.keyboard = self.window.get_keyboard()
+        self.image_file = image_file
+        self.is_dead = False
+        self.death_instant = 0
 
-    def move1(self, target, cmdstr=0, maze_graph=0):
-        # Mudança de animação de Blinky nas 4 direções cardinais.
-        if self.vy < 0 and self.facing != 'U':
-            self.facing = 'U'
-            self.set_sequence(6, 8, True)
-        if self.vy > 0 and self.facing != 'D':
-            self.facing = 'D'
-            self.set_sequence(4, 6, True)
-        if self.vx < 0 and self.facing != 'L':
-            self.facing = 'L'
-            self.set_sequence(2, 4, True)
-        if self.vx > 0 and self.facing != 'R':
-            self.facing = 'R'
-            self.set_sequence(0, 2, True)
+
+    def move1(self, target):
+
         
+        # pacman comendo os pontos normais
+        if(isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], Point)):
+            self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0
+
+        # pacman comendo os powerups
+        if(isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], PowerUp)):
+            self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0
+            # mudar estado do pacman e do blinky
+            print("Comeu powerup")
+            self.maze.powerup_num -= 1
+            if(self.maze.powerup_num == 0):
+                #teste morte do pacman
+                self.die()
+            print(self.maze.powerup_num)
+
         # Coordenadas do pacman em relação ao 0 da fase
         self.maze_axis = self.get_maze_axis()
         
@@ -43,10 +53,12 @@ class Enemy(Sprite):
         # antigo self.matrix_position e self.get_matrix_position()
         self.matrix_coordinates = self.get_matrix_coordinates()
         
-        can_go_down = (self.level.pathing[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
-        can_go_up = (self.level.pathing[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
-        can_go_left = (self.level.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
-        can_go_right = (self.level.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
+
+        can_go_down = (self.maze.pathing[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_up = (self.maze.pathing[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_left = (self.maze.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
+        can_go_right = (self.maze.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
+
 
         # ia do pacman baseada na posição relativa
         #self.ia_pacman_1(target)
@@ -55,7 +67,13 @@ class Enemy(Sprite):
         # self.ia_pacman_2(target, maze_graph)
 
         # ia do pacman baseada no algoritmo flowfield
-        self.ia_pacman_follow(target)
+        if(not self.is_dead):
+            self.animate()
+            self.ia_pacman_follow(target)
+        else:
+            if(time.time() - self.death_instant >= 10):
+                self.hide()
+
 
         # pacman controlado pelo jogador, para testes
         #self.ia_pacman_testes()
@@ -64,8 +82,8 @@ class Enemy(Sprite):
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1
         delta_y = 1
-        x_window = (self.matrix_coordinates[1] - 0.5) * self.level.wall.width - delta_x < self.maze_axis[0] < (self.matrix_coordinates[1] - 0.5) * self.level.wall.width + delta_x
-        y_window = (self.matrix_coordinates[0] - 0.5) * self.level.wall.height - delta_y < self.maze_axis[1] < (self.matrix_coordinates[0] - 0.5) * self.level.wall.height + delta_y
+        x_window = (self.matrix_coordinates[1] - 0.5) * self.maze.wall.width - delta_x < self.maze_axis[0] < (self.matrix_coordinates[1] - 0.5) * self.maze.wall.width + delta_x
+        y_window = (self.matrix_coordinates[0] - 0.5) * self.maze.wall.height - delta_y < self.maze_axis[1] < (self.matrix_coordinates[0] - 0.5) * self.maze.wall.height + delta_y
         # Movimento VERTICAL (REQUERIMENTO DE POSIÇÃO HORIZONTAL)
         if x_window:
             if self.cmd == 'd' and can_go_down:
@@ -89,25 +107,25 @@ class Enemy(Sprite):
                 self.vy = 0
 
         # Checa condição de colisão de pacman com parede em x
-        if not can_go_right and self.vx > 0 and self.maze_axis[0] >= (self.matrix_coordinates[1] - 0.5) * self.level.wall.width:
+        if not can_go_right and self.vx > 0 and self.maze_axis[0] >= (self.matrix_coordinates[1] - 0.5) * self.maze.wall.width:
             self.vx = 0
-        if not can_go_left and self.vx < 0 and self.maze_axis[0] <= (self.matrix_coordinates[1] - 0.5) * self.level.wall.width:
+        if not can_go_left and self.vx < 0 and self.maze_axis[0] <= (self.matrix_coordinates[1] - 0.5) * self.maze.wall.width:
             self.vx = 0
 
         # Checa condição de colisão de pacman com parede em y
-        if not can_go_up and self.vy < 0 and self.maze_axis[1] <= (self.matrix_coordinates[0] - 0.5) * self.level.wall.height:
+        if not can_go_up and self.vy < 0 and self.maze_axis[1] <= (self.matrix_coordinates[0] - 0.5) * self.maze.wall.height:
             self.vy = 0
-        if not can_go_down and self.vy > 0 and self.maze_axis[1] >= (self.matrix_coordinates[0] - 0.5) * self.level.wall.height:
+        if not can_go_down and self.vy > 0 and self.maze_axis[1] >= (self.matrix_coordinates[0] - 0.5) * self.maze.wall.height:
             self.vy = 0
 
 
         # Checa colisão de com portal esquerdo.
-        if self.maze_axis[0] < 0 + self.level.wall.width / 2:  # aka: 0 + 20/2 = 10
-            self.x += 2 * self.level.half_maze_width - self.level.wall.width
+        if self.maze_axis[0] < 0 + self.maze.wall.width / 2:  # aka: 0 + 20/2 = 10
+            self.x += 2 * self.maze.half_maze_width - self.maze.wall.width
 
         # Checa colisão de com portal direito.
-        if self.maze_axis[0] > 28 * self.level.wall.width - self.level.wall.width / 2:  # aka: 28*20 - 20/2 550
-            self.x -= 2 * self.level.half_maze_width - self.level.wall.width
+        if self.maze_axis[0] > 28 * self.maze.wall.width - self.maze.wall.width / 2:  # aka: 28*20 - 20/2 550
+            self.x -= 2 * self.maze.half_maze_width - self.maze.wall.width
 
 
     def ia_pacman_1(self, target):
@@ -154,14 +172,35 @@ class Enemy(Sprite):
             self.cmd = 'r'
         if self.keyboard.key_pressed("A"):
             self.cmd = 'l'
+    
+    def animate(self):
+        # Mudança de animação nas 4 direções cardinais.
+        if self.vy < 0 and self.facing != 'U':
+            self.facing = 'U'
+            self.set_sequence(6, 8, True)
+        if self.vy > 0 and self.facing != 'D':
+            self.facing = 'D'
+            self.set_sequence(4, 6, True)
+        if self.vx < 0 and self.facing != 'L':
+            self.facing = 'L'
+            self.set_sequence(2, 4, True)
+        if self.vx > 0 and self.facing != 'R':
+            self.facing = 'R'
+            self.set_sequence(0, 2, True)
 
+    def die(self):
+        self.death_instant = time.time()
+        self.is_dead = True
+        self.vx = 0
+        self.vy = 0
+        self.set_sequence_time(9, 22, 200, False)
 
     def relative_position_of_target(self, target):
         return target.x - self.x, target.y - self.y
 
     def get_maze_axis(self):
-        return (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2, 
-                self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2)
+        return (self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2, 
+                self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2)
 
 
     def ia_pacman_follow(self, target):
@@ -182,7 +221,7 @@ class Enemy(Sprite):
 
     def get_matrix_coordinates(self):
         return (
-            int((self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1),
-            int((self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1)
+            int((self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1),
+            int((self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1)
             )
 

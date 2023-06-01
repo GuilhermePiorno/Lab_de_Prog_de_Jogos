@@ -1,5 +1,8 @@
 from PPlay.gameimage import *
 from EatThis.procedural_map import *
+from EatThis.Classes.Point import *
+from EatThis.Classes.PowerUp import *
+import random
 
 # Auxilia na criação da matriz pathing (apenas 0 e 1)
 # Provavelmente é possível criar esta matriz durante a execução de fill_level() em vez de criar uma função separada.
@@ -30,6 +33,9 @@ class Maze:
         self.half_maze_width = (self.wall.width * 28) / 2
         createlevel()
         self.level = self.fill_level()
+        self.powerup_num = 1
+        self.create_powerups()
+
         self.pathing = create_path_matrix() # Cria uma matriz com 0s e 1s para auxiliar na criação das sinkmatrix
                                             # level não pode ser usada pois ela contém os sprites das paredes e pontos.
 
@@ -55,7 +61,7 @@ class Maze:
                     if level[i][j] == 1:
                         wall_direction = ''
                         for k in range(4):
-                            if level[i + deslocamento_xy[k]][j + deslocamento_xy[k + 1]] != 0:
+                            if level[i + deslocamento_xy[k]][j + deslocamento_xy[k + 1]] != 0 and not isinstance(level[i + deslocamento_xy[k]][j + deslocamento_xy[k + 1]], Point):
                                 if k == 0:
                                     wall_direction += 'U'
                                 elif k == 1:
@@ -66,7 +72,7 @@ class Maze:
                                     wall_direction += 'L'
                         if wall_direction == 'URDL':
                             for k in range(4):
-                                if level[i + deslocamento_diagonal[k]][j + deslocamento_diagonal[k + 1]] == 0:
+                                if level[i + deslocamento_diagonal[k]][j + deslocamento_diagonal[k + 1]] == 0 or isinstance(level[i + deslocamento_diagonal[k]][j + deslocamento_diagonal[k + 1]], Point):
                                     if k == 0:
                                         wall_direction = 'UR'
                                     elif k == 1:
@@ -107,6 +113,27 @@ class Maze:
                             wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_RD.png")
                             wall.set_position(maze_x, maze_y)
                         level[i][j] = wall
+                    
+                    else:
+
+                        point = Point("Sprites/ponto_20_255_255_153_menor.png", (i, j))
+
+                        # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
+                        self.half_maze_width = (len(level[0]) - 2) / 2 * wall.width
+                        # x offset for column (j) in the matrix
+                        x_offset = (j - 1) * wall.width
+                        maze_x = self.window.width / 2 - self.half_maze_width + x_offset
+
+                        # offset measurement for half of the matrix's PLOTTED height (lines - 2 == len(level["any"] - 2).
+                        self.half_maze_height = (len(level) - 2) / 2 * wall.height
+                        # y offset for column (i) in the matrix
+                        y_offset = (i - 1) * wall.height
+                        maze_y = self.window.height / 2 - self.half_maze_height + y_offset
+
+                        point.set_position(maze_x, maze_y)
+                        level[i][j] = point
+
+
 
         level[15][1] = 0    # Remove a parede para posicionamento do portal esquerdo
         level[15][28] = 0   # Remove a parede para posicionamento do portal direito
@@ -117,6 +144,18 @@ class Maze:
             for j in range(1, 29):
                 if isinstance(self.level[i][j], GameImage):
                     self.level[i][j].draw()
+
+    def create_powerups(self):
+        powerup_count = 0
+        while(powerup_count < self.powerup_num):
+            i = random.randint(2, len(self.level)-2)
+            j = random.randint(2, len(self.level[0])-2)
+            if(isinstance(self.level[i][j], Point)):
+                point = self.level[i][j]
+                powerup = PowerUp("Sprites/powerup_20_255_215_0.png", (i, j))
+                powerup.set_position(point.x, point.y)
+                self.level[i][j] = powerup
+                powerup_count += 1
 
     # fill_level adaptado para grafos
     def fill_level2(self):

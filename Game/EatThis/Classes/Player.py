@@ -1,8 +1,10 @@
 from PPlay.sprite import *
+from PPlay.gameimage import *
+from EatThis.Classes.Point import *
 from copy import deepcopy
 
 class Player(Sprite):
-    def __init__(self, window, level, image_file, frames=1):
+    def __init__(self, window, maze, image_file, frames=1):
         super().__init__(image_file, frames)
         self.vx = 0
         self.vy = 0
@@ -10,16 +12,16 @@ class Player(Sprite):
         self.cmd = ''
         self.window = window
         self.keyboard = self.window.get_keyboard()
-        self.level = level
+        self.maze = maze
         # self.sinkmatrix = self.level.pathing.copy()
-        self.sinkmatrix = deepcopy(self.level.pathing)
+        self.sinkmatrix = deepcopy(self.maze.pathing)
         self.buffer = 0
         self.facing = 'AFK'
-        self.maze_axis = (self.x - (window.width / 2 - level.half_maze_width) + self.width / 2,
-                          self.y - (window.height / 2 - level.half_maze_height) + self.height / 2)
+        self.maze_axis = (self.x - (window.width / 2 - maze.half_maze_width) + self.width / 2,
+                          self.y - (window.height / 2 - maze.half_maze_height) + self.height / 2)
         self.matrix_coordinates = (
-            (self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1,
-            (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1
+            (self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1,
+            (self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1
             )
 
     def move1(self):
@@ -59,20 +61,22 @@ class Player(Sprite):
         #Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
         self.matrix_coordinates = self.get_matrix_coordinates()
         
-        can_go_down = (self.level.pathing[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
-        can_go_up = (self.level.pathing[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
-        can_go_left = (self.level.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
-        can_go_right = (self.level.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
+
+        can_go_down = (self.maze.pathing[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_up = (self.maze.pathing[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
+        can_go_left = (self.maze.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
+        can_go_right = (self.maze.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
+
 
 
         # Determina as tolerâncias de movimento (até quantos pixels errados blinky aceita para fazer curva)
         delta_x = 1
         delta_y = 1
 
-        x_window = (self.matrix_coordinates[1] - 0.5) * self.level.wall.width - delta_x < self.maze_axis[0] < (
-                self.matrix_coordinates[1] - 0.5) * self.level.wall.width + delta_x
-        y_window = (self.matrix_coordinates[0] - 0.5) * self.level.wall.height - delta_y < self.maze_axis[1] < (
-                self.matrix_coordinates[0] - 0.5) * self.level.wall.height + delta_y
+        x_window = (self.matrix_coordinates[1] - 0.5) * self.maze.wall.width - delta_x < self.maze_axis[0] < (
+                self.matrix_coordinates[1] - 0.5) * self.maze.wall.width + delta_x
+        y_window = (self.matrix_coordinates[0] - 0.5) * self.maze.wall.height - delta_y < self.maze_axis[1] < (
+                self.matrix_coordinates[0] - 0.5) * self.maze.wall.height + delta_y
 
         # Condição para aceitar qualquer input de movimento.
         if self.buffer < 0.5:
@@ -105,37 +109,37 @@ class Player(Sprite):
 
         # Checa condição de colisão com parede em x
         if not can_go_right and self.vx > 0 and self.maze_axis[0] >= (
-                self.matrix_coordinates[1] - 0.5) * self.level.wall.width:
+                self.matrix_coordinates[1] - 0.5) * self.maze.wall.width:
             self.vx = 0
         if not can_go_left and self.vx < 0 and self.maze_axis[0] <= (
-                self.matrix_coordinates[1] - 0.5) * self.level.wall.width:
+                self.matrix_coordinates[1] - 0.5) * self.maze.wall.width:
             self.vx = 0
 
         # Checa condição de colisão com parede em y
         if not can_go_up and self.vy < 0 and self.maze_axis[1] <= (
-                self.matrix_coordinates[0] - 0.5) * self.level.wall.height:
+                self.matrix_coordinates[0] - 0.5) * self.maze.wall.height:
             self.vy = 0
         if not can_go_down and self.vy > 0 and self.maze_axis[1] >= (
-                self.matrix_coordinates[0] - 0.5) * self.level.wall.height:
+                self.matrix_coordinates[0] - 0.5) * self.maze.wall.height:
             self.vy = 0
 
         # Checa colisão de blinky com portal esquerdo.
-        if self.maze_axis[0] < 0 + self.level.wall.width / 2:  # aka: 0 + 20/2 = 10
-            self.x += 2 * self.level.half_maze_width - self.level.wall.width
+        if self.maze_axis[0] < 0 + self.maze.wall.width / 2:  # aka: 0 + 20/2 = 10
+            self.x += 2 * self.maze.half_maze_width - self.maze.wall.width
 
         # Checa colisão de blinky com portal direito.
-        if self.maze_axis[0] > 28 * self.level.wall.width - self.level.wall.width / 2:  # aka: 28*20 - 20/2 550
-            self.x -= 2 * self.level.half_maze_width - self.level.wall.width
+        if self.maze_axis[0] > 28 * self.maze.wall.width - self.maze.wall.width / 2:  # aka: 28*20 - 20/2 550
+            self.x -= 2 * self.maze.half_maze_width - self.maze.wall.width
 
     def get_maze_axis(self):
-        return (self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2,
-                self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2)
+        return (self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2,
+                self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2)
 
 
     def get_matrix_coordinates(self):
         return ( 
-            int((self.y - (self.window.height / 2 - self.level.half_maze_height) + self.height / 2) // self.level.wall.width + 1),
-            int((self.x - (self.window.width / 2 - self.level.half_maze_width) + self.width / 2) // self.level.wall.width + 1)
+            int((self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1),
+            int((self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1)
             )
 
     def set_maze_axis(self):
@@ -154,7 +158,7 @@ class Player(Sprite):
         if lista is None:
             # sinkmatrix é uma deepcopy de levelpathing, levelpathing é a matriz de paredes (0s) e caminhos (1s)
             # levelpathing (level.pathing) apenas existe para facilitar a criação de sinkmatrixes.
-            self.sinkmatrix = deepcopy(self.level.pathing)
+            self.sinkmatrix = deepcopy(self.maze.pathing)
             targetstart = self.get_matrix_coordinates()
             # coloca as coordenadas de blinky na lista neste formato: [[y, x]] aka: [[linha, coluna]]
             # é importante a criação de uma lista para que a função recursiva funcione.

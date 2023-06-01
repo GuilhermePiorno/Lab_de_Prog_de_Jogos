@@ -5,7 +5,6 @@ from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
 from EatThis.a_star import *
 
-
 print("Hotkeys:")
 print("        N - Gera mapa novo")
 print("        G - Liga/Desliga Grid")
@@ -42,7 +41,7 @@ bgm.play()
 maze = Maze(walltype, janela)
 # cria o grafo a partir desse maze
 maze_graph = MazeGraph(maze.level)
-maze_graph.create_graph()
+# maze_graph.create_graph()
 
 # Cria o sprite de Blinky e define o número de frames de sua animação.
 # blinky = Sprite("./Sprites/Blinky.png", 8)
@@ -52,14 +51,12 @@ blinky.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width *
 blinky.set_sequence_time(0, 8, 100, True)
 blinky.set_sequence(0, 1, True)
 
-
 # Cria o sprite de Pacman e define o número de frames de sua animação.
-pacman = Enemy(janela, maze, "./Sprites/pacman.png", 8)
+pacman = Enemy(janela, maze, "./Sprites/pacman_movimento_e_morte.png", 22)
 pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
                     janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
 pacman.set_sequence_time(0, 8, 100, True)
 pacman.set_sequence(0, 1, True)
-
 
 # pacman2 = Enemy(janela, maze, "./Sprites/pacman.png", 8)
 # pacman2.set_position(janela.width / 2 + maze.half_maze_width/2 - (maze.wall.width * 1.5 + pacman.width / 2),
@@ -68,12 +65,12 @@ pacman.set_sequence(0, 1, True)
 # pacman2.set_sequence(0, 1, True)
 
 # cria o caminho (no grafo) do pacman até o blinky
-"""
-graph_path = a_star(maze_graph, pacman.get_matrix_coordinates(), blinky.get_matrix_coordinates())
-graph_path.append(blinky.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
-pacman_cmds = matrix_path(graph_path, pacman.get_matrix_coordinates())
-pacman.cmdstr = pacman_cmds
-"""
+
+# graph_path = a_star(maze_graph, pacman.get_matrix_coordinates(), blinky.get_matrix_coordinates())
+# graph_path.append(blinky.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
+# pacman_cmds = matrix_path(graph_path, pacman.get_matrix_coordinates())
+# pacman.cmdstr = pacman_cmds
+
 
 # Portal_Esquerdo
 portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -106,8 +103,8 @@ while True:
         maze = Maze(walltype, janela)
 
         # cria o grafo a partir desse maze
-        maze_graph = MazeGraph(maze.level)
-        maze_graph.create_graph()
+        # maze_graph = MazeGraph(maze.level)
+        # maze_graph.create_graph()
         blinky.level = maze  # Atualiza o level do blinky
         pacman.level = maze  # Atualiza o level do pacman
         # pacman2.level = maze  # Atualiza o level do pacman2
@@ -124,7 +121,6 @@ while True:
         maze.walltype = walltype  # Atualiza o walltype do maze
         maze.level = maze.fill_level()  # Atualiza o level do maze para incluir a walltype nova
 
-
     if teclado.key_pressed("M") and not TesteDebugMapa:
         if BGM_Toggle:
             BGM_Toggle = False
@@ -136,13 +132,11 @@ while True:
 
     # Atualiza buffer de inputs
     blinky.buffer += dt
-    
+
     blinky.move1()
     blinky.x += blinky.vx * dt
     blinky.y += blinky.vy * dt
-    """
-    pacman.move1(blinky, pacman_cmds, maze_graph)
-    """
+
     pacman.move1(blinky)
 
     pacman.x += pacman.vx * dt
