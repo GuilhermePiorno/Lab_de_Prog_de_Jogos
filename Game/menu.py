@@ -35,6 +35,7 @@ def open_menu(screen_width, screen_height):
                     return "play"
                 elif menu_selection[selection_index] == "options":
                     print("Options selected")
+                    return "options"
                 elif menu_selection[selection_index] == "exit":
                     return "close"
 

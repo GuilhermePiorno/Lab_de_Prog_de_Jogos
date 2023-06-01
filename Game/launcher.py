@@ -1,9 +1,7 @@
-from PPlay.window import *
-from PPlay.sound import *
-from EatThis.Classes.cinematic_classes import *
-from EatThis.cinematics import *
 from intro import *
 from menu import *
+from main import *
+from options import *
 
 screen_width = 1280
 screen_height = 720
@@ -20,7 +18,7 @@ while next_step != "close":
     if next_step == "play":
         play_game(screen_width, screen_height, vol)
     elif next_step == "options":
-        vol = open_options()
+        vol = open_options(screen_width, screen_height)
 
 print("Game closed by launcher.")
 janela.close()
