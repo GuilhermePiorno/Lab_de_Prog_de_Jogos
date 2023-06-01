@@ -1,50 +1,28 @@
 from PPlay.window import *
 from PPlay.sound import *
 from EatThis.Classes.cinematic_classes import *
-from math import sin
+from EatThis.cinematics import *
+from menu import *
 
+#font = pygame.font.Font('freesansbold.ttf', 24)
+font = pygame.font.Font('./Sprites/Fonts/MinimalPixel v2.ttf', 24)
+timer = pygame.time.Clock()
+message = 'Check out this long ass message! The quick brown fox jumps over the lazy dog.'
+snip = font.render('', True, 'white')
+counter = 0
+speed = 500
+done = False
+tic = 0
+text_speed = 50
 
-def ship_func(actor, dt, time):
-    if time > 3:  # 3 segundos de delay para a nave aparecer
-        if actor.vx > 0:
-            actor.x += actor.vx * dt + (actor.ax * dt ** 2) / 2
-            actor.vx += actor.ax * dt
-        else:
-            actor.vx = 0
-            actor.ax = 0
-
-    amplitude = 500 / time
-    ship.y = janela.height / 2 - ship.height / 2 + amplitude * sin(time)
-
-
-def dust_func(actor, dt, time):
-    actor.x += actor.vx * dt
-    if actor.x < - actor.width:
-        actor.x = actor.width
-
-
-def move_actor(actor, dt, time):
-    if actor.f == "":
-        actor.vx += actor.ax * dt
-        actor.vy += actor.ax * dt
-        actor.x += actor.vx * dt
-        actor.y += actor.vy * dt
-    else:
-        actor.f(actor, dt, time)
-
-
-def update_actors(actor_list, dt, time):
-    for i in range(len(actor_list)):
-        if type(actor_list[i]) == list:
-            for j in range(len(actor_list[i])):
-                move_actor(actor_list[i][j], dt, time)
-        else:
-            move_actor(actor_list[i], dt, time)
-
-
-janela = Window(1280, 720)
+screen_width = 1280
+screen_height = 720
+janela = Window(screen_width, screen_height)
 janela.set_title("Game Start")
+input_teclado = janela.get_keyboard()
 
+
+# ============================Incialização de atores em uma lista "actor_list"============================
 actor_list = []
 # Spawn assets
 background = Actor("Sprites/Intro/Asset_Sky_Extended.png")
@@ -72,51 +50,55 @@ ship.set_position(- ship.width, janela.height / 2 - ship.height / 2)
 ship.f = ship_func
 actor_list.append(ship)
 
-song = "music/FTL - Lanius (Explore).mp3"
+
 
 # Music
+song = "music/FTL - Lanius (Explore).mp3"
 bgm = Sound(song)
 print(f"\nPlaying: {song[6:len(song) - 4]} \n")
 bgm.set_volume(50)
 bgm.play()
-time = 0.000001  # Evita divisão por 0 no cálculo da posição y da nave.
-on_menu = True
-tempo = 0
-cont = 0
-FPS = 0
-while on_menu:
+
+
+
+t = 0.000001  # Evita divisão por 0 no cálculo da posição y da nave.
+on_intro = True
+
+
+
+while on_intro:
     dt = janela.delta_time()
-    time += dt
-
-    str1 = "looooooo-abcdefghijklkmlniopquertoqpoiueralkfdhzcv^oooooooooooooooooooooong"
-    # str1 = "MUITO TEXTO"
-    # str2 = "MUITO TEXTO"
-    # str3 = "MUITO TEXTO"
-    # str4 = "MUITO TEXTO"
-    # str5 = "MUITO TEXTO"
+    t += dt
 
 
 
-    # FPS
-    tempo += dt
-    cont += 1
-    if tempo >= 1:
-        tempo = 0
-        FPS = cont
-        cont = 0
+    pygame.draw.rect(janela.screen, 'black', [0, 600, 1280, 720])
+    if t - tic > 1/text_speed and counter < len(message):
+        tic = t
+        counter += 1
+    elif counter >= len(message) and not done:
+        done = True
+    snip = font.render(message[0:counter], True, 'white')
 
-    update_actors(actor_list, dt, time)
+
+    # Eventos
+    update_actors(actor_list, dt, t, screen_width, screen_height)
     background.draw()
     stars.draw()
     ship.draw()
     dust[0].draw()
     dust[1].draw()
-    janela.draw_text(str(FPS), 10, janela.height - 50, size=25, color=(255, 255, 0))
-    janela.draw_text(str1, 10, 50, size=25, color=(255, 255, 0))
-    # janela.draw_text(str2, 10, 100, size=25, color=(255, 255, 0))
-    # janela.draw_text(str3, 10, 150, size=25, color=(255, 255, 0))
-    # janela.draw_text(str4, 10, 200, size=25, color=(255, 255, 0))
-    # janela.draw_text(str5, 10, 250, size=25, color=(255, 255, 0))
+
+    # Texto
+    janela.screen.blit(snip, (10, 610))
+    janela.screen.blit(snip, (10, 650))
+    janela.screen.blit(snip, (10, 690))
+
+    # Update
     janela.update()
 
+    if input_teclado.key_pressed("ESC"):
+        on_intro = False
+        bgm.stop()
 
+menu(screen_width, screen_height)
