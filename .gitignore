@@ -1,3 +1,4 @@
 Game/PPlay
 Game/venv
 Game/.idea
+*.pyc

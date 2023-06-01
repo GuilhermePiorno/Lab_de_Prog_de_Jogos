@@ -17,7 +17,6 @@ def play_game(screen_width, screen_height, vol):
     teclado = janela.get_keyboard()
     walltype = 'Curved_20'
     TesteDebugMapa = False
-    buffer = 0  # Buffer para pressionar botão direcional.
     grid_toggle = False
     BGM_Toggle = True
 
@@ -45,7 +44,6 @@ def play_game(screen_width, screen_height, vol):
     # maze_graph.create_graph()
 
     # Cria o sprite de Blinky e define o número de frames de sua animação.
-    # blinky = Sprite("./Sprites/Blinky.png", 8)
     blinky = Player(janela, maze, "./Sprites/Blinky.png", 8)
     blinky.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width * 1.5 - blinky.width / 2),
                         janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - blinky.height / 2))
