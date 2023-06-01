@@ -1,8 +1,10 @@
 from PPlay.window import *
 from PPlay.sprite import *
+
+
 # from main import *
 
-def menu(screen_width, screen_height):
+def open_menu(screen_width, screen_height):
     janela = Window(screen_width, screen_height)
     background = Sprite("Sprites/Menu/Menu_Background.png")
     cursor = Sprite("Sprites/Blinky.png", 8)
@@ -13,7 +15,6 @@ def menu(screen_width, screen_height):
     last_input = "esc"
     menu_selection = ["start", "options", "exit"]
     selection_index = 0
-
 
     while in_menu:
 
@@ -30,14 +31,12 @@ def menu(screen_width, screen_height):
                 button_state = True
                 last_input = "return"
                 if menu_selection[selection_index] == "start":
-                    # game()
                     print("New game selected")
+                    return "play"
                 elif menu_selection[selection_index] == "options":
                     print("Options selected")
                 elif menu_selection[selection_index] == "exit":
-                    print("Quit game selected")
-                    janela.close()
-
+                    return "close"
 
         if not teclado.key_pressed(last_input):
             button_state = False
@@ -53,5 +52,3 @@ def menu(screen_width, screen_height):
         cursor.draw()
         cursor.update()
         janela.update()
-
-
