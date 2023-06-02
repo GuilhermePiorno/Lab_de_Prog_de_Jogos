@@ -2,3 +2,4 @@ Game/PPlay
 Game/venv
 Game/.idea
 *.pyc
+Game/EatThis/maze.txt
