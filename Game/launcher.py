@@ -8,7 +8,7 @@ screen_height = 720
 janela = Window(screen_width, screen_height)
 janela.set_title("Splash")
 input_teclado = janela.get_keyboard()
-vol = 100
+vol = 10
 
 play_intro(screen_width, screen_height)
 next_step = ""

@@ -4,9 +4,13 @@ from EatThis.Classes.Maze import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
 from EatThis.a_star import *
+from EatThis.debug import *
+
 
 def play_game(screen_width, screen_height, vol):
     print("Hotkeys:")
+    print("        B - Bullet-Time")
+    print("        P - Pause")
     print("        N - Gera mapa novo")
     print("        G - Liga/Desliga Grid")
     print("        M - Liga/Desliga Música")
@@ -15,10 +19,14 @@ def play_game(screen_width, screen_height, vol):
     janela = Window(screen_width, screen_height)
     janela.set_title("Eat This!")
     teclado = janela.get_keyboard()
-    walltype = 'Curved_20'
-    teste_debug_jogo = False
+    walltypes = ["Curved_20", "Curved_20_Matrix"]
+    wall_select = 0
+    walltype = walltypes[wall_select]
+    debug_timer = 0
+    just_pressed = False
     grid_toggle = False
-    BGM_Toggle = True
+    new_map = False
+    bgm_toggle = True
     pause = False
     bullet_time = False
     time_ratio = 1
@@ -34,18 +42,17 @@ def play_game(screen_width, screen_height, vol):
     else:
         song = "music/The Bat Matriarch.mp3"
 
-
+    slowmo = [Sound("SFX/SlowMotionIn.mp3"),Sound("SFX/SlowMotionOut.mp3")]
     bgm = Sound(song)
     print(f"\nPlaying: {song[6:len(song) - 4]} \n")
-    bgm.set_volume(5)
+    bgm.set_volume(vol)
     bgm.set_repeat(True)
     bgm.play()
 
     # cria o objeto maze
     maze = Maze(walltype, janela)
     # cria o grafo a partir desse maze
-    maze_graph = MazeGraph(maze.level)
-    # maze_graph.create_graph()
+
 
     # Cria o sprite de Blinky e define o número de frames de sua animação.
     blinky = Player(janela, maze, "./Sprites/Blinky.png", 8)
@@ -60,28 +67,6 @@ def play_game(screen_width, screen_height, vol):
                         janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
     pacman.set_sequence_time(0, 8, 100, True)
     pacman.set_sequence(0, 1, True)
-
-    # --- Pacmans para teste, no futuro incializar pacmans em uma lista.
-    pacman2 = Enemy(janela, maze, "./Sprites/pacman.png", 8)
-    pacman2.set_position(janela.width / 2 - maze.half_maze_width / 2 - (maze.wall.width * 1.5 + pacman.width / 2),
-                         janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
-    pacman2.set_sequence_time(0, 8, 100, True)
-    pacman2.set_sequence(0, 1, True)
-
-    pacman3 = Enemy(janela, maze, "./Sprites/pacman.png", 8)
-    pacman3.set_position(janela.width / 2 + maze.half_maze_width / 2 - (maze.wall.width * 1.5 + pacman.width / 2),
-                         janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - pacman.height / 2))
-    pacman3.set_sequence_time(0, 8, 100, True)
-    pacman3.set_sequence(0, 1, True)
-    # --- Fim da inicialização de Pacmans para teste
-
-
-    # cria o caminho (no grafo) do pacman até o blinky
-    # graph_path = a_star(maze_graph, pacman.get_matrix_coordinates(), blinky.get_matrix_coordinates())
-    # graph_path.append(blinky.get_matrix_coordinates()) # gambiarra: deve dar pra fazer isso dentro da função
-    # pacman_cmds = matrix_path(graph_path, pacman.get_matrix_coordinates())
-    # pacman.cmdstr = pacman_cmds
-
 
 
     # Portal_Esquerdo
@@ -107,65 +92,50 @@ def play_game(screen_width, screen_height, vol):
     while True:
         # Leitura de Entradas
         dt = janela.delta_time()
+        # Se algum carregamento gerar um dt muito grande, considerar dt=0 para evitar movimentos "pulados".
+        if dt > 0.1:
+            dt = 0
+        debug_timer += dt
+        print(dt)
 
-        # Código para a geração do mapa para testes.
-        if not teclado.key_pressed("N") and not teclado.key_pressed("G") and not teclado.key_pressed("M") and not teclado.key_pressed("P") and not teclado.key_pressed("B"):
-            teste_debug_jogo = False
-        if teclado.key_pressed("N") and not teste_debug_jogo:
-            maze = Maze(walltype, janela)
 
-            # cria o grafo a partir desse maze
-            # maze_graph = MazeGraph(maze.level)
-            # maze_graph.create_graph()
-            blinky.level = maze  # Atualiza o level do blinky
-            pacman.level = maze  # Atualiza o level do pacman
-            # pacman2.level = maze  # Atualiza o level do pacman2
-            teste_debug_jogo = True
+# <============================================================ DEBUG AREA START
+        # Se nada tiver sido pressionado, checa inputs.
+        if not just_pressed:
+            bullet_time = var_toggle(bullet_time, "B", teclado)
+            bgm_toggle = var_toggle(bgm_toggle, "M", teclado)
+            pause = var_toggle(pause, "P", teclado)
+            grid_toggle = var_toggle(grid_toggle, "G", teclado)
+            new_map = var_toggle(new_map, "N", teclado)
 
-        if teclado.key_pressed("G") and not teste_debug_jogo:
-            if grid_toggle:
-                grid_toggle = False
-                walltype = walltype.split("_")[0] + "_" + walltype.split("_")[1]
-            else:
-                grid_toggle = True
-                walltype += '_Matrix'
-            teste_debug_jogo = True
+        # Notação pythonica de atribuição simples com if.
+        # variável = valor_se_sim if condicao else valor_se_nao.
+        bgm.unpause() if bgm_toggle else bgm.pause()
+
+        change_state = time_ratio
+        time_ratio = 0.2 if bullet_time else 1
+        if change_state != time_ratio:
+            # 0.2//1 = 0 ou 1//1 = 1, ou seja, alterna entre som de SlowMotionIn ou SlowMotionOut.
+            slowmo[int(time_ratio//1)].play()
+            bgm.set_volume(vol * time_ratio)
+
+        if grid_toggle:
+            wall_select += 1
+            walltype = walltypes[wall_select % (len(walltypes))]
             maze.walltype = walltype  # Atualiza o walltype do maze
             maze.level = maze.fill_level()  # Atualiza o level do maze para incluir a walltype nova
+            grid_toggle = False
 
-        if teclado.key_pressed("M") and not teste_debug_jogo:
-            if BGM_Toggle:
-                BGM_Toggle = False
-                bgm.pause()
-            else:
-                BGM_Toggle = True
-                bgm.unpause()
-            teste_debug_jogo = True
+        if new_map:
+            maze = Maze(walltype, janela)
+            blinky.maze = maze  # Atualiza o level do blinky
+            pacman.maze = maze  # Atualiza o level do pacman
+            new_map = False
 
-        if teclado.key_pressed("P") and not teste_debug_jogo:
-            if pause:
-                pause = False
-            else:
-                pause = True
-            teste_debug_jogo = True
+        # Atualiza caso algo tenha sido pressionado.
+        just_pressed = check_keys(teclado, "B", "G", "M", "N", "P")
+# <============================================================ DEBUG AREA END
 
-        if teclado.key_pressed("B") and not teste_debug_jogo:
-            if bullet_time:
-                bullet_time = False
-                time_ratio = 1
-            else:
-                bullet_time = True
-                time_ratio = 0.2
-            teste_debug_jogo = True
-
-
-        # cria o grafo a partir desse maze
-        #maze_graph = MazeGraph(maze.level)
-        #maze_graph.create_graph()
-        blinky.maze = maze  # Atualiza o level do blinky
-        pacman.maze = maze  # Atualiza o level do pacman
-        pacman2.maze = maze  # Atualiza o level do pacman2
-        pacman3.maze = maze  # Atualiza o level do pacman3
 
 
         # Atualiza buffer de inputs
@@ -182,16 +152,6 @@ def play_game(screen_width, screen_height, vol):
             pacman.y += pacman.vy * dt * time_ratio
             pacman.update()
 
-            pacman2.move1(blinky)
-            pacman2.x += pacman2.vx * dt * time_ratio
-            pacman2.y += pacman2.vy * dt * time_ratio
-            pacman2.update()
-
-            pacman3.move1(blinky)
-            pacman3.x += pacman3.vx * dt * time_ratio
-            pacman3.y += pacman3.vy * dt * time_ratio
-            pacman3.update()
-
 
 
         # FPS
@@ -207,12 +167,14 @@ def play_game(screen_width, screen_height, vol):
         maze.draw()
         blinky.draw()
         pacman.draw()
-        pacman2.draw()
-        pacman3.draw()
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()
         portal_direito.update()
-
         janela.update()
+
+
+
+
+
 
