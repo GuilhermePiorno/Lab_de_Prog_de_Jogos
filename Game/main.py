@@ -96,7 +96,6 @@ def play_game(screen_width, screen_height, vol):
         if dt > 0.1:
             dt = 0
         debug_timer += dt
-        print(dt)
 
 
 # <============================================================ DEBUG AREA START

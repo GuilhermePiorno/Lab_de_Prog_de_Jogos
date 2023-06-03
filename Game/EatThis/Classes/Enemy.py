@@ -67,11 +67,18 @@ class Enemy(Sprite):
         # self.ia_pacman_2(target, maze_graph)
 
         # ia do pacman baseada no algoritmo flowfield
-        if(not self.is_dead):
+        if not self.is_dead:
             self.animate()
             self.ia_pacman_follow(target)
+            # dist = (delta_x**2 + delta_y**2)^0.5
+            direct_distance = self.relative_position_of_target(target)[0]**2
+            direct_distance += self.relative_position_of_target(target)[1]**2
+            direct_distance = direct_distance**0.5
+
+            if direct_distance <= 100:
+                self.ia_pacman_run_away(target)
         else:
-            if(time.time() - self.death_instant >= 10):
+            if time.time() - self.death_instant >= 10:
                 self.hide()
 
 
@@ -218,6 +225,20 @@ class Enemy(Sprite):
         if target.sinkmatrix[self.matrix_coordinates[0]][self.matrix_coordinates[1] + 1] < \
                 target.sinkmatrix[self.matrix_coordinates[0]][self.matrix_coordinates[1]]:
             self.cmd = 'r'
+
+    def ia_pacman_run_away(self, target):
+        # Inversão do conceito de ia_pacman_follow
+        # "menor que" é trocado por "maior que" e "0 >" é adicionado a equação para evitar
+        # que fugir para a parede seja uma opção.
+        direcoes = ['d', 'u', 'l', 'r']
+        offsets = [[1, 0], [-1, 0], [0, -1], [0, 1]]
+        for i in range(4):
+            if [self.matrix_coordinates[0] + offsets[i][0], self.matrix_coordinates[1] + offsets[i][1]] != [15, 1] and \
+                    [self.matrix_coordinates[0] + offsets[i][0], self.matrix_coordinates[1] + offsets[i][1]] != [15, 28]:
+                if 0 > target.sinkmatrix[self.matrix_coordinates[0] + offsets[i][0]][self.matrix_coordinates[1] + offsets[i][1]] > \
+                        target.sinkmatrix[self.matrix_coordinates[0]][self.matrix_coordinates[1]]:
+                    self.cmd = direcoes[i]
+
 
     def get_matrix_coordinates(self):
         return (
