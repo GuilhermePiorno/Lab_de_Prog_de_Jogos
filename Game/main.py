@@ -16,6 +16,7 @@ def play_game(screen_width, screen_height, vol):
     print("        G - Liga/Desliga Grid")
     print("        M - Liga/Desliga Música")
     print("        T - Altera modo IA do inimgo")
+    print("        V - Altera modo do player")
 
     # Inicialização.
     janela = Window(screen_width, screen_height)
@@ -26,7 +27,7 @@ def play_game(screen_width, screen_height, vol):
     walltype = walltypes[wall_select]
     debug_timer = 0
     just_pressed = False
-    grid_toggle = True
+    grid_toggle = False
     new_map = False
     bgm_toggle = True
     pause = False
@@ -34,6 +35,7 @@ def play_game(screen_width, screen_height, vol):
     toggle_mood = False
     moods = ["hungry", "afraid", "angry"]
     mood_ind = 0
+    toggle_vulnerability = False
     time_ratio = 1
 
     # Background Music.
@@ -60,10 +62,10 @@ def play_game(screen_width, screen_height, vol):
 
 
     # Cria o sprite de Blinky e define o número de frames de sua animação.
-    blinky = Player(janela, maze, "./Sprites/Blinky.png", 8)
+    blinky = Player(janela, maze, "./Sprites/Blinky.png", 12)
     blinky.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width * 1.5 - blinky.width / 2),
                         janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - blinky.height / 2))
-    blinky.set_sequence_time(0, 8, 100, True)
+    blinky.set_sequence_time(0, 12, 100, True)
     blinky.set_sequence(0, 1, True)
 
     # Cria o sprite de Pacman e define o número de frames de sua animação.
@@ -119,7 +121,6 @@ def play_game(screen_width, screen_height, vol):
             dt = 0
         debug_timer += dt
 
-        aux = time()
 # <============================================================ DEBUG AREA START
         # Se nada tiver sido pressionado, checa inputs.
         if not just_pressed:
@@ -129,6 +130,7 @@ def play_game(screen_width, screen_height, vol):
             grid_toggle = var_toggle(grid_toggle, "G", teclado)
             new_map = var_toggle(new_map, "N", teclado)
             toggle_mood = var_toggle(toggle_mood, "T", teclado)
+            toggle_vulnerability =  var_toggle(toggle_vulnerability, "V", teclado)
 
         # Notação pythonica de atribuição simples com if.
         # variável = valor_se_sim if condicao else valor_se_nao.
@@ -189,8 +191,15 @@ def play_game(screen_width, screen_height, vol):
             toggle_mood = not toggle_mood
             print(f"Now I'm {moods[mood_ind]}!")
 
+
+        if toggle_vulnerability:                        # ---DEBUG------> V
+            blinky.change_state()
+            print(f"Now I'm {blinky.state}!")
+            toggle_vulnerability = not toggle_vulnerability
+
+
         # Atualiza caso algo tenha sido pressionado.
-        just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T")
+        just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
 # <============================================================ DEBUG AREA END
 
 

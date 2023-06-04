@@ -9,6 +9,8 @@ class Enemy(Sprite):
         super().__init__(image_file, frames)
         self.name = name
         self.state = "hungry"  # hungry, afraid e angry
+        self.base_fear_time = 5
+        self.fear_timer = 0.0
         self.vx = 0
         self.vy = 0
         self.base_speed = 100
@@ -31,27 +33,27 @@ class Enemy(Sprite):
         self.nearest_point = self.get_next_closest_point()
 
     def move1(self, target):
-        # self.get_next_closest_point()
-        # pacman comendo os pontos normais
+
+        if self.get_matrix_coordinates() == target.get_matrix_coordinates() and target.state == "invulnerable":
+            self.die()
+
+        # Detecta se pacman comeu powerup
+        if isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], PowerUp):
+            self.maze.powerup_num -= 1
+            if target.state != "vulnerable":
+                target.change_state()
+
+
+        # pacman comendo os pontos normais e remove pontos normais ou powerups ao serem comidos.
         if isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], Point):
             self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0 # deleta o ponto.
-            #print(f"Sou {self.name} e acabo de comer {self.get_matrix_coordinates()}")
-            # Busca ponto recém comido e o retira da lista de pontos.
 
             for i in range(len(self.maze.list_of_points)):
                 if self.get_matrix_coordinates() == self.maze.list_of_points[i]:
                     del self.maze.list_of_points[i]
-                    #self.get_next_closest_point()
                     break
 
-            # Memoriza o ponto mais próximo e gera/atualiza lista de pontos.
-            #self.nearest_point = self.get_next_closest_point()
 
-        # pacman comendo os powerups
-        if isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], PowerUp):
-            self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0
-            # mudar estado do pacman e do blinky
-            self.maze.powerup_num -= 1
 
         # Coordenadas do pacman em relação ao 0 da fase
         self.maze_axis = self.get_maze_axis()
@@ -72,6 +74,16 @@ class Enemy(Sprite):
         if not self.is_dead:
             self.animate()
 
+            # Faz pacman voltar ao estado "hungry" após self.fear_timer expirar.
+            if self.fear_timer > 0 and self.state == "afraid":
+                self.fear_timer -= self.window.delta_time()
+            else:
+                self.state = "hungry"
+
+            if target.state == "vulnerable":
+                self.state = "angry"
+
+            # Estado padrão do pacman
             if self.state == "hungry":
             # Se houverem pontos para ser comidos
                 if len(self.maze.list_of_points) > 0:
@@ -82,7 +94,6 @@ class Enemy(Sprite):
                         self.maze.level[self.nearest_point[1][0]][self.nearest_point[1][1]].get_flow_field()
 
                     self.ia_pacman_follow(self.maze.level[self.nearest_point[1][0]][self.nearest_point[1][1]])
-
                 else:
                     # Segue blinky
                     self.ia_pacman_follow(target)
@@ -96,8 +107,10 @@ class Enemy(Sprite):
             direct_distance += self.relative_position_of_target(target)[1]**2
             direct_distance = direct_distance**0.5
 
-            # if direct_distance <= 100:
-            #     self.ia_pacman_run_away(target)
+            if direct_distance <= 100 and target.state != "vulnerable":
+                self.fear_timer = self.base_fear_time
+                self.state = "afraid"
+
         else:
             if time.time() - self.death_instant >= 10:
                 self.hide()

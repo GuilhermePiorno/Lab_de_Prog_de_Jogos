@@ -6,10 +6,15 @@ from copy import deepcopy
 class Player(Sprite):
     def __init__(self, window, maze, image_file, frames=1):
         super().__init__(image_file, frames)
+        self.state = "invulnerable"
         self.vx = 0
         self.vy = 0
         self.base_speed = 120
         self.cmd = ''
+        self.vulnerability_timer = 0
+        self.base_vulnerability_time = 2
+        self.transition_timer = 0
+        self.transition_base_time = 2
         self.window = window
         self.keyboard = self.window.get_keyboard()
         self.maze = maze
@@ -28,19 +33,42 @@ class Player(Sprite):
         # Como primeira ação blinky atualiza sua sinkmatrix/flowfield.
         self.get_flow_field()
 
-        # Mudança de animação de Blinky nas 4 direções cardinais.
-        if self.vy < 0 and self.facing != 'U':
-            self.facing = 'U'
-            self.set_sequence(6, 8, True)
-        if self.vy > 0 and self.facing != 'D':
-            self.facing = 'D'
-            self.set_sequence(4, 6, True)
-        if self.vx < 0 and self.facing != 'L':
-            self.facing = 'L'
-            self.set_sequence(2, 4, True)
-        if self.vx > 0 and self.facing != 'R':
-            self.facing = 'R'
-            self.set_sequence(0, 2, True)
+
+        if self.vulnerability_timer > 0:
+            self.vulnerability_timer -= self.window.delta_time()
+
+        if self.vulnerability_timer <= 0 and self.state == "vulnerable":
+            self.state = "transition"
+            #self.set_sequence(8, 12, True)
+            self.update_sequence()
+            self.state_transition()
+
+        if self.transition_timer > 0:
+            self.transition_timer -= self.window.delta_time()
+        if self.transition_timer <= 0 and self.state == "transition":
+            self.change_state()
+
+
+
+
+
+        if self.state == "invulnerable":
+            # Mudança de animação de Blinky nas 4 direções cardinais.
+            if self.vy < 0 and self.facing != 'U':
+                self.facing = 'U'
+                self.set_sequence(6, 8, True)
+            if self.vy > 0 and self.facing != 'D':
+                self.facing = 'D'
+                self.set_sequence(4, 6, True)
+            if self.vx < 0 and self.facing != 'L':
+                self.facing = 'L'
+                self.set_sequence(2, 4, True)
+            if self.vx > 0 and self.facing != 'R':
+                self.facing = 'R'
+                self.set_sequence(0, 2, True)
+
+
+
 
         if self.keyboard.key_pressed("UP"):
             self.buffer = 0
@@ -190,5 +218,38 @@ class Player(Sprite):
         else:  # se a lista de coordenadas a serem analisadas está vazia quer dizer que o processo chegou ao fim.
             return
 
+    def change_state(self):
+        if self.state == "invulnerable":
+            self.state = "vulnerable"
+            self.base_speed *= 0.5
+            self.vx *= 0.5
+            self.vy *= 0.5
+            self.vulnerability_timer = self.base_vulnerability_time
+        elif self.state == "vulnerable" or self.state == "transition":
+            self.base_speed /= 0.5
+            self.vx /= 0.5
+            self.vy /= 0.5
+            self.state = "invulnerable"
+        self.update_sequence()
 
+    def state_transition(self):
+        self.transition_timer = self.transition_base_time
+
+
+
+    def update_sequence(self):
+        if self.state == "invulnerable":
+            if self.facing == 'U':
+                self.set_sequence(6, 8, True)
+            if self.facing == 'D':
+                self.set_sequence(4, 6, True)
+            if self.facing == 'L':
+                self.set_sequence(2, 4, True)
+            if self.facing == 'R':
+                self.set_sequence(0, 2, True)
+        if self.state == "vulnerable":
+            self.set_sequence(8, 10, True)
+        if self.state == "transition":
+            self.set_sequence(8, 12, True)
+            self.set_total_duration(50)
 
