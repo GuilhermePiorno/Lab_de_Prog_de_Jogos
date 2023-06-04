@@ -5,8 +5,10 @@ from EatThis.Classes.PowerUp import *
 import time
 
 class Enemy(Sprite):
-    def __init__(self, window, maze, image_file, frames=1):
+    def __init__(self, name, window, maze, image_file, frames=1):
         super().__init__(image_file, frames)
+        self.name = name
+        self.state = "hungry"  # hungry, afraid e angry
         self.vx = 0
         self.vy = 0
         self.base_speed = 100
@@ -25,32 +27,37 @@ class Enemy(Sprite):
         self.image_file = image_file
         self.is_dead = False
         self.death_instant = 0
-
+        self.distance_list = []
+        self.nearest_point = self.get_next_closest_point()
 
     def move1(self, target):
-
-        
+        # self.get_next_closest_point()
         # pacman comendo os pontos normais
-        if(isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], Point)):
-            self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0
+        if isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], Point):
+            self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0 # deleta o ponto.
+            #print(f"Sou {self.name} e acabo de comer {self.get_matrix_coordinates()}")
+            # Busca ponto recém comido e o retira da lista de pontos.
+
+            for i in range(len(self.maze.list_of_points)):
+                if self.get_matrix_coordinates() == self.maze.list_of_points[i]:
+                    del self.maze.list_of_points[i]
+                    #self.get_next_closest_point()
+                    break
+
+            # Memoriza o ponto mais próximo e gera/atualiza lista de pontos.
+            #self.nearest_point = self.get_next_closest_point()
 
         # pacman comendo os powerups
-        if(isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], PowerUp)):
+        if isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], PowerUp):
             self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0
             # mudar estado do pacman e do blinky
-            print("Comeu powerup")
             self.maze.powerup_num -= 1
-            if(self.maze.powerup_num == 0):
-                #teste morte do pacman
-                self.die()
-            print(self.maze.powerup_num)
 
         # Coordenadas do pacman em relação ao 0 da fase
         self.maze_axis = self.get_maze_axis()
         
 
         #Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
-        # antigo self.matrix_position e self.get_matrix_position()
         self.matrix_coordinates = self.get_matrix_coordinates()
         
 
@@ -60,32 +67,43 @@ class Enemy(Sprite):
         can_go_right = (self.maze.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
 
 
-        # ia do pacman baseada na posição relativa
-        #self.ia_pacman_1(target)
-
-        # ia do pacman baseada no algoritmo a*
-        # self.ia_pacman_2(target, maze_graph)
 
         # ia do pacman baseada no algoritmo flowfield
         if not self.is_dead:
             self.animate()
-            self.ia_pacman_follow(target)
-            # dist = (delta_x**2 + delta_y**2)^0.5
+
+            if self.state == "hungry":
+            # Se houverem pontos para ser comidos
+                if len(self.maze.list_of_points) > 0:
+                    # Decide se é realmente necessário atualizar flowfield (melhora de performance).
+                    aux = self.get_next_closest_point()
+                    if self.nearest_point != aux:
+                        self.nearest_point = aux
+                        self.maze.level[self.nearest_point[1][0]][self.nearest_point[1][1]].get_flow_field()
+
+                    self.ia_pacman_follow(self.maze.level[self.nearest_point[1][0]][self.nearest_point[1][1]])
+
+                else:
+                    # Segue blinky
+                    self.ia_pacman_follow(target)
+            elif self.state == "afraid":
+                self.ia_pacman_run_away(target)
+            elif self.state == "angry":
+                self.ia_pacman_follow(target)
+
+            # distância entre os dois pontos => dist = (delta_x**2 + delta_y**2)^0.5
             direct_distance = self.relative_position_of_target(target)[0]**2
             direct_distance += self.relative_position_of_target(target)[1]**2
             direct_distance = direct_distance**0.5
 
-            if direct_distance <= 100:
-                self.ia_pacman_run_away(target)
+            # if direct_distance <= 100:
+            #     self.ia_pacman_run_away(target)
         else:
             if time.time() - self.death_instant >= 10:
                 self.hide()
 
 
-        # pacman controlado pelo jogador, para testes
-        #self.ia_pacman_testes()
 
-    
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1
         delta_y = 1
@@ -209,7 +227,6 @@ class Enemy(Sprite):
         return (self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2, 
                 self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2)
 
-
     def ia_pacman_follow(self, target):
         # Consulta a "sinkmatrix" para determinar a direção de movimento.
         # A matriz sink é uma matriz de mesma dimensão que a matriz "level" que contém valores de "distancia" de cada célula até o blinky.
@@ -239,10 +256,37 @@ class Enemy(Sprite):
                         target.sinkmatrix[self.matrix_coordinates[0]][self.matrix_coordinates[1]]:
                     self.cmd = direcoes[i]
 
-
     def get_matrix_coordinates(self):
+        """Retorna tupla (linha, coluna)"""
         return (
             int((self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1),
             int((self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1)
             )
 
+    # Função utiliza o atributo maze.list_of_points para resgatar a lista de pontos e cria uma lista de
+    # listas chama "distances_list" que armazenam a distancia entre si e os pontos e as coordenadas dos pontos.
+    # Ex: Se maze.list_of_points é [(2, 3), (9, 4)]
+    # distances_list será algo do tipo: [[5.3, (2, 3)], [20.1, (9, 4)]]
+    # distances_list[0] diz "Existe um ponto em (2, 3) que está a 5.3 unidades de distância.
+    # distances_list[1] diz "Existe um ponto em (9, 4) que está a 20.1 unidades de distância.
+    # A função retorna o elemento com a menor distância, neste caso a função retornaria min_dist = [5.3, (2, 3)]
+    # Observação: maze.list_of_points inclue TODOS os pontos, ou seja, pontos normais e powerups.
+    def get_next_closest_point(self):
+        """
+        Retorna uma lista composta da distancia do ponto e uma tupla (linha, coluna) do ponto.
+        Saida: [distancia, (ponto_linha, ponto_coluna)]
+
+        :returns [float distancia, (int ponto_linha, int ponto_coluna)]
+        """
+        distances_list = []
+        min_dist = [42.0, (0, 0)]
+        for i in range(len(self.maze.list_of_points)):
+            distances_list.append((self.points_distance(self.maze.list_of_points[i]), self.maze.list_of_points[i]))
+            if min_dist[0] > distances_list[i][0]:
+                min_dist = distances_list[i]
+        self.distance_list = distances_list
+        return min_dist
+
+
+    def points_distance(self, tupla):
+        return ((self.matrix_coordinates[0] - tupla[0]) ** 2 + (self.matrix_coordinates[1] - tupla[1]) ** 2)**0.5

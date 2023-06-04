@@ -27,6 +27,7 @@ class Maze:
     def __init__(self, walltype, window):
         self.window = window
         self.keyboard = self.window.get_keyboard()
+        self.list_of_points = []
         self.walltype = walltype
         self.wall = GameImage("Sprites/Walls/" + self.walltype + "/Wall_URDL.png")
         self.half_maze_height = (self.wall.height * 31) / 2
@@ -35,11 +36,11 @@ class Maze:
         self.level = self.fill_level()
         self.powerup_num = 10
         self.create_powerups()
-
         self.pathing = create_path_matrix() # Cria uma matriz com 0s e 1s para auxiliar na criação das sinkmatrix
                                             # level não pode ser usada pois ela contém os sprites das paredes e pontos.
 
     def fill_level(self):
+        self.list_of_points = []
         # Acessa o labirinto criado e armazena os sprites criados em uma matriz para depois ser desenhada
         with open('./EatThis/maze.txt', mode='r', encoding='utf-8') as fin:
             i = 0
@@ -116,7 +117,7 @@ class Maze:
                     
                     else:
 
-                        point = Point("Sprites/ponto_20_255_255_153_menor.png", (i, j))
+                        point = Point("Sprites/ponto_20_255_255_153_menor.png", (i, j), self.window, create_path_matrix())
 
                         # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
                         self.half_maze_width = (len(level[0]) - 2) / 2 * wall.width
@@ -132,8 +133,7 @@ class Maze:
 
                         point.set_position(maze_x, maze_y)
                         level[i][j] = point
-
-
+                        self.list_of_points.append((i, j))
 
         level[15][1] = 0    # Remove a parede para posicionamento do portal esquerdo
         level[15][28] = 0   # Remove a parede para posicionamento do portal direito
@@ -147,26 +147,25 @@ class Maze:
 
     def create_powerups(self):
         powerup_count = 0
-        while(powerup_count < self.powerup_num):
+        while powerup_count < self.powerup_num:
             i = random.randint(2, len(self.level)-2)
             j = random.randint(2, len(self.level[0])-2)
-            if(isinstance(self.level[i][j], Point)):
+            if isinstance(self.level[i][j], Point):
                 point = self.level[i][j]
-                powerup = PowerUp("Sprites/powerup_20_255_215_0.png", (i, j))
+                powerup = PowerUp("Sprites/powerup_20_255_215_0.png", (i, j), self.window, create_path_matrix())
                 powerup.set_position(point.x, point.y)
                 self.level[i][j] = powerup
                 powerup_count += 1
 
     # fill_level adaptado para grafos
     def fill_level2(self):
-
         self.level = [[1] * 30 for _ in range(33)]
         with open('maze.txt', mode='r', encoding='utf-8') as fin:
             fin.readline()  # pula a primeira linha vazia
             for i in range(31):
                 linha = fin.readline()
                 for j in range(28):
-                    if (linha[j] != "|"):
+                    if linha[j] != "|":
                         self.level[i + 1][j + 1] = 0
 
         # Altera o sprite das paredes para fazerem sentido
