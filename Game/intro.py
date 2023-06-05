@@ -50,7 +50,7 @@ def play_intro(screen_width, screen_height):
     # Music
     song = "Assets/Music/FTL - Lanius (Explore).mp3"
     bgm = Sound(song)
-    print(f"\nPlaying: {song[6:len(song) - 4]} \n")
+    print(f"\nPlaying: {song[13:len(song) - 4]} \n")
     bgm.set_volume(50)
     bgm.play()
 

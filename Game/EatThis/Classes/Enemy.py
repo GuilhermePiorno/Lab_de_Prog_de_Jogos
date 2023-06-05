@@ -82,7 +82,7 @@ class Enemy(Sprite):
             else:
                 self.state = "hungry"
 
-            if target.state == "vulnerable":
+            if target.state == "vulnerable" or target.state == "transition":
                 self.state = "angry"
 
             # Estado padrão do pacman

@@ -1,6 +1,4 @@
-Spawn points for pacman to collect
 
-Pacman points interaction (collisions or matrix lookup, probably collisions idk)
 
 Transitions when level has been beaten (portal change)
 
