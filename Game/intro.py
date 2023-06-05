@@ -6,7 +6,7 @@ from menu import *
 
 
 def play_intro(screen_width, screen_height):
-    font = pygame.font.Font('./Sprites/Fonts/MinimalPixel v2.ttf', 24)
+    font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 24)
     message = 'Check out this long ass message! The quick brown fox jumps over the lazy dog.'
     # snip = font.render('', True, 'white')
     counter = 0
@@ -21,15 +21,16 @@ def play_intro(screen_width, screen_height):
     # ============================Incialização de atores em uma lista "actor_list"============================
     actor_list = []
     # Spawn assets
-    background = Actor("Sprites/Intro/Asset_Sky_Extended.png")
+    background = Actor("Assets/Sprites/Intro/Asset_Sky_Extended.png")
     background.vx = -2
     actor_list.append(background)
-    stars = Actor("Sprites/Intro/Asset_Stars_Extended.png")
+    stars = Actor("Assets/Sprites/Intro/Asset_Stars_Extended.png")
     stars.vx = -4
     actor_list.append(stars)
 
     # Inicia poeira espacial/destritos voando rapidamente
-    dust = [Actor("Sprites/Intro/Asset_Dust_Extended.png"), Actor("Sprites/Intro/Asset_Dust_Extended.png")]
+    dust = [Actor("Assets/Sprites/Intro/Asset_Dust_Extended.png"), Actor(
+        "Assets/Sprites/Intro/Asset_Dust_Extended.png")]
     dust[0].f = dust_func
     dust[1].f = dust_func
     dust[0].x = 0
@@ -39,7 +40,7 @@ def play_intro(screen_width, screen_height):
     actor_list.append(dust)
 
     # Inicia nave.
-    ship = Actor("Sprites/Intro/SpaceShip_Scaled.png")
+    ship = Actor("Assets/Sprites/Intro/SpaceShip_Scaled.png")
     ship.vx = 60
     ship.ax = - (ship.vx ** 2) / (2 * ((janela.width / 2 - ship.width / 2) + ship.width))
     ship.set_position(- ship.width, janela.height / 2 - ship.height / 2)
@@ -47,7 +48,7 @@ def play_intro(screen_width, screen_height):
     actor_list.append(ship)
 
     # Music
-    song = "music/FTL - Lanius (Explore).mp3"
+    song = "Assets/Music/FTL - Lanius (Explore).mp3"
     bgm = Sound(song)
     print(f"\nPlaying: {song[6:len(song) - 4]} \n")
     bgm.set_volume(50)

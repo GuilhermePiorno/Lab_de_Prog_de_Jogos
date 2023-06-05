@@ -50,7 +50,7 @@ def fill_level(walltype, janela):
                             elif k == 3:
                                 wall_direction = 'UL'
 
-                wall = GameImage("Sprites/Walls/" + walltype + "/Wall_" + wall_direction + ".png")
+                wall = GameImage("Assets/Walls/" + walltype + "/Wall_" + wall_direction + ".png")
                 # wall.width and wall.height should be the same anyway (wall blocks are squares)
 
                 # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
@@ -68,17 +68,17 @@ def fill_level(walltype, janela):
                 wall.set_position(maze_x, maze_y)
                 level[i][j] = wall
                 if i == 14 and j == 1:
-                    wall = GameImage("./Sprites/Walls/" + walltype + "/Wall_UL.png")
+                    wall = GameImage("./Assets/Walls/" + walltype + "/Wall_UL.png")
                     wall.set_position(maze_x, maze_y)
                 elif i == 14 and j == 28:
-                    wall = GameImage("./Sprites/Walls/" + walltype + "/Wall_UR.png")
+                    wall = GameImage("./Assets/Walls/" + walltype + "/Wall_UR.png")
                     wall.set_position(maze_x, maze_y)
 
                 if i == 16 and j == 1:
-                    wall = GameImage("./Sprites/Walls/" + walltype + "/Wall_DL.png")
+                    wall = GameImage("./Assets/Walls/" + walltype + "/Wall_DL.png")
                     wall.set_position(maze_x, maze_y)
                 elif i == 16 and j == 28:
-                    wall = GameImage("./Sprites/Walls/" + walltype + "/Wall_RD.png")
+                    wall = GameImage("./Assets/Walls/" + walltype + "/Wall_RD.png")
                     wall.set_position(maze_x, maze_y)
                 level[i][j] = wall
 

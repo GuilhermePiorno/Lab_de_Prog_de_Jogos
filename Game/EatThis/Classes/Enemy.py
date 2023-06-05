@@ -33,6 +33,8 @@ class Enemy(Sprite):
         self.nearest_point = self.get_next_closest_point()
 
     def move1(self, target):
+        if len(self.maze.list_of_points) == 0:
+            print("game over")
 
         if self.get_matrix_coordinates() == target.get_matrix_coordinates() and target.state == "invulnerable":
             self.die()
@@ -44,7 +46,7 @@ class Enemy(Sprite):
                 target.change_state()
 
 
-        # pacman comendo os pontos normais e remove pontos normais ou powerups ao serem comidos.
+        # pacman comendo os pontos remove pontos normais ou powerups ao serem comidos.
         if isinstance(self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]], Point):
             self.maze.level[self.get_matrix_coordinates()[0]][self.get_matrix_coordinates()[1]] = 0 # deleta o ponto.
 
@@ -85,7 +87,7 @@ class Enemy(Sprite):
 
             # Estado padrão do pacman
             if self.state == "hungry":
-            # Se houverem pontos para ser comidos
+                # Se houverem pontos para ser comidos
                 if len(self.maze.list_of_points) > 0:
                     # Decide se é realmente necessário atualizar flowfield (melhora de performance).
                     aux = self.get_next_closest_point()

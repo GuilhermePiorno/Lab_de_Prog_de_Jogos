@@ -6,8 +6,8 @@ from PPlay.sprite import *
 
 def open_menu(screen_width, screen_height):
     janela = Window(screen_width, screen_height)
-    background = Sprite("Sprites/Menu/Menu_Background.png")
-    cursor = Sprite("Sprites/Blinky.png", 12)
+    background = Sprite("Assets/Sprites/Menu/Menu_Background.png")
+    cursor = Sprite("Assets/Sprites/Characters/Blinky.png", 12)
     cursor.set_sequence_time(0, 2, 100, True)
     teclado = janela.get_keyboard()
     in_menu = True

@@ -41,17 +41,17 @@ def play_game(screen_width, screen_height, vol):
     # Background Music.
     sorteio = random.random()
     if sorteio < 0.25:
-        song = "music/Unreal Super Hero 3 by Kenet & Rez.mp3"
+        song = "Assets/Music/Unreal Super Hero 3 by Kenet & Rez.mp3"
     elif sorteio < 0.5:
-        song = "music/FLCTR4 (feat. Zabutom).mp3"
+        song = "Assets/Music/FLCTR4 (feat. Zabutom).mp3"
     elif sorteio < 0.75:
-        song = "music/The Arcane Golem.mp3"
+        song = "Assets/Music/The Arcane Golem.mp3"
     else:
-        song = "music/The Bat Matriarch.mp3"
+        song = "Assets/Music/The Bat Matriarch.mp3"
 
-    slowmo = [Sound("SFX/SlowMotionIn.mp3"),Sound("SFX/SlowMotionOut.mp3")]
+    slowmo = [Sound("Assets/SFX/SlowMotionIn.mp3"), Sound("Assets/SFX/SlowMotionOut.mp3")]
     bgm = Sound(song)
-    print(f"\nPlaying: {song[6:len(song) - 4]} \n")
+    print(f"\nPlaying: {song[13:len(song) - 4]} \n")
     bgm.set_volume(vol)
     bgm.set_repeat(True)
     bgm.play()
@@ -62,39 +62,39 @@ def play_game(screen_width, screen_height, vol):
 
 
     # Cria o sprite de Blinky e define o número de frames de sua animação.
-    blinky = Player(janela, maze, "./Sprites/Blinky.png", 12)
+    blinky = Player(janela, maze, "Assets/Sprites/Characters/Blinky.png", 12)
     blinky.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width * 1.5 - blinky.width / 2),
                         janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - blinky.height / 2))
     blinky.set_sequence_time(0, 12, 100, True)
     blinky.set_sequence(0, 1, True)
 
     # Cria o sprite de Pacman e define o número de frames de sua animação.
-    pacman = Enemy("pac1", janela, maze, "./Sprites/pacman_movimento_e_morte.png", 22)
+    pacman = Enemy("pac1", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
     pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
                         janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
     pacman.set_sequence_time(0, 8, 100, True)
     pacman.set_sequence(0, 1, True)
 
-    pac2 = Enemy("pac2", janela, maze, "./Sprites/pacman_movimento_e_morte.png", 22)
+    pac2 = Enemy("pac2", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
     pac2.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width * 1.5 - pac2.width / 2),
                         janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac2.height / 2))
     pac2.set_sequence_time(0, 8, 100, True)
     pac2.set_sequence(0, 1, True)
 
-    pac3 = Enemy("pac3", janela, maze, "./Sprites/pacman_movimento_e_morte.png", 22)
+    pac3 = Enemy("pac3", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
     pac3.set_position(janela.width / 2 + 0.5*maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
                         janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac3.height / 2))
     pac3.set_sequence_time(0, 8, 100, True)
     pac3.set_sequence(0, 1, True)
 
-    pac4 = Enemy("pac4", janela, maze, "./Sprites/pacman_movimento_e_morte.png", 22)
+    pac4 = Enemy("pac4", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
     pac4.set_position(janela.width / 2 + -0.5*maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
                       janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac4.height / 2))
     pac4.set_sequence_time(0, 8, 100, True)
     pac4.set_sequence(0, 1, True)
 
     # Portal_Esquerdo
-    portal_esquerdo = Sprite("Sprites/Walls/" + walltype + "/Portal_L.png", 3)
+    portal_esquerdo = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_L.png", 3)
     portal_esquerdo.set_sequence_time(0, 3, 100, True)
     portal_esquerdo.set_sequence(0, 3, True)
     portal_esquerdo.set_position(janela.width / 2 - maze.half_maze_width - maze.wall.width,
@@ -102,7 +102,7 @@ def play_game(screen_width, screen_height, vol):
 
 
     # Portal_Direito
-    portal_direito = Sprite("Sprites/Walls/" + walltype + "/Portal_D.png", 3)
+    portal_direito = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_D.png", 3)
     portal_direito.set_sequence_time(0, 3, 100, True)
     portal_direito.set_sequence(0, 3, True)
     portal_direito.set_position(janela.width / 2 + maze.half_maze_width,

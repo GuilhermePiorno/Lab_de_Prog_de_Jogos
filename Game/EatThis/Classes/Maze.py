@@ -29,7 +29,7 @@ class Maze:
         self.keyboard = self.window.get_keyboard()
         self.list_of_points = []
         self.walltype = walltype
-        self.wall = GameImage("Sprites/Walls/" + self.walltype + "/Wall_URDL.png")
+        self.wall = GameImage("Assets/Sprites/Walls/" + self.walltype + "/Wall_URDL.png")
         self.half_maze_height = (self.wall.height * 31) / 2
         self.half_maze_width = (self.wall.width * 28) / 2
         createlevel()
@@ -83,7 +83,7 @@ class Maze:
                                     elif k == 3:
                                         wall_direction = 'UL'
 
-                        wall = GameImage("Sprites/Walls/" + self.walltype + "/Wall_" + wall_direction + ".png")
+                        wall = GameImage("Assets/Sprites/Walls/" + self.walltype + "/Wall_" + wall_direction + ".png")
                         # wall.width and wall.height should be the same anyway (wall blocks are squares)
 
                         # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
@@ -101,23 +101,23 @@ class Maze:
                         wall.set_position(maze_x, maze_y)
                         level[i][j] = wall
                         if i == 14 and j == 1:
-                            wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_UL.png")
+                            wall = GameImage("./Assets/Sprites/Walls/" + self.walltype + "/Wall_UL.png")
                             wall.set_position(maze_x, maze_y)
                         elif i == 14 and j == 28:
-                            wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_UR.png")
+                            wall = GameImage("./Assets/Sprites/Walls/" + self.walltype + "/Wall_UR.png")
                             wall.set_position(maze_x, maze_y)
 
                         if i == 16 and j == 1:
-                            wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_DL.png")
+                            wall = GameImage("./Assets/Sprites/Walls/" + self.walltype + "/Wall_DL.png")
                             wall.set_position(maze_x, maze_y)
                         elif i == 16 and j == 28:
-                            wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_RD.png")
+                            wall = GameImage("./Assets/Sprites/Walls/" + self.walltype + "/Wall_RD.png")
                             wall.set_position(maze_x, maze_y)
                         level[i][j] = wall
                     
                     else:
 
-                        point = Point("Sprites/ponto_20_255_255_153_menor.png", (i, j), self.window, create_path_matrix())
+                        point = Point("Assets/Sprites/PickUps/ponto_20_255_255_153_menor.png", (i, j), self.window, create_path_matrix())
 
                         # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
                         self.half_maze_width = (len(level[0]) - 2) / 2 * wall.width
@@ -152,7 +152,7 @@ class Maze:
             j = random.randint(2, len(self.level[0])-2)
             if isinstance(self.level[i][j], Point):
                 point = self.level[i][j]
-                powerup = PowerUp("Sprites/powerup_20_255_215_0.png", (i, j), self.window, create_path_matrix())
+                powerup = PowerUp("Assets/Sprites/PickUps/powerup_20_255_215_0.png", (i, j), self.window, create_path_matrix())
                 powerup.set_position(point.x, point.y)
                 self.level[i][j] = powerup
                 powerup_count += 1
@@ -197,7 +197,7 @@ class Maze:
                                 elif k == 3:
                                     wall_direction = 'UL'
 
-                    wall = GameImage("Sprites/Walls/" + self.walltype + "/Wall_" + wall_direction + ".png")
+                    wall = GameImage("Assets/Sprites/Walls/" + self.walltype + "/Wall_" + wall_direction + ".png")
                     # wall.width and wall.height should be the same anyway (wall blocks are squares)
 
                     # offset measurement for half of the matrix's PLOTTED width (columns - 2 == len(level["any"] - 2).
@@ -215,17 +215,17 @@ class Maze:
                     wall.set_position(maze_x, maze_y)
                     self.level[i][j] = wall
                     if i == 14 and j == 1:
-                        wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_UL.png")
+                        wall = GameImage("./Assets/Sprites/Walls/" + self.walltype + "/Wall_UL.png")
                         wall.set_position(maze_x, maze_y)
                     elif i == 14 and j == 28:
-                        wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_UR.png")
+                        wall = GameImage("./Assets/Sprites/Walls/" + self.walltype + "/Wall_UR.png")
                         wall.set_position(maze_x, maze_y)
 
                     if i == 16 and j == 1:
-                        wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_DL.png")
+                        wall = GameImage("./Assets/Sprites/Walls/" + self.walltype + "/Wall_DL.png")
                         wall.set_position(maze_x, maze_y)
                     elif i == 16 and j == 28:
-                        wall = GameImage("./Sprites/Walls/" + self.walltype + "/Wall_RD.png")
+                        wall = GameImage("./Assets/Sprites/Walls/" + self.walltype + "/Wall_RD.png")
                         wall.set_position(maze_x, maze_y)
                     self.level[i][j] = wall
 
