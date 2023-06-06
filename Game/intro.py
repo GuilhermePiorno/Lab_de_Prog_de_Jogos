@@ -60,6 +60,8 @@ def play_intro(screen_width, screen_height):
     while on_intro:
         dt = janela.delta_time()
         t += dt
+        if dt > 0.1:
+            dt = 0
 
         pygame.draw.rect(janela.screen, 'black', [0, 600, 1280, 720])
         if t - tic > 1 / text_speed and counter < len(message):
