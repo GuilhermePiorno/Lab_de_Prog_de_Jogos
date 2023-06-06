@@ -1,20 +1,11 @@
 from PPlay.window import *
 from PPlay.sprite import *
-from EatThis.game_save_data import *
 from PPlay.sound import *
-import os
-
-UPGRADE_VELOCIDADE = 0      # [nível do upgrade]
-UPGRADE_MEIA_VOLTA = 1      # [nível do upgrade]
-UPGRADE_STATE_CHANGE = 2    # [liga/desliga, cooldown]
-UPGRADE_TIRO = 3            # [liga/desliga]
-BULLET_TIME = 4             # [liga/desliga, duration
 
 
-
-def open_menu(screen_width, screen_height):
-
+def open_menu(screen_width, screen_height, save):
     janela = Window(screen_width, screen_height)
+    janela.set_title("Menu")
     background = Sprite("Assets/Sprites/Menu/Menu_Background_Empty.png")
     cursor = Sprite("Assets/Sprites/Characters/Blinky.png", 12)
     cursor.set_sequence_time(0, 2, 100, True)
@@ -23,22 +14,19 @@ def open_menu(screen_width, screen_height):
     button_state = True
     last_input = "esc"
     selection_index = 0
-    save_found = False
-    sfx_select = Sound('Assets/SFX/Select_0.wav')
-    sfx_select.set_volume(50)
-    sfx_confirm = Sound('Assets/SFX/Confirm_0.wav')
-    sfx_confirm.set_volume(50)
-    sfx_cancel = Sound('Assets/SFX/Cancel_0.wav')
-    sfx_cancel.set_volume(50)
+    save_found = save.read_save_data()
 
-    if os.path.exists("./EatThis/savegame.txt"):  # Caso não haja save..
-        save_found = True
+    # Sounds
+    sfx_select = Sound('Assets/SFX/Select_0.wav')
+    sfx_select.set_volume(save.SFX_vol * (save.Master_vol/100))
+    sfx_confirm = Sound('Assets/SFX/Confirm_0.wav')
+    sfx_confirm.set_volume(save.SFX_vol * (save.Master_vol/100))
+    sfx_cancel = Sound('Assets/SFX/Cancel_0.wav')
+    sfx_cancel.set_volume(save.SFX_vol * (save.Master_vol/100))
 
     print("Sava Data found!" if save_found else "No Save Data found..")
 
-
     menu_selection = ["continue", "newgame", "options", "exit"]
-
 
     font = pygame.font.Font('Assets/Fonts/ARCADE.TTF', 80)
     if save_found:
@@ -101,20 +89,20 @@ def open_menu(screen_width, screen_height):
             button_state = False
 
         if selection_index == 0:
-            cursor.set_position(janela.width/2 - newgame.get_width()/2 - cursor.width - 10, 450)
+            cursor.set_position(janela.width / 2 - newgame.get_width() / 2 - cursor.width - 10, 450)
             loadgame = font.render(message0, True, 'yellow')
             newgame = font.render(message1, True, 'white')
             options = font.render(message2, True, 'white')
             quit_game = font.render(message3, True, 'white')
         elif selection_index == 1:
-            cursor.set_position(janela.width/2 - newgame.get_width()/2 - cursor.width - 10, 520)
+            cursor.set_position(janela.width / 2 - newgame.get_width() / 2 - cursor.width - 10, 520)
 
             loadgame = font.render(message0, True, 'white')
             newgame = font.render(message1, True, 'yellow')
             options = font.render(message2, True, 'white')
             quit_game = font.render(message3, True, 'white')
         elif selection_index == 2:
-            cursor.set_position(janela.width/2 - newgame.get_width()/2 - cursor.width - 10, 590)
+            cursor.set_position(janela.width / 2 - newgame.get_width() / 2 - cursor.width - 10, 590)
 
             loadgame = font.render(message0, True, 'white')
             newgame = font.render(message1, True, 'white')
@@ -129,12 +117,10 @@ def open_menu(screen_width, screen_height):
 
         background.draw()
 
-
         janela.screen.blit(loadgame, (janela.width / 2 - newgame.get_width() / 2, 440))
-        janela.screen.blit(newgame, (janela.width/2 - newgame.get_width()/2, 510))
+        janela.screen.blit(newgame, (janela.width / 2 - newgame.get_width() / 2, 510))
         janela.screen.blit(options, (janela.width / 2 - newgame.get_width() / 2, 580))
         janela.screen.blit(quit_game, (janela.width / 2 - newgame.get_width() / 2, 650))
         cursor.draw()
         cursor.update()
         janela.update()
-

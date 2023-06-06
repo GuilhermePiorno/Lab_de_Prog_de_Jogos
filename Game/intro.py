@@ -5,7 +5,8 @@ from EatThis.cinematics import *
 from menu import *
 
 
-def play_intro(screen_width, screen_height):
+def play_intro(screen_width, screen_height, save):
+    #save.write_save_data(save)
     font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 24)
     message = 'Check out this long ass message! The quick brown fox jumps over the lazy dog.'
     # snip = font.render('', True, 'white')
@@ -15,7 +16,7 @@ def play_intro(screen_width, screen_height):
     text_speed = 50
 
     janela = Window(screen_width, screen_height)
-    janela.set_title("Game Start")
+    janela.set_title("Intro")
     input_teclado = janela.get_keyboard()
 
     # ============================Incialização de atores em uma lista "actor_list"============================
