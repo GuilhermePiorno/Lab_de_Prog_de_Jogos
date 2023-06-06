@@ -3,6 +3,7 @@ from PPlay.sound import *
 from EatThis.Classes.Maze import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
+from EatThis.Classes.Shot import *
 from EatThis.a_star import *
 from EatThis.debug import *
 from time import *
@@ -33,10 +34,13 @@ def play_game(screen_width, screen_height, vol):
     pause = False
     bullet_time = False
     toggle_mood = False
+    shot_fireball = False
     moods = ["hungry", "afraid", "angry"]
     mood_ind = 0
     toggle_vulnerability = False
     time_ratio = 1
+    shots_list = []
+    enemies_list = []
 
     # Background Music.
     sorteio = random.random()
@@ -58,8 +62,6 @@ def play_game(screen_width, screen_height, vol):
 
     # cria o objeto maze
     maze = Maze(walltype, janela)
-    # cria o grafo a partir desse maze
-
 
     # Cria o sprite de Blinky e define o número de frames de sua animação.
     blinky = Player(janela, maze, "Assets/Sprites/Characters/Blinky.png", 12)
@@ -131,6 +133,7 @@ def play_game(screen_width, screen_height, vol):
             new_map = var_toggle(new_map, "N", teclado)
             toggle_mood = var_toggle(toggle_mood, "T", teclado)
             toggle_vulnerability =  var_toggle(toggle_vulnerability, "V", teclado)
+            shot_fireball = var_toggle(shot_fireball, "SPACE", teclado)
 
         # Notação pythonica de atribuição simples com if.
         # variável = valor_se_sim if condicao else valor_se_nao.
@@ -197,9 +200,14 @@ def play_game(screen_width, screen_height, vol):
             print(f"Now I'm {blinky.state}!")
             toggle_vulnerability = not toggle_vulnerability
 
+        if shot_fireball:
+            shot = Shot("Assets\Sprites\VFX\\fireball_19x9.png", blinky, 2)
+            shots_list.append(shot)
+
+
 
         # Atualiza caso algo tenha sido pressionado.
-        just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
+        just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V", "SPACE")
 # <============================================================ DEBUG AREA END
 
 
@@ -233,6 +241,10 @@ def play_game(screen_width, screen_height, vol):
             pac4.y += pac4.vy * dt * time_ratio
             pac4.update()
 
+            for shot in shots_list:
+                shot.x += shot.vx * dt
+                shot.y += shot.vy * dt
+
 
 
 
@@ -252,6 +264,10 @@ def play_game(screen_width, screen_height, vol):
         pac2.draw()
         pac3.draw()
         pac4.draw()
+        #for enemy in enemies_list:
+        #    enemy.draw()
+        for shot in shots_list:
+            shot.draw()
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()
