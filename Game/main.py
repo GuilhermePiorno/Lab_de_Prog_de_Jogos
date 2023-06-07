@@ -229,7 +229,13 @@ def play_game(screen_width, screen_height, vol):
             blinky.y += blinky.vy * dt
             blinky.update()
 
+            for enemy in enemies_list:
+                enemy.move1(blinky)
+                enemy.x += enemy.vx * dt * time_ratio
+                enemy.y += enemy.vy * dt * time_ratio
+                enemy.update()
 
+            """    
             pacman.move1(blinky)
             pacman.x += pacman.vx * dt * time_ratio
             pacman.y += pacman.vy * dt * time_ratio
@@ -250,7 +256,8 @@ def play_game(screen_width, screen_height, vol):
             pac4.x += pac4.vx * dt * time_ratio
             pac4.y += pac4.vy * dt * time_ratio
             pac4.update()
-
+            """
+            
             for shot in shots_list:
                 shot.x += shot.vx * dt
                 shot.y += shot.vy * dt
