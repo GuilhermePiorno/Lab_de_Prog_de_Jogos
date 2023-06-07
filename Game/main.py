@@ -8,7 +8,7 @@ from EatThis.debug import *
 from time import *
 
 
-def play_game(screen_width, screen_height, vol):
+def play_game(screen_width, screen_height, save):
     print("Hotkeys:")
     print("        B - Bullet-Time")
     print("        P - Pause")
@@ -52,7 +52,7 @@ def play_game(screen_width, screen_height, vol):
     slowmo = [Sound("Assets/SFX/SlowMotionIn.mp3"), Sound("Assets/SFX/SlowMotionOut.mp3")]
     bgm = Sound(song)
     print(f"\nPlaying: {song[13:len(song) - 4]} \n")
-    bgm.set_volume(vol)
+    bgm.set_volume(save.BGM_vol * save.Master_vol)
     bgm.set_repeat(True)
     bgm.play()
 
@@ -114,6 +114,7 @@ def play_game(screen_width, screen_height, vol):
     cont = 0
     # Game-loop
     while True:
+        print(save.BGM_vol)
         # Leitura de Entradas
         dt = janela.delta_time()
         # Se algum carregamento gerar um dt muito grande, considerar dt=0 para evitar movimentos "pulados".
@@ -141,7 +142,7 @@ def play_game(screen_width, screen_height, vol):
         if change_state != time_ratio:
             # 0.2//1 = 0 ou 1//1 = 1, ou seja, alterna entre som de SlowMotionIn ou SlowMotionOut.
             slowmo[int(time_ratio//1)].play()
-            bgm.set_volume(vol * time_ratio)
+            bgm.set_volume(save.BGM_vol * save.Master_vol * time_ratio)
             #print(pacman.distance_list)
 
 

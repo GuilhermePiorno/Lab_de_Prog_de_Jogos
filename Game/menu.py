@@ -1,7 +1,7 @@
 from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.sound import *
-
+import os
 
 def open_menu(screen_width, screen_height, save):
     janela = Window(screen_width, screen_height)
@@ -14,17 +14,18 @@ def open_menu(screen_width, screen_height, save):
     button_state = True
     last_input = "esc"
     selection_index = 0
-    save_found = save.read_save_data()
+    save_found = True if os.path.exists("./EatThis/savegame.txt") else False
+    # print("Sava Data found!" if save_found else "No Save Data found..")
 
     # Sounds
     sfx_select = Sound('Assets/SFX/Select_0.wav')
-    sfx_select.set_volume(save.SFX_vol * (save.Master_vol/100))
+    sfx_select.set_volume(save.SFX_vol * save.Master_vol)
     sfx_confirm = Sound('Assets/SFX/Confirm_0.wav')
-    sfx_confirm.set_volume(save.SFX_vol * (save.Master_vol/100))
+    sfx_confirm.set_volume(save.SFX_vol * save.Master_vol)
     sfx_cancel = Sound('Assets/SFX/Cancel_0.wav')
-    sfx_cancel.set_volume(save.SFX_vol * (save.Master_vol/100))
+    sfx_cancel.set_volume(save.SFX_vol * save.Master_vol)
 
-    print("Sava Data found!" if save_found else "No Save Data found..")
+
 
     menu_selection = ["continue", "newgame", "options", "exit"]
 
@@ -45,6 +46,10 @@ def open_menu(screen_width, screen_height, save):
     selection_index = selection_index + 1 if not save_found else selection_index
 
     while in_menu:
+        sfx_select.set_volume(save.SFX_vol * save.Master_vol)
+        sfx_confirm.set_volume(save.SFX_vol * save.Master_vol)
+        sfx_cancel.set_volume(save.SFX_vol * save.Master_vol)
+
         if not button_state:
             if teclado.key_pressed("down"):
                 button_state = True
@@ -73,18 +78,18 @@ def open_menu(screen_width, screen_height, save):
                 last_input = "return"
                 if menu_selection[selection_index] == "continue":
                     print("Load game selected.")
-                    save_data = read_save_data()
-                    return "play"
+                    return ["play", save]
                 if menu_selection[selection_index] == "newgame":
                     print("New game selected.")
-                    reset_save_data()
-                    save_data = read_save_data()
-                    return "play"
+                    save.reset_save_data() # resta o save
+                    save.write_save_to_file() # escreve save me arquivo.
+                    return ["play", save]
                 elif menu_selection[selection_index] == "options":
                     print("Options selected.")
-                    return "options"
+                    return ["options", save]
                 elif menu_selection[selection_index] == "exit":
-                    return "close"
+                    save.write_save_to_file()
+                    return ["close", save]
         if not teclado.key_pressed(last_input) and not teclado.key_pressed("return"):
             button_state = False
 

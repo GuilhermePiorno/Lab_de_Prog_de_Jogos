@@ -4,14 +4,18 @@ import os
 class SaveFile:
     def __init__(self, path):
         self.path = path
-        self.Master_vol = 50
-        self.BGM_vol = 50
-        self.SFX_vol = 50
+        # Variáveis internas para armazenar valores padrão de inicialização. (usado para restar save)
+        self._Master_vol = 0.5
+        self._BGM_vol = 50
+        self._SFX_vol = 50
+        self.Master_vol = self._Master_vol
+        self.BGM_vol = self._BGM_vol
+        self.SFX_vol = self._SFX_vol
 
-    def read_save_data(self):
+    def read_save_from_file(self):
         """
-        Loads save if it exists and returns 1.
-        returns 0 in case save is not found.
+        Loads save, returns True if the save game is present on path False if it's not.
+
         :return:
         """
         if os.path.exists(self.path):
@@ -23,18 +27,31 @@ class SaveFile:
                     aux = list(map(float, aux.split()))  # aplica float em todos elementos.
                     data.append(aux)
 
-                    # Linha 0 => [master_vol, bgm_vol, sfx_vol]
-            self.Master_Vol = data[0][0]
-            self.BGM_Vol = data[0][1]
-            self.SFX_Vol = data[0][2]
+            # Linha 0 => [master_vol, bgm_vol, sfx_vol]
+            self.Master_vol = data[0][0]
+            self.BGM_vol = data[0][1]
+            self.SFX_vol = data[0][2]
+            # Linha 1 => ??
             print("Loaded Save Data.")
             return True
         else:
             print("No save detected, using default values.")
             return False
 
-    def write_save_data(self, data):
-        with open('./EatThis/savegame.txt', mode='w', encoding='utf-8') as fout:  # Preenche um save inicial em arquivo.
-            for linha in range(1):
-                fout.write(f'{self.Master_Vol} {self.BGM_Vol} {self.SFX_Vol}')
-                fout.write('\n')
+    def write_save_to_file(self):
+        """
+        Escreve os dados em memória no arquivo.
+        :return:
+        """
+        with open('./EatThis/savegame.txt', mode='w', encoding='utf-8') as fout:
+            fout.write(f'{self.Master_vol} {self.BGM_vol} {self.SFX_vol} \n')
+        print("Game was saved.")
+
+    def reset_save_data(self):
+        """
+        Carrega em memória os dados iniciais pardrão do save.
+        :return:
+        """
+        self.Master_vol = self._Master_vol
+        self.BGM_vol = self._BGM_vol
+        self.SFX_vol = self._SFX_vol

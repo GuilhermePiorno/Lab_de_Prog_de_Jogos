@@ -3,7 +3,7 @@ from PPlay.gameimage import *
 from PPlay.sound import *
 
 
-def open_options(screen_width, screen_height):
+def open_options(screen_width, screen_height, save):
     janela = Window(screen_width, screen_height)
     janela.set_title("Options")
     teclado = janela.get_keyboard()
@@ -23,17 +23,15 @@ def open_options(screen_width, screen_height):
     vol_bar_layer1.set_position(bar_posx, bar_posy)
     vol_bar_layer2.set_position(bar_posx, bar_posy)
 
-    master_vol = 50
-    bgm_vol = 50
-    sfx_vol = 50
+
 
     # SFX init.
     sfx_select = Sound('Assets/SFX/Select_0.wav')
-    sfx_select.set_volume(sfx_vol)
+    sfx_select.set_volume(save.SFX_vol)
     sfx_confirm = Sound('Assets/SFX/Confirm_0.wav')
-    sfx_confirm.set_volume(sfx_vol)
+    sfx_confirm.set_volume(save.SFX_vol)
     sfx_cancel = Sound('Assets/SFX/Cancel_0.wav')
-    sfx_cancel.set_volume(sfx_vol)
+    sfx_cancel.set_volume(save.SFX_vol)
 
     # Text init.
     font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 30)
@@ -47,7 +45,6 @@ def open_options(screen_width, screen_height):
     nav_level = 0
 
     # System Variables.
-    options_output = 20  # Por equanto apenas o volume, no futuro mais coisas.
     last_input = "return"
     button_state = True
     in_options = True
@@ -57,9 +54,9 @@ def open_options(screen_width, screen_height):
     controlling_BGM_volume = False
 
     while in_options:
-        sfx_select.set_volume(sfx_vol)
-        sfx_confirm.set_volume(sfx_vol)
-        sfx_cancel.set_volume(sfx_vol)
+        sfx_select.set_volume(save.SFX_vol * save.Master_vol)
+        sfx_confirm.set_volume(save.SFX_vol * save.Master_vol)
+        sfx_cancel.set_volume(save.SFX_vol * save.Master_vol)
 
         if not button_state:
             if teclado.key_pressed("down"):
@@ -68,17 +65,17 @@ def open_options(screen_width, screen_height):
                     last_input = "down"
                     sfx_select.play()
                     if controlling_master_volume:  # controle do volume "master"
-                        master_vol -= 10
-                        if master_vol < 0:
-                            master_vol = 0
+                        save.Master_vol -= 0.1
+                        if save.Master_vol < 0:
+                            save.Master_vol = 0
                     if controlling_BGM_volume:  # controle do volume "BGM"
-                        bgm_vol -= 10
-                        if bgm_vol < 0:
-                            bgm_vol = 0
+                        save.BGM_vol -= 10
+                        if save.BGM_vol < 0:
+                            save.BGM_vol = 0
                     if controlling_SFX_volume:  # controle do volume "SFX"
-                        sfx_vol -= 10
-                        if sfx_vol < 0:
-                            sfx_vol = 0
+                        save.SFX_vol -= 10
+                        if save.SFX_vol < 0:
+                            save.SFX_vol = 0
                 else:
                     button_state = True
                     last_input = "down"
@@ -90,17 +87,17 @@ def open_options(screen_width, screen_height):
                     last_input = "up"
                     sfx_select.play()
                     if controlling_master_volume:  # controle do volume "master"
-                        master_vol += 10
-                        if master_vol > 100:
-                            master_vol = 100
+                        save.Master_vol += 0.1
+                        if save.Master_vol > 1:
+                            save.Master_vol = 1
                     if controlling_BGM_volume:  # controle do volume "BGM"
-                        bgm_vol += 10
-                        if bgm_vol > 100:
-                            bgm_vol = 100
+                        save.BGM_vol += 10
+                        if save.BGM_vol > 100:
+                            save.BGM_vol = 100
                     if controlling_SFX_volume:  # controle do volume "SFX"
-                        sfx_vol += 10
-                        if sfx_vol > 100:
-                            sfx_vol = 100
+                        save.SFX_vol += 10
+                        if save.SFX_vol > 100:
+                            save.SFX_vol = 100
                 else:
                     button_state = True
                     last_input = "up"
@@ -112,17 +109,17 @@ def open_options(screen_width, screen_height):
                     last_input = "left"
                     sfx_select.play()
                     if controlling_master_volume:  # controle do volume "master"
-                        master_vol -= 1
-                        if master_vol < 0:
-                            master_vol = 0
+                        save.Master_vol -= 0.01
+                        if save.Master_vol < 0:
+                            save.Master_vol = 0
                     if controlling_BGM_volume:  # controle do volume "BGM"
-                        bgm_vol -= 1
-                        if bgm_vol < 0:
-                            bgm_vol = 0
+                        save.BGM_vol -= 1
+                        if save.BGM_vol < 0:
+                            save.BGM_vol = 0
                     if controlling_SFX_volume:  # controle do volume "SFX"
-                        sfx_vol -= 1
-                        if sfx_vol < 0:
-                            sfx_vol = 0
+                        save.SFX_vol -= 1
+                        if save.SFX_vol < 0:
+                            save.SFX_vol = 0
 
             if teclado.key_pressed("right"):
                 if controlling_master_volume or controlling_SFX_volume or controlling_BGM_volume:
@@ -130,17 +127,17 @@ def open_options(screen_width, screen_height):
                     last_input = "right"
                     sfx_select.play()
                     if controlling_master_volume:  # controle do volume "master"
-                        master_vol += 1
-                        if master_vol > 100:
-                            master_vol = 100
+                        save.Master_vol += 0.01
+                        if save.Master_vol > 1:
+                            save.Master_vol = 1
                     if controlling_BGM_volume:  # controle do volume "BGM"
-                        bgm_vol += 1
-                        if bgm_vol > 100:
-                            bgm_vol = 100
+                        save.BGM_vol += 1
+                        if save.BGM_vol > 100:
+                            save.BGM_vol = 100
                     if controlling_SFX_volume:  # controle do volume "SFX"
-                        sfx_vol += 1
-                        if sfx_vol > 100:
-                            sfx_vol = 100
+                        save.SFX_vol += 1
+                        if save.SFX_vol > 100:
+                            save.SFX_vol = 100
 
             if teclado.key_pressed("return"):
                 button_state = True
@@ -152,7 +149,8 @@ def open_options(screen_width, screen_height):
                         # volta nav_level para a "coluna" da opção, como 'back' está sempre na coluna zero. nav_level = 0
                         nav_level = options_items[nav_level].index(options_items[nav_level][option_item_select])
                     else:
-                        return options_output
+                        save.write_save_to_file()
+                        return save
                 if options_items[nav_level][option_item_select] == "Volume":
                     sfx_confirm.play()
                     # nav_level recebe a "coluna" da opção, como 'volume' é o segundo item da lista, nav_level = 1.
@@ -186,7 +184,8 @@ def open_options(screen_width, screen_height):
                         option_item_select = 0  # retorna cursor para a primeira opção
                         nav_level = 0  # Volta ao inicio do options (pode ser feito porque nenhum menu tem mais de 1 de profundidade)
                     else:
-                        return options_output
+                        save.write_save_to_file()
+                        return save
 
         if not teclado.key_pressed(last_input):
             button_state = False
@@ -219,7 +218,7 @@ def open_options(screen_width, screen_height):
                                     space + 200 + 50 * i))
             vol_bar_layer0.set_position(bar_posx, bar_posy)
             vol_bar_layer0.draw()
-            vol_bar_layer1.set_position(bar_posx + 2.06 * master_vol, bar_posy)  # 0 a 206
+            vol_bar_layer1.set_position(bar_posx + 206 * save.Master_vol, bar_posy)  # 0 a 206
             vol_bar_layer1.draw()
             vol_bar_layer2.set_position(bar_posx, bar_posy)
             vol_bar_layer2.draw()
@@ -233,7 +232,7 @@ def open_options(screen_width, screen_height):
                                     space + 200 + 50 * i))
             vol_bar_layer0.set_position(bar_posx, bar_posy + 50)
             vol_bar_layer0.draw()
-            vol_bar_layer1.set_position(bar_posx + 2.06 * bgm_vol, bar_posy + 50)  # 0 a 206
+            vol_bar_layer1.set_position(bar_posx + 2.06 * save.BGM_vol, bar_posy + 50)  # 0 a 206
             vol_bar_layer1.draw()
             vol_bar_layer2.set_position(bar_posx, bar_posy + 50)
             vol_bar_layer2.draw()
@@ -245,7 +244,7 @@ def open_options(screen_width, screen_height):
                                     200 + 50 * i))
             vol_bar_layer0.set_position(bar_posx, bar_posy + 100)
             vol_bar_layer0.draw()
-            vol_bar_layer1.set_position(bar_posx + 2.06 * sfx_vol, bar_posy + 100)  # 0 a 206
+            vol_bar_layer1.set_position(bar_posx + 2.06 * save.SFX_vol, bar_posy + 100)  # 0 a 206
             vol_bar_layer1.draw()
             vol_bar_layer2.set_position(bar_posx, bar_posy + 100)
             vol_bar_layer2.draw()
