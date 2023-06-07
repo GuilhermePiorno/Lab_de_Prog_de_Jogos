@@ -76,24 +76,28 @@ def play_game(screen_width, screen_height, vol):
                         janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
     pacman.set_sequence_time(0, 8, 100, True)
     pacman.set_sequence(0, 1, True)
+    enemies_list.append(pacman)
 
     pac2 = Enemy("pac2", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
     pac2.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width * 1.5 - pac2.width / 2),
                         janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac2.height / 2))
     pac2.set_sequence_time(0, 8, 100, True)
     pac2.set_sequence(0, 1, True)
+    enemies_list.append(pac2)
 
     pac3 = Enemy("pac3", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
     pac3.set_position(janela.width / 2 + 0.5*maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
                         janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac3.height / 2))
     pac3.set_sequence_time(0, 8, 100, True)
     pac3.set_sequence(0, 1, True)
+    enemies_list.append(pac3)
 
     pac4 = Enemy("pac4", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
     pac4.set_position(janela.width / 2 + -0.5*maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
                       janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac4.height / 2))
     pac4.set_sequence_time(0, 8, 100, True)
     pac4.set_sequence(0, 1, True)
+    enemies_list.append(pac4)
 
     # Portal_Esquerdo
     portal_esquerdo = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_L.png", 3)
@@ -201,7 +205,7 @@ def play_game(screen_width, screen_height, vol):
             toggle_vulnerability = not toggle_vulnerability
 
         # Atualiza caso algo tenha sido pressionado.
-        just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V", "SPACE")
+        just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
 # <============================================================ DEBUG AREA END
 
         if teclado.key_pressed("SPACE"):
@@ -216,7 +220,6 @@ def play_game(screen_width, screen_height, vol):
                 shots_list.remove(shot)
             if((shot.y > (janela.height/2 + maze.half_maze_height)) or (shot.y < janela.height/2 - maze.half_maze_height)):
                 shots_list.remove(shot)
-        print(len(shots_list))
 
         # Atualiza buffer de inputs
         blinky.buffer += dt
@@ -253,6 +256,20 @@ def play_game(screen_width, screen_height, vol):
                 shot.x += shot.vx * dt
                 shot.y += shot.vy * dt
 
+            for shot in shots_list:
+                for enemy in enemies_list:
+                    if shot.collided_perfect(enemy):
+                        enemy.die()
+                        shot.hit_enemy = True
+
+            for shot in shots_list:
+                if(shot.hit_enemy):
+                    shots_list.remove(shot)
+            
+            for enemy in enemies_list:
+                if(enemy.is_dead and (time() - enemy.death_instant) > 3): # esperando o tempo da animação de morte do pacman para então remover ele da lista
+                    enemies_list.remove(enemy)
+
 
 
 
@@ -268,12 +285,12 @@ def play_game(screen_width, screen_height, vol):
         janela.draw_text(str(FPS), 10, janela.height - 50, size=25, color=(255, 255, 0))
         maze.draw()
         blinky.draw()
-        pacman.draw()
-        pac2.draw()
-        pac3.draw()
-        pac4.draw()
-        #for enemy in enemies_list:
-        #    enemy.draw()
+        #pacman.draw()
+        #pac2.draw()
+        #pac3.draw()
+        #pac4.draw()
+        for enemy in enemies_list:
+            enemy.draw()
         for shot in shots_list:
             shot.draw()
         for shot in shots_list:

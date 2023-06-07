@@ -5,6 +5,7 @@ class Shot(Sprite):
         super().__init__(image_file, frames)
         self.direction = shooter.facing
         self.base_speed = max(abs(shooter.vx), abs(shooter.vy)) + 40
+        self.hit_enemy = False
         if(shooter.facing == "U"):
             #tiro para cima
             self.vx = 0
