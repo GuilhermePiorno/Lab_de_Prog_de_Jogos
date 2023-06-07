@@ -114,10 +114,8 @@ class Enemy(Sprite):
                 self.state = "afraid"
 
         else:
-            if time.time() - self.death_instant >= 10:
+            if time.time() - self.death_instant >= 4:
                 self.hide()
-
-
 
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1
