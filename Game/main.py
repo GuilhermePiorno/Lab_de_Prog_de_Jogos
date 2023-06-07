@@ -40,6 +40,7 @@ def play_game(screen_width, screen_height, vol):
     toggle_vulnerability = False
     time_ratio = 1
     shots_list = []
+    shots_list_max_len = 5
     enemies_list = []
 
     # Background Music.
@@ -179,21 +180,6 @@ def play_game(screen_width, screen_height, vol):
                 enemy.maze = maze
                 enemy.get_next_closest_point()
                 enemy.maze.level[enemy.nearest_point[1][0]][enemy.nearest_point[1][1]].get_flow_field()
-            
-            """
-            pacman.maze = maze  # Atualiza o level do pacman
-            pacman.get_next_closest_point()
-            pacman.maze.level[pacman.nearest_point[1][0]][pacman.nearest_point[1][1]].get_flow_field()
-            pac2.maze = maze  # Atualiza o level do pacman
-            pac2.get_next_closest_point()
-            pac2.maze.level[pac2.nearest_point[1][0]][pac2.nearest_point[1][1]].get_flow_field()
-            pac3.maze = maze  # Atualiza o level do pacman
-            pac3.get_next_closest_point()
-            pac3.maze.level[pac3.nearest_point[1][0]][pac3.nearest_point[1][1]].get_flow_field()
-            pac4.maze = maze  # Atualiza o level do pacman
-            pac4.get_next_closest_point()
-            pac4.maze.level[pac4.nearest_point[1][0]][pac4.nearest_point[1][1]].get_flow_field()
-            """
             new_map = False
 
         if toggle_mood:                                 # ---DEBUG------> T
@@ -201,13 +187,6 @@ def play_game(screen_width, screen_height, vol):
 
             for enemy in enemies_list:
                 enemy.state = moods[mood_ind]
-            
-            """
-            pacman.state = moods[mood_ind]
-            pac2.state = moods[mood_ind]
-            pac3.state = moods[mood_ind]
-            pac4.state = moods[mood_ind]
-            """
             
             toggle_mood = not toggle_mood
             print(f"Now I'm {moods[mood_ind]}!")
@@ -222,7 +201,7 @@ def play_game(screen_width, screen_height, vol):
         just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
 # <============================================================ DEBUG AREA END
 
-        if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK'):
+        if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and len(shots_list) < 5):
             if(blinky.shot_timer > blinky.reload_time):
                 blinky.shot_timer = 0
                 shot = Shot("Assets\Sprites\VFX\\blue fireball_32x32_omni.png", blinky, 8)
@@ -249,29 +228,6 @@ def play_game(screen_width, screen_height, vol):
                 enemy.y += enemy.vy * dt * time_ratio
                 enemy.update()
 
-            """    
-            pacman.move1(blinky)
-            pacman.x += pacman.vx * dt * time_ratio
-            pacman.y += pacman.vy * dt * time_ratio
-            pacman.update()
-
-
-            pac2.move1(blinky)
-            pac2.x += pac2.vx * dt * time_ratio
-            pac2.y += pac2.vy * dt * time_ratio
-            pac2.update()
-
-            pac3.move1(blinky)
-            pac3.x += pac3.vx * dt * time_ratio
-            pac3.y += pac3.vy * dt * time_ratio
-            pac3.update()
-
-            pac4.move1(blinky)
-            pac4.x += pac4.vx * dt * time_ratio
-            pac4.y += pac4.vy * dt * time_ratio
-            pac4.update()
-            """
-
             for shot in shots_list:
                 shot.x += shot.vx * dt
                 shot.y += shot.vy * dt
@@ -287,7 +243,8 @@ def play_game(screen_width, screen_height, vol):
                     shots_list.remove(shot)
             
             for enemy in enemies_list:
-                if(enemy.is_dead and (time() - enemy.death_instant) > 3): # esperando o tempo da animação de morte do pacman para então remover ele da lista
+                # esperando o tempo da animação de morte do pacman para então remover ele da lista
+                if(enemy.is_dead and (time() - enemy.death_instant) > 3):
                     enemies_list.remove(enemy)
 
 
