@@ -222,7 +222,7 @@ def play_game(screen_width, screen_height, vol):
         just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
 # <============================================================ DEBUG AREA END
 
-        if teclado.key_pressed("SPACE"):
+        if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK'):
             if(blinky.shot_timer > blinky.reload_time):
                 blinky.shot_timer = 0
                 shot = Shot("Assets\Sprites\VFX\\fireball_teste.png", blinky, 8)
