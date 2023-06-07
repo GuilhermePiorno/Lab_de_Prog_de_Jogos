@@ -201,12 +201,12 @@ def play_game(screen_width, screen_height, vol):
         just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
 # <============================================================ DEBUG AREA END
 
-        if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and len(shots_list) < 5):
+        if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len)):
             if(blinky.shot_timer > blinky.reload_time):
                 blinky.shot_timer = 0
                 shot = Shot("Assets\Sprites\VFX\\blue fireball_32x32_omni.png", blinky, 8)
                 shots_list.append(shot)
-        
+
         for shot in shots_list:
             if((shot.x > (janela.width/2 + maze.half_maze_width)) or shot.x < (janela.width/2 - maze.half_maze_width)):
                 shots_list.remove(shot)
@@ -231,7 +231,8 @@ def play_game(screen_width, screen_height, vol):
             for shot in shots_list:
                 shot.x += shot.vx * dt
                 shot.y += shot.vy * dt
-
+                shot.check_collision_with_wall()
+            
             for shot in shots_list:
                 for enemy in enemies_list:
                     if (shot.collided(enemy) and not enemy.is_dead):
@@ -239,9 +240,9 @@ def play_game(screen_width, screen_height, vol):
                         shot.hit_enemy = True
 
             for shot in shots_list:
-                if(shot.hit_enemy):
+                if(shot.hit_enemy or shot.hit_wall):
                     shots_list.remove(shot)
-            
+
             for enemy in enemies_list:
                 # esperando o tempo da animação de morte do pacman para então remover ele da lista
                 if(enemy.is_dead and (time() - enemy.death_instant) > 3):
@@ -262,7 +263,6 @@ def play_game(screen_width, screen_height, vol):
         janela.draw_text(str(FPS), 10, janela.height - 50, size=25, color=(255, 255, 0))
         maze.draw()
         blinky.draw()
-
         for enemy in enemies_list:
             enemy.draw()
         for shot in shots_list:

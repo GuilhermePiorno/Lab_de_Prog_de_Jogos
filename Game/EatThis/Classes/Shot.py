@@ -1,4 +1,5 @@
 from PPlay.sprite import *
+from EatThis.Classes.Point import *
 
 class Shot(Sprite):
     def __init__(self, image_file, shooter, frames):
@@ -6,6 +7,9 @@ class Shot(Sprite):
         self.direction = shooter.facing
         self.base_speed = max(abs(shooter.vx), abs(shooter.vy)) + 40
         self.hit_enemy = False
+        self.hit_wall = False
+        self.window = shooter.window
+        self.maze = shooter.maze
         self.set_total_duration(1000)
         if(shooter.facing == "U"):
             #tiro para cima
@@ -34,3 +38,14 @@ class Shot(Sprite):
         else:
             #blinky afk - está crashando o jogo
             pass
+
+    def check_collision_with_wall(self):
+        coordinate = self.get_matrix_coordinates()
+        if(not(isinstance(self.maze.level[coordinate[0]][coordinate[1]], Point) or self.maze.level[coordinate[0]][coordinate[1]] == 0)):
+            self.hit_wall = True
+
+    def get_matrix_coordinates(self):
+        return ( 
+            int((self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1),
+            int((self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1)
+            )
