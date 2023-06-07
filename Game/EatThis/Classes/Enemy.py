@@ -36,7 +36,7 @@ class Enemy(Sprite):
         if len(self.maze.list_of_points) == 0:
             print("game over")
 
-        if self.get_matrix_coordinates() == target.get_matrix_coordinates() and target.state == "invulnerable":
+        if self.get_matrix_coordinates() == target.get_matrix_coordinates() and target.state == "invulnerable" and not self.is_dead:
             self.die()
 
         # Detecta se pacman comeu powerup

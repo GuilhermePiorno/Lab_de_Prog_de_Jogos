@@ -211,8 +211,7 @@ def play_game(screen_width, screen_height, vol):
         if teclado.key_pressed("SPACE"):
             if(blinky.shot_timer > blinky.reload_time):
                 blinky.shot_timer = 0
-                shot = Shot("Assets\Sprites\VFX\\fireball_19x9.png", blinky, 2)
-                shot.set_sequence_time(0, 2, 100, True)
+                shot = Shot("Assets\Sprites\VFX\\fireball_teste.png", blinky, frames=8)
                 shots_list.append(shot)
         
         for shot in shots_list:
@@ -293,8 +292,7 @@ def play_game(screen_width, screen_height, vol):
             enemy.draw()
         for shot in shots_list:
             shot.draw()
-        for shot in shots_list:
-            shot.update()
+            #shot.update()
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()
