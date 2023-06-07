@@ -211,7 +211,7 @@ def play_game(screen_width, screen_height, vol):
         if teclado.key_pressed("SPACE"):
             if(blinky.shot_timer > blinky.reload_time):
                 blinky.shot_timer = 0
-                shot = Shot("Assets\Sprites\VFX\\fireball_teste.png", blinky, frames=8)
+                shot = Shot("Assets\Sprites\VFX\\fireball_teste.png", blinky, 8)
                 shots_list.append(shot)
         
         for shot in shots_list:
@@ -284,15 +284,12 @@ def play_game(screen_width, screen_height, vol):
         janela.draw_text(str(FPS), 10, janela.height - 50, size=25, color=(255, 255, 0))
         maze.draw()
         blinky.draw()
-        #pacman.draw()
-        #pac2.draw()
-        #pac3.draw()
-        #pac4.draw()
+
         for enemy in enemies_list:
             enemy.draw()
         for shot in shots_list:
             shot.draw()
-            #shot.update()
+            shot.update()
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()

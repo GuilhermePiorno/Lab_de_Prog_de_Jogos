@@ -6,6 +6,7 @@ class Shot(Sprite):
         self.direction = shooter.facing
         self.base_speed = max(abs(shooter.vx), abs(shooter.vy)) + 40
         self.hit_enemy = False
+        self.set_total_duration(1000)
         if(shooter.facing == "U"):
             #tiro para cima
             self.vx = 0
