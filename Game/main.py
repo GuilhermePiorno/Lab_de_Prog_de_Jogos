@@ -257,7 +257,7 @@ def play_game(screen_width, screen_height, vol):
 
             for shot in shots_list:
                 for enemy in enemies_list:
-                    if (shot.collided_perfect(enemy) and not enemy.is_dead):
+                    if (shot.collided(enemy) and not enemy.is_dead):
                         enemy.die()
                         shot.hit_enemy = True
 
