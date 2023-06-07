@@ -225,7 +225,7 @@ def play_game(screen_width, screen_height, vol):
         if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK'):
             if(blinky.shot_timer > blinky.reload_time):
                 blinky.shot_timer = 0
-                shot = Shot("Assets\Sprites\VFX\\fireball_teste.png", blinky, 8)
+                shot = Shot("Assets\Sprites\VFX\\blue fireball_32x32_omni.png", blinky, 8)
                 shots_list.append(shot)
         
         for shot in shots_list:

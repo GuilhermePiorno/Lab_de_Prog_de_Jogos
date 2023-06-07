@@ -12,13 +12,13 @@ class Shot(Sprite):
             self.vx = 0
             self.vy = -self.base_speed
             self.set_position((shooter.x + shooter.width/2) - self.width/2, shooter.y - self.height)
-            self.set_sequence(4, 6, True)
+            self.set_sequence(6, 8, True)
         elif(shooter.facing == "D"):
             #tiro para baixo
             self.vx = 0
             self.vy = self.base_speed
             self.set_position((shooter.x + shooter.width/2) - self.width/2, shooter.y + shooter.height)
-            self.set_sequence(6, 8, True)
+            self.set_sequence(4, 6, True)
         elif(shooter.facing == "L"):
             #tiro para a esquerda
             self.vx = -self.base_speed
