@@ -114,7 +114,6 @@ def play_game(screen_width, screen_height, save):
     cont = 0
     # Game-loop
     while True:
-        print(save.BGM_vol)
         # Leitura de Entradas
         dt = janela.delta_time()
         # Se algum carregamento gerar um dt muito grande, considerar dt=0 para evitar movimentos "pulados".

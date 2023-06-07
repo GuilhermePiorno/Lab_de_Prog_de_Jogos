@@ -14,7 +14,8 @@ class SaveFile:
 
     def read_save_from_file(self):
         """
-        Loads save, returns True if the save game is present on path False if it's not.
+        Loads data from file to memory.
+        Returns True if the save game is present on path, False if it's not.
 
         :return:
         """
@@ -40,7 +41,7 @@ class SaveFile:
 
     def write_save_to_file(self):
         """
-        Escreve os dados em memória no arquivo.
+        Writes data from memory into the file.
         :return:
         """
         with open('./EatThis/savegame.txt', mode='w', encoding='utf-8') as fout:
@@ -49,7 +50,8 @@ class SaveFile:
 
     def reset_save_data(self):
         """
-        Carrega em memória os dados iniciais pardrão do save.
+        Loads default values into memory.
+
         :return:
         """
         self.Master_vol = self._Master_vol

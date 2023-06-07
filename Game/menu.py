@@ -81,8 +81,12 @@ def open_menu(screen_width, screen_height, save):
                     return ["play", save]
                 if menu_selection[selection_index] == "newgame":
                     print("New game selected.")
+                    aux = [save.Master_vol, save.BGM_vol, save.SFX_vol]
                     save.reset_save_data() # resta o save
-                    save.write_save_to_file() # escreve save me arquivo.
+                    save.Master_vol = aux[0]
+                    save.BGM_vol = aux[1]
+                    save.SFX_vol = aux[2]
+                    save.write_save_to_file() # escreve save em arquivo.
                     return ["play", save]
                 elif menu_selection[selection_index] == "options":
                     print("Options selected.")
