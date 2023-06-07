@@ -175,6 +175,12 @@ def play_game(screen_width, screen_height, vol):
         if new_map:                                     #---DEBUG------> N
             maze = Maze(walltype, janela)
             blinky.maze = maze  # Atualiza o level do blinky
+            for enemy in enemies_list:
+                enemy.maze = maze
+                enemy.get_next_closest_point()
+                enemy.maze.level[enemy.nearest_point[1][0]][enemy.nearest_point[1][1]].get_flow_field()
+            
+            """
             pacman.maze = maze  # Atualiza o level do pacman
             pacman.get_next_closest_point()
             pacman.maze.level[pacman.nearest_point[1][0]][pacman.nearest_point[1][1]].get_flow_field()
@@ -187,14 +193,22 @@ def play_game(screen_width, screen_height, vol):
             pac4.maze = maze  # Atualiza o level do pacman
             pac4.get_next_closest_point()
             pac4.maze.level[pac4.nearest_point[1][0]][pac4.nearest_point[1][1]].get_flow_field()
+            """
             new_map = False
 
         if toggle_mood:                                 # ---DEBUG------> T
             mood_ind = (mood_ind + 1) % 3
+
+            for enemy in enemies_list:
+                enemy.state = moods[mood_ind]
+            
+            """
             pacman.state = moods[mood_ind]
             pac2.state = moods[mood_ind]
             pac3.state = moods[mood_ind]
             pac4.state = moods[mood_ind]
+            """
+            
             toggle_mood = not toggle_mood
             print(f"Now I'm {moods[mood_ind]}!")
 
@@ -257,7 +271,7 @@ def play_game(screen_width, screen_height, vol):
             pac4.y += pac4.vy * dt * time_ratio
             pac4.update()
             """
-            
+
             for shot in shots_list:
                 shot.x += shot.vx * dt
                 shot.y += shot.vy * dt
