@@ -28,6 +28,8 @@ class Player(Sprite):
             (self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1,
             (self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1
             )
+        self.reload_time = 0.5
+        self.shot_timer = self.reload_time + 1
 
     def move1(self):
         # Como primeira ação blinky atualiza sua sinkmatrix/flowfield.

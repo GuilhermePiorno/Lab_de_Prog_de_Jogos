@@ -34,7 +34,7 @@ def play_game(screen_width, screen_height, vol):
     pause = False
     bullet_time = False
     toggle_mood = False
-    shot_fireball = False
+    #shot_fireball = False
     moods = ["hungry", "afraid", "angry"]
     mood_ind = 0
     toggle_vulnerability = False
@@ -133,7 +133,7 @@ def play_game(screen_width, screen_height, vol):
             new_map = var_toggle(new_map, "N", teclado)
             toggle_mood = var_toggle(toggle_mood, "T", teclado)
             toggle_vulnerability =  var_toggle(toggle_vulnerability, "V", teclado)
-            shot_fireball = var_toggle(shot_fireball, "SPACE", teclado)
+            #shot_fireball = var_toggle(shot_fireball, "SPACE", teclado)
 
         # Notação pythonica de atribuição simples com if.
         # variável = valor_se_sim if condicao else valor_se_nao.
@@ -200,19 +200,27 @@ def play_game(screen_width, screen_height, vol):
             print(f"Now I'm {blinky.state}!")
             toggle_vulnerability = not toggle_vulnerability
 
-        if shot_fireball:
-            shot = Shot("Assets\Sprites\VFX\\fireball_19x9.png", blinky, 2)
-            shots_list.append(shot)
-
-
-
         # Atualiza caso algo tenha sido pressionado.
         just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V", "SPACE")
 # <============================================================ DEBUG AREA END
 
+        if teclado.key_pressed("SPACE"):
+            if(blinky.shot_timer > blinky.reload_time):
+                blinky.shot_timer = 0
+                shot = Shot("Assets\Sprites\VFX\\fireball_19x9.png", blinky, 2)
+                shot.set_sequence_time(0, 2, 100, True)
+                shots_list.append(shot)
+        
+        for shot in shots_list:
+            if((shot.x > (janela.width/2 + maze.half_maze_width)) or shot.x < (janela.width/2 - maze.half_maze_width)):
+                shots_list.remove(shot)
+            if((shot.y > (janela.height/2 + maze.half_maze_height)) or (shot.y < janela.height/2 - maze.half_maze_height)):
+                shots_list.remove(shot)
+        print(len(shots_list))
 
         # Atualiza buffer de inputs
         blinky.buffer += dt
+        blinky.shot_timer += dt
         if not pause:
             blinky.move1()
             blinky.x += blinky.vx * dt
@@ -268,6 +276,8 @@ def play_game(screen_width, screen_height, vol):
         #    enemy.draw()
         for shot in shots_list:
             shot.draw()
+        for shot in shots_list:
+            shot.update()
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()
