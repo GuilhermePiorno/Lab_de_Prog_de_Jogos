@@ -4,6 +4,7 @@ from EatThis.Classes.Maze import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
 from EatThis.Classes.Shot import *
+from EatThis.Classes.Trap import *
 from EatThis.a_star import *
 from EatThis.debug import *
 from time import *
@@ -42,6 +43,7 @@ def play_game(screen_width, screen_height, vol):
     shots_list = []
     shots_list_max_len = 5
     enemies_list = []
+    traps_list = []
 
     # Background Music.
     sorteio = random.random()
@@ -201,18 +203,6 @@ def play_game(screen_width, screen_height, vol):
         just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
 # <============================================================ DEBUG AREA END
 
-        if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len)):
-            if(blinky.shot_timer > blinky.reload_time):
-                blinky.shot_timer = 0
-                shot = Shot("Assets\Sprites\VFX\\blue fireball_32x32_omni.png", blinky, 8)
-                shots_list.append(shot)
-
-        for shot in shots_list:
-            if((shot.x > (janela.width/2 + maze.half_maze_width)) or shot.x < (janela.width/2 - maze.half_maze_width)):
-                shots_list.remove(shot)
-            if((shot.y > (janela.height/2 + maze.half_maze_height)) or (shot.y < janela.height/2 - maze.half_maze_height)):
-                shots_list.remove(shot)
-
         # Atualiza buffer de inputs
         blinky.buffer += dt
         blinky.shot_timer += dt
@@ -228,6 +218,12 @@ def play_game(screen_width, screen_height, vol):
                 enemy.y += enemy.vy * dt * time_ratio
                 enemy.update()
 
+            if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len)):
+                if(blinky.shot_timer > blinky.reload_time):
+                    blinky.shot_timer = 0
+                    shot = Shot("Assets\Sprites\VFX\\blue fireball_32x32_omni.png", blinky, 8)
+                    shots_list.append(shot)
+
             for shot in shots_list:
                 shot.x += shot.vx * dt
                 shot.y += shot.vy * dt
@@ -242,6 +238,20 @@ def play_game(screen_width, screen_height, vol):
             for shot in shots_list:
                 if(shot.hit_enemy or shot.hit_wall):
                     shots_list.remove(shot)
+
+            if(teclado.key_pressed("A") and len(traps_list) < 1):
+                trap = Trap("Assets\Sprites\PickUps\\trap_20_108_196_98.png", blinky)
+                traps_list.append(trap)
+
+            for trap in traps_list:
+                for enemy in enemies_list:
+                    if(trap.collided(enemy) and not enemy.is_dead):
+                        enemy.die()
+                        trap.was_eaten = True
+            
+            for trap in traps_list:
+                if(trap.was_eaten):
+                    traps_list.remove(trap)
 
             for enemy in enemies_list:
                 # esperando o tempo da animação de morte do pacman para então remover ele da lista
@@ -268,6 +278,8 @@ def play_game(screen_width, screen_height, vol):
         for shot in shots_list:
             shot.draw()
             shot.update()
+        for trap in traps_list:
+            trap.draw()
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()
