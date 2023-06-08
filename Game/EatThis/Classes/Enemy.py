@@ -2,12 +2,14 @@ from PPlay.sprite import *
 from EatThis.a_star import *
 from EatThis.Classes.Point import *
 from EatThis.Classes.PowerUp import *
+from PPlay.sound import *
 import time
 
 class Enemy(Sprite):
-    def __init__(self, name, window, maze, image_file, frames=1):
+    def __init__(self, name, window, maze, save, image_file, frames=1):
         super().__init__(image_file, frames)
         self.name = name
+        self.save = save
         self.state = "hungry"  # hungry, afraid e angry
         self.base_fear_time = 5
         self.fear_timer = 0.0
@@ -27,6 +29,7 @@ class Enemy(Sprite):
         self.cmdstr = ''
         self.keyboard = self.window.get_keyboard()
         self.image_file = image_file
+        self.is_dying = False
         self.is_dead = False
         self.death_instant = 0
         self.distance_list = []
@@ -73,7 +76,7 @@ class Enemy(Sprite):
 
 
         # ia do pacman baseada no algoritmo flowfield
-        if not self.is_dead:
+        if not self.is_dying and not self.is_dead:
             self.animate()
 
             # Faz pacman voltar ao estado "hungry" após self.fear_timer expirar.
@@ -114,8 +117,8 @@ class Enemy(Sprite):
                 self.state = "afraid"
 
         else:
-            if time.time() - self.death_instant >= 10:
-                self.hide()
+            if time.time() - self.death_instant >= 2:
+                self.is_dead = True
 
 
 
@@ -229,11 +232,14 @@ class Enemy(Sprite):
             self.set_sequence(0, 2, True)
 
     def die(self):
-        self.death_instant = time.time()
-        self.is_dead = True
+        if not self.is_dying:
+            self.death_instant = time.time()
+            self.is_dying = True
+            self.death_rattle()
+            self.set_sequence_time(9, 22, 100, False)
         self.vx = 0
         self.vy = 0
-        self.set_sequence_time(9, 22, 200, False)
+
 
     def relative_position_of_target(self, target):
         return target.x - self.x, target.y - self.y
@@ -305,3 +311,8 @@ class Enemy(Sprite):
 
     def points_distance(self, tupla):
         return ((self.matrix_coordinates[0] - tupla[0]) ** 2 + (self.matrix_coordinates[1] - tupla[1]) ** 2)**0.5
+
+    def death_rattle(self):
+        DeathCry = Sound("Assets/SFX/PacmanDeath.mp3")
+        DeathCry.set_volume(self.save.SFX_vol * self.save.Master_vol)
+        DeathCry.play()

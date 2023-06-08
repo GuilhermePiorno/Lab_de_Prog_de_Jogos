@@ -152,11 +152,11 @@ class Player(Sprite):
             self.vy = 0
 
         # Checa colisão de blinky com portal esquerdo.
-        if self.maze_axis[0] < 0 + self.maze.wall.width / 2:  # aka: 0 + 20/2 = 10
+        if self.maze_axis[0] < 0: # + self.maze.wall.width / 2:  # aka: 0 + 20/2 = 10
             self.x += 2 * self.maze.half_maze_width - self.maze.wall.width
 
         # Checa colisão de blinky com portal direito.
-        if self.maze_axis[0] > 28 * self.maze.wall.width - self.maze.wall.width / 2:  # aka: 28*20 - 20/2 550
+        if self.maze_axis[0] > 28 * self.maze.wall.width - self.maze.wall.width/ 4:  # aka: 28*20 - 20/2 550
             self.x -= 2 * self.maze.half_maze_width - self.maze.wall.width
 
     def get_maze_axis(self):

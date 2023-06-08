@@ -7,6 +7,10 @@ import random
 # Auxilia na criação da matriz pathing (apenas 0 e 1)
 # Provavelmente é possível criar esta matriz durante a execução de fill_level() em vez de criar uma função separada.
 def create_path_matrix(): # Cria uma matriz com 0 e 1 para auxiliar na criação do pathing
+    """
+    Retorna uma matriz de caminhos mat[0..32][0..29]
+    :return:
+    """
     with open('./EatThis/maze.txt', mode='r', encoding='utf-8') as fin:
         i = 0
         # linha 0 e linha 32 são vazias.
@@ -24,7 +28,7 @@ def create_path_matrix(): # Cria uma matriz com 0 e 1 para auxiliar na criação
 
 
 class Maze:
-    def __init__(self, walltype, window):
+    def __init__(self, walltype, window, powerup_no):
         self.window = window
         self.keyboard = self.window.get_keyboard()
         self.list_of_points = []
@@ -34,7 +38,7 @@ class Maze:
         self.half_maze_width = (self.wall.width * 28) / 2
         createlevel()
         self.level = self.fill_level()
-        self.powerup_num = 4
+        self.powerup_num = powerup_no
         self.create_powerups()
         self.pathing = create_path_matrix() # Cria uma matriz com 0s e 1s para auxiliar na criação das sinkmatrix
                                             # level não pode ser usada pois ela contém os sprites das paredes e pontos.
@@ -239,3 +243,15 @@ class Maze:
             for j in range(1, 29):
                 if self.level[i][j] != 0 and isinstance(self.level[i][j], GameImage):
                     self.level[i][j].draw()
+
+    def get_spawn_coordinates(self, coords, width, height):
+        """
+        Receives [line, column] sprite.width, sprite.height, returns [x, y] that centers the sprite in that cell.
+        Remember that line-> y, column -> x when using it.
+        Returns coordiantes for the center of a given set of a given (line, column)
+        :return:
+        """
+        x = (self.window.width/2 - self.half_maze_width) + (coords[1] - 1) * self.wall.width + 0.5 * self.wall.width - width/2
+        y = (self.window.height/2 - self.half_maze_height) + (coords[0] - 1) * self.wall.height + 0.5 * self.wall.height - height/2
+
+        return x, y

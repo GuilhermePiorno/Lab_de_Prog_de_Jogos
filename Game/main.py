@@ -5,6 +5,7 @@ from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
 from EatThis.a_star import *
 from EatThis.debug import *
+from EatThis.enemy_spawn import *
 from time import *
 
 
@@ -33,10 +34,13 @@ def play_game(screen_width, screen_height, save):
     pause = False
     bullet_time = False
     toggle_mood = False
-    moods = ["hungry", "afraid", "angry"]
-    mood_ind = 0
     toggle_vulnerability = False
     time_ratio = 1
+    level_start = True
+    level_clock = 0
+    # Variáveis que impactam dificuldade!
+    powerups_no = 4
+    numero_inimigos = 3
 
     # Background Music.
     sorteio = random.random()
@@ -57,52 +61,38 @@ def play_game(screen_width, screen_height, save):
     bgm.play()
 
     # cria o objeto maze
-    maze = Maze(walltype, janela)
-    # cria o grafo a partir desse maze
+    maze = Maze(walltype, janela, powerups_no)
 
+    # Cria um blinky "fake" para introdução.
+    fake_blinky = Sprite("Assets/Sprites/Characters/Blinky.png", 12)
+    fake_blinky_pos = maze.get_spawn_coordinates((15,1), fake_blinky.width, fake_blinky.height)
+    fake_blinky.set_position(fake_blinky_pos[0] - 50, fake_blinky_pos[1])
+    fake_blinky.set_sequence_time(0, 12, 100, True)
+    fake_blinky.set_sequence(0, 2, True)
 
     # Cria o sprite de Blinky e define o número de frames de sua animação.
     blinky = Player(janela, maze, "Assets/Sprites/Characters/Blinky.png", 12)
-    blinky.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width * 1.5 - blinky.width / 2),
-                        janela.height / 2 - maze.half_maze_height + (maze.wall.height * 1.5 - blinky.height / 2))
+    player_start_pos = maze.get_spawn_coordinates((15, 1), blinky.width, blinky.height)
+    blinky.set_position(player_start_pos[0], player_start_pos[1])
     blinky.set_sequence_time(0, 12, 100, True)
     blinky.set_sequence(0, 1, True)
 
-    # Cria o sprite de Pacman e define o número de frames de sua animação.
-    pacman = Enemy("pac1", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
-    pacman.set_position(janela.width / 2 + maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
-                        janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pacman.height / 2))
-    pacman.set_sequence_time(0, 8, 100, True)
-    pacman.set_sequence(0, 1, True)
 
-    pac2 = Enemy("pac2", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
-    pac2.set_position(janela.width / 2 - maze.half_maze_width + (maze.wall.width * 1.5 - pac2.width / 2),
-                        janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac2.height / 2))
-    pac2.set_sequence_time(0, 8, 100, True)
-    pac2.set_sequence(0, 1, True)
 
-    pac3 = Enemy("pac3", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
-    pac3.set_position(janela.width / 2 + 0.5*maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
-                        janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac3.height / 2))
-    pac3.set_sequence_time(0, 8, 100, True)
-    pac3.set_sequence(0, 1, True)
+    # Enemy Creation
+    enemies_list = create_pacmans(janela, maze, numero_inimigos, save)
 
-    pac4 = Enemy("pac4", janela, maze, "Assets/Sprites/Characters/pacman_movimento_e_morte.png", 22)
-    pac4.set_position(janela.width / 2 + -0.5*maze.half_maze_width - (maze.wall.width * 1.5 + pacman.width / 2),
-                      janela.height / 2 + maze.half_maze_height - (maze.wall.height * 1.5 + pac4.height / 2))
-    pac4.set_sequence_time(0, 8, 100, True)
-    pac4.set_sequence(0, 1, True)
 
     # Portal_Esquerdo
-    portal_esquerdo = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_L.png", 3)
+    portal_esquerdo = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_L_mask.png", 3)
     portal_esquerdo.set_sequence_time(0, 3, 100, True)
     portal_esquerdo.set_sequence(0, 3, True)
-    portal_esquerdo.set_position(janela.width / 2 - maze.half_maze_width - maze.wall.width,
+    portal_esquerdo.set_position(janela.width / 2 - maze.half_maze_width - maze.wall.width - 40,
                                  janela.height / 2 - maze.half_maze_height + 13.5 * maze.wall.height - 1)
 
 
     # Portal_Direito
-    portal_direito = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_D.png", 3)
+    portal_direito = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_D_mask.png", 3)
     portal_direito.set_sequence_time(0, 3, 100, True)
     portal_direito.set_sequence(0, 3, True)
     portal_direito.set_position(janela.width / 2 + maze.half_maze_width,
@@ -116,10 +106,15 @@ def play_game(screen_width, screen_height, save):
     while True:
         # Leitura de Entradas
         dt = janela.delta_time()
+
         # Se algum carregamento gerar um dt muito grande, considerar dt=0 para evitar movimentos "pulados".
         if dt > 0.1:
             dt = 0
         debug_timer += dt
+        level_clock += dt
+
+        if level_start and level_clock >= 2:
+            level_start = False
 
 # <============================================================ DEBUG AREA START
         # Se nada tiver sido pressionado, checa inputs.
@@ -151,45 +146,27 @@ def play_game(screen_width, screen_height, save):
             maze.walltype = walltype  # Atualiza o walltype do maze
             maze.level = maze.fill_level()  # Atualiza o level do maze para incluir a walltype nova
             grid_toggle = False
-            # trash below here
-            pacman.get_next_closest_point()
-            pacman.maze.level[pacman.nearest_point[1][0]][pacman.nearest_point[1][1]].get_flow_field()
-            pac2.maze = maze  # Atualiza o level do pacman
-            pac2.get_next_closest_point()
-            pac2.maze.level[pac2.nearest_point[1][0]][pac2.nearest_point[1][1]].get_flow_field()
-            pac3.maze = maze  # Atualiza o level do pacman
-            pac3.get_next_closest_point()
-            pac3.maze.level[pac3.nearest_point[1][0]][pac3.nearest_point[1][1]].get_flow_field()
-            pac4.maze = maze  # Atualiza o level do pacman
-            pac4.get_next_closest_point()
-            pac4.maze.level[pac4.nearest_point[1][0]][pac4.nearest_point[1][1]].get_flow_field()
+
+
+            for i in range(numero_inimigos):
+                enemies_list[i].get_next_closest_point()
+                enemies_list[i].maze.level[enemies_list[i].nearest_point[1][0]][enemies_list[i].nearest_point[1][1]].get_flow_field()
+
 
 
         if new_map:                                     #---DEBUG------> N
-            maze = Maze(walltype, janela)
+            maze = Maze(walltype, janela, powerups_no)
             blinky.maze = maze  # Atualiza o level do blinky
-            pacman.maze = maze  # Atualiza o level do pacman
-            pacman.get_next_closest_point()
-            pacman.maze.level[pacman.nearest_point[1][0]][pacman.nearest_point[1][1]].get_flow_field()
-            pac2.maze = maze  # Atualiza o level do pacman
-            pac2.get_next_closest_point()
-            pac2.maze.level[pac2.nearest_point[1][0]][pac2.nearest_point[1][1]].get_flow_field()
-            pac3.maze = maze  # Atualiza o level do pacman
-            pac3.get_next_closest_point()
-            pac3.maze.level[pac3.nearest_point[1][0]][pac3.nearest_point[1][1]].get_flow_field()
-            pac4.maze = maze  # Atualiza o level do pacman
-            pac4.get_next_closest_point()
-            pac4.maze.level[pac4.nearest_point[1][0]][pac4.nearest_point[1][1]].get_flow_field()
+
+            for i in range(numero_inimigos):
+                enemies_list[i].maze = maze
+                enemies_list[i].get_next_closest_point()
+                enemies_list[i].maze.level[enemies_list[i].nearest_point[1][0]][enemies_list[i].nearest_point[1][1]].get_flow_field()
+
             new_map = False
 
         if toggle_mood:                                 # ---DEBUG------> T
-            mood_ind = (mood_ind + 1) % 3
-            pacman.state = moods[mood_ind]
-            pac2.state = moods[mood_ind]
-            pac3.state = moods[mood_ind]
-            pac4.state = moods[mood_ind]
-            toggle_mood = not toggle_mood
-            print(f"Now I'm {moods[mood_ind]}!")
+            pass
 
 
         if toggle_vulnerability:                        # ---DEBUG------> V
@@ -205,35 +182,23 @@ def play_game(screen_width, screen_height, save):
 
         # Atualiza buffer de inputs
         blinky.buffer += dt
-        if not pause:
+        if not pause and not level_start:
             blinky.move1()
             blinky.x += blinky.vx * dt
             blinky.y += blinky.vy * dt
             blinky.update()
 
-
-            pacman.move1(blinky)
-            pacman.x += pacman.vx * dt * time_ratio
-            pacman.y += pacman.vy * dt * time_ratio
-            pacman.update()
-
-
-            pac2.move1(blinky)
-            pac2.x += pac2.vx * dt * time_ratio
-            pac2.y += pac2.vy * dt * time_ratio
-            pac2.update()
-
-            pac3.move1(blinky)
-            pac3.x += pac3.vx * dt * time_ratio
-            pac3.y += pac3.vy * dt * time_ratio
-            pac3.update()
-
-            pac4.move1(blinky)
-            pac4.x += pac4.vx * dt * time_ratio
-            pac4.y += pac4.vy * dt * time_ratio
-            pac4.update()
+            for pacman in enemies_list:
+                pacman.move1(blinky)
+                pacman.x += pacman.vx * dt * time_ratio
+                pacman.y += pacman.vy * dt * time_ratio
+                pacman.update()
 
 
+        for pacman in enemies_list:
+            # print(pacman.is_dead)
+            if pacman.is_dead:
+                enemies_list.remove(pacman)
 
 
         # FPS
@@ -247,11 +212,21 @@ def play_game(screen_width, screen_height, save):
         janela.set_background_color((0, 0, 0))
         janela.draw_text(str(FPS), 10, janela.height - 50, size=25, color=(255, 255, 0))
         maze.draw()
-        blinky.draw()
-        pacman.draw()
-        pac2.draw()
-        pac3.draw()
-        pac4.draw()
+        if not level_start:
+            fake_blinky.hide()
+            blinky.unhide()
+            blinky.draw()
+            for pacman in enemies_list:
+                pacman.draw()
+        else:
+            fake_blinky.x += 25 * dt
+            blinky.hide()
+            if level_clock // 0.1 in [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]:
+                for pacman in enemies_list:
+                    pacman.draw()
+
+        fake_blinky.draw()
+        fake_blinky.update()
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()
