@@ -46,6 +46,7 @@ def play_game(screen_width, screen_height, vol):
     enemies_list = []
     traps_list = []
     bombs_list = []
+    blasts_list = []
 
     # Background Music.
     sorteio = random.random()
@@ -256,6 +257,10 @@ def play_game(screen_width, screen_height, vol):
                 if(bomb.timer > bomb.explode_time):
                     blasts_list = bomb.explode()
 
+            for blast in blasts_list:
+                if((time() - blast.creation_instant) > blast.delta_time):
+                    blasts_list.remove(blast)
+
             for bomb in bombs_list:
                 if(bomb.exploded):
                     bombs_list.remove(bomb)
@@ -300,11 +305,11 @@ def play_game(screen_width, screen_height, vol):
         for bomb in bombs_list:
             bomb.draw()
             bomb.update()
-        try:
-            for blast in blasts_list:
-                blast.draw()
-        except UnboundLocalError:
-            pass
+        
+
+        for blast in blasts_list:
+            blast.draw()
+
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()
