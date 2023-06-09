@@ -5,6 +5,7 @@ from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
 from EatThis.Classes.Shot import *
 from EatThis.Classes.Trap import *
+from EatThis.Classes.Bomb import *
 from EatThis.a_star import *
 from EatThis.debug import *
 from time import *
@@ -44,6 +45,7 @@ def play_game(screen_width, screen_height, vol):
     shots_list_max_len = 5
     enemies_list = []
     traps_list = []
+    bombs_list = []
 
     # Background Music.
     sorteio = random.random()
@@ -243,6 +245,21 @@ def play_game(screen_width, screen_height, vol):
                 trap = Trap("Assets\Sprites\PickUps\\trap_20_108_196_98.png", blinky)
                 traps_list.append(trap)
 
+            if(teclado.key_pressed("X") and len(bombs_list) < 1):
+                bomb = Bomb("Assets\Sprites\VFX\\bomb.png", maze, blinky)
+                bombs_list.append(bomb)
+
+            for bomb in bombs_list:
+                bomb.timer += dt
+
+            for bomb in bombs_list:
+                if(bomb.timer > bomb.explode_time):
+                    blasts_list = bomb.explode()
+
+            for bomb in bombs_list:
+                if(bomb.exploded):
+                    bombs_list.remove(bomb)
+
             for trap in traps_list:
                 for enemy in enemies_list:
                     if(trap.collided(enemy) and not enemy.is_dead):
@@ -280,6 +297,14 @@ def play_game(screen_width, screen_height, vol):
             shot.update()
         for trap in traps_list:
             trap.draw()
+        for bomb in bombs_list:
+            bomb.draw()
+            bomb.update()
+        try:
+            for blast in blasts_list:
+                blast.draw()
+        except UnboundLocalError:
+            pass
         portal_esquerdo.draw()
         portal_esquerdo.update()
         portal_direito.draw()
