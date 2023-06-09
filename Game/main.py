@@ -257,6 +257,11 @@ def play_game(screen_width, screen_height, vol):
                 if(bomb.timer > bomb.explode_time):
                     blasts_list = bomb.explode()
 
+            for enemy in enemies_list:
+                for blast in blasts_list:
+                    if blast.collided(enemy):
+                        enemy.die()
+                        
             for blast in blasts_list:
                 if((time() - blast.creation_instant) > blast.delta_time):
                     blasts_list.remove(blast)
