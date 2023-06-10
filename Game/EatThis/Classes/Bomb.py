@@ -6,6 +6,7 @@ class Bomb(Sprite):
         super().__init__(game_image, frames=2)
         self.timer = 0
         self.explode_time = 5
+        self.max_radius = 5
         self.exploded = False
         self.maze = maze
         self.window = player.window
@@ -58,25 +59,25 @@ class Bomb(Sprite):
 
         #checa se tem corredor para cima
         matrix_cell = level[bomb_coordinates[0] - 1][bomb_coordinates[1]]
-        while(matrix_cell != 1):
+        while(matrix_cell != 1 and up <= self.max_radius):
             up += 1
             matrix_cell = level[bomb_coordinates[0] - 1 - up][bomb_coordinates[1]]
 
         #checa se tem corredor para baixo
         matrix_cell = level[bomb_coordinates[0] + 1][bomb_coordinates[1]]
-        while(matrix_cell != 1):
+        while(matrix_cell != 1 and down <= self.max_radius):
             down += 1
             matrix_cell = level[bomb_coordinates[0] + 1 + down][bomb_coordinates[1]]
 
         #checa se tem corredor para a direita
         matrix_cell = level[bomb_coordinates[0]][bomb_coordinates[1] + 1]
-        while(matrix_cell != 1):
+        while(matrix_cell != 1 and right <= self.max_radius):
             right += 1
             matrix_cell = level[bomb_coordinates[0]][bomb_coordinates[1] + 1 + right]
 
         #checa se tem corredor para a esquerda
         matrix_cell = level[bomb_coordinates[0]][bomb_coordinates[1] - 1]
-        while(matrix_cell != 1):
+        while(matrix_cell != 1 and left <= self.max_radius):
             left += 1
             matrix_cell = level[bomb_coordinates[0]][bomb_coordinates[1] - 1 - left]
         
