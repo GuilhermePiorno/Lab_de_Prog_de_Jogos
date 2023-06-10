@@ -39,7 +39,7 @@ class Enemy(Sprite):
         if len(self.maze.list_of_points) == 0:
             print("game over")
 
-        if self.get_matrix_coordinates() == target.get_matrix_coordinates() and target.state == "invulnerable":
+        if self.get_matrix_coordinates() == target.get_matrix_coordinates() and target.state == "invulnerable" and not self.is_dead:
             self.die()
 
         # Detecta se pacman comeu powerup
@@ -119,8 +119,6 @@ class Enemy(Sprite):
         else:
             if time.time() - self.death_instant >= 2:
                 self.is_dead = True
-
-
 
         # Determina as tolerâncias de movimento (até quantos pixels errados pacman aceita para fazer curva)
         delta_x = 1

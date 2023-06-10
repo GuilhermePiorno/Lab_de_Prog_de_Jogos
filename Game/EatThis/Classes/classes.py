@@ -187,7 +187,3 @@ class Point(Sprite):
 class PowerUp():
     def __init__(self):
         pass
-
-class Shot():
-    def __init__(self):
-        pass

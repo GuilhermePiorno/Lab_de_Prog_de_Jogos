@@ -3,6 +3,9 @@ from PPlay.sound import *
 from EatThis.Classes.Maze import *
 from EatThis.Classes.Enemy import *
 from EatThis.Classes.Player import *
+from EatThis.Classes.Shot import *
+from EatThis.Classes.Trap import *
+from EatThis.Classes.Bomb import *
 from EatThis.a_star import *
 from EatThis.debug import *
 from EatThis.enemy_spawn import *
@@ -56,6 +59,12 @@ def play_game(screen_width, screen_height, save):
     level_clock = 0
     pause = False
     time_ratio = 1
+    shots_list = []
+    shots_list_max_len = 5
+    enemies_list = []
+    traps_list = []
+    bombs_list = []
+    blasts_list = []
     level_finished = False
 
     # Variáveis que impactam dificuldade.
@@ -72,7 +81,6 @@ def play_game(screen_width, screen_height, save):
 
 
     slowmo = [Sound("Assets/SFX/SlowMotionIn.mp3"), Sound("Assets/SFX/SlowMotionOut.mp3")]
-
     bgm = Sound(song)
     print(f"\nPlaying: {song[13:len(song) - 4]} \n")
     bgm.set_volume(save.BGM_vol * save.Master_vol)
@@ -151,6 +159,7 @@ def play_game(screen_width, screen_height, save):
             new_map = var_toggle(new_map, "N", teclado)
             toggle_mood = var_toggle(toggle_mood, "T", teclado)
             toggle_vulnerability =  var_toggle(toggle_vulnerability, "V", teclado)
+            #shot_fireball = var_toggle(shot_fireball, "SPACE", teclado)
 
         # Notação pythonica de atribuição simples com if.
         # variável = valor_se_sim if condicao else valor_se_nao.
@@ -214,7 +223,6 @@ def play_game(screen_width, screen_height, save):
             print(f"Now I'm {blinky.state}!")
             toggle_vulnerability = not toggle_vulnerability
 
-
         # Atualiza caso algo tenha sido pressionado.
         just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
 # <============================================================ DEBUG AREA END
@@ -223,6 +231,7 @@ def play_game(screen_width, screen_height, save):
 
         # Atualiza buffer de inputs
         blinky.buffer += dt
+        blinky.shot_timer += dt
         if not pause and not level_start and not blinky_out:
             blinky.move1()
             blinky.x += blinky.vx * dt
@@ -235,11 +244,69 @@ def play_game(screen_width, screen_height, save):
                 pacman.y += pacman.vy * dt * time_ratio
                 pacman.update()
 
+            if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len)):
+                if(blinky.shot_timer > blinky.reload_time):
+                    blinky.shot_timer = 0
+                    shot = Shot("Assets\Sprites\VFX\\blue fireball_32x32_omni.png", blinky, 8)
+                    shots_list.append(shot)
+
+            for shot in shots_list:
+                shot.x += shot.vx * dt
+                shot.y += shot.vy * dt
+                shot.check_collision_with_wall()
+
+            for shot in shots_list:
+                for enemy in enemies_list:
+                    if (shot.collided(enemy) and not enemy.is_dead):
+                        enemy.die()
+                        shot.hit_enemy = True
+
+            for shot in shots_list:
+                if(shot.hit_enemy or shot.hit_wall):
+                    shots_list.remove(shot)
+
+            if(teclado.key_pressed("A") and len(traps_list) < 1):
+                trap = Trap("Assets\Sprites\PickUps\\trap_20_108_196_98.png", blinky)
+                traps_list.append(trap)
+
+            if (teclado.key_pressed("X") and len(bombs_list) < 1):
+                bomb = Bomb("Assets\Sprites\VFX\\bomb.png", maze, blinky)
+                bombs_list.append(bomb)
+
+            for bomb in bombs_list:
+                bomb.timer += dt
+
+            for bomb in bombs_list:
+                if(bomb.timer > bomb.explode_time):
+                    blasts_list = bomb.explode()
+
+            for enemy in enemies_list:
+                for blast in blasts_list:
+                    if blast.collided(enemy):
+                        enemy.die()
+
+            for blast in blasts_list:
+                if ((time() - blast.creation_instant) > blast.delta_time):
+                    blasts_list.remove(blast)
+
+            for bomb in bombs_list:
+                if (bomb.exploded):
+                    bombs_list.remove(bomb)
+
+            for trap in traps_list:
+                for enemy in enemies_list:
+                    if (trap.collided(enemy) and not enemy.is_dead):
+                        enemy.die()
+                        trap.was_eaten = True
+
+            for trap in traps_list:
+                if (trap.was_eaten):
+                    traps_list.remove(trap)
 
 
-        for pacman in enemies_list:
-            if pacman.is_dead:
-                enemies_list.remove(pacman)
+            for pacman in enemies_list:
+                if pacman.is_dead:
+                    enemies_list.remove(pacman)
 
         # Displays and updates player credits at the end of the level.
         if len(enemies_list) == 0 and not level_finished:
@@ -250,6 +317,11 @@ def play_game(screen_width, screen_height, save):
             save.credits += len(maze.list_of_points)
             credits_rollup = f"credits: {save.credits}"
         snip = font.render(credits_rollup, True, 'white')
+
+
+
+
+
 
 
         # FPS
@@ -309,7 +381,17 @@ def play_game(screen_width, screen_height, save):
             for pacman in enemies_list:
                 pacman.draw()
 
+        for shot in shots_list:
+            shot.draw()
+            shot.update()
+        for trap in traps_list:
+            trap.draw()
+        for bomb in bombs_list:
+            bomb.draw()
+            bomb.update()
 
+        for blast in blasts_list:
+            blast.draw()
 
 
 
