@@ -16,49 +16,70 @@ def play_game(screen_width, screen_height, save):
     print("        N - Gera mapa novo")
     print("        G - Liga/Desliga Grid")
     print("        M - Liga/Desliga Música")
-    print("        T - Altera modo IA do inimgo")
+    # print("        T - Altera modo IA do inimgo")
     print("        V - Altera modo do player")
-
     # Inicialização.
+    font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 24)
+    fps_msg = "FPS"
+    current_stage = f"Stage: {save.stage_no}"
+    stage_render = font.render(current_stage, True, 'white')
+    credits_rollup = f"credits: {save.credits}"
     janela = Window(screen_width, screen_height)
     janela.set_title("Eat This!")
     teclado = janela.get_keyboard()
-    walltypes = ["Curved_20", "Curved_20_Matrix"]
-    wall_select = 0
+    walltypes = ["Curved_20", "Curved_20_Matrix",
+                 "Curved_20_Cyan", "Curved_20_Cyan_Matrix",
+                 "Curved_20_Salmon", "Curved_20_Purple",
+                 "Curved_20_Orange", "Curved_20_White",
+                 "Curved_20_Green"]
+
+    # Gera um indice de cor diferente por fase
+    aux = 1
+    while aux == 1 or aux == 3:
+        aux = random.randint(0, 8)
+    wall_select = aux
+
     walltype = walltypes[wall_select]
+
+    # Debuging variables.
     debug_timer = 0
     just_pressed = False
     grid_toggle = False
     new_map = False
     bgm_toggle = True
-    pause = False
     bullet_time = False
     toggle_mood = False
     toggle_vulnerability = False
-    time_ratio = 1
+
+    # Variáveis do jogo.
     level_start = True
     level_clock = 0
-    # Variáveis que impactam dificuldade!
-    powerups_no = 4
-    numero_inimigos = 3
+    pause = False
+    time_ratio = 1
+    level_finished = False
+
+    # Variáveis que impactam dificuldade.
+    powerups_no = 2
+    numero_inimigos = 1
 
     # Background Music.
-    sorteio = random.random()
-    if sorteio < 0.25:
-        song = "Assets/Music/Unreal Super Hero 3 by Kenet & Rez.mp3"
-    elif sorteio < 0.5:
-        song = "Assets/Music/FLCTR4 (feat. Zabutom).mp3"
-    elif sorteio < 0.75:
-        song = "Assets/Music/The Arcane Golem.mp3"
-    else:
-        song = "Assets/Music/The Bat Matriarch.mp3"
+    song_list = ["Assets/Music/Unreal Super Hero 3 by Kenet & Rez.mp3",
+                 "Assets/Music/FLCTR4 (feat. Zabutom).mp3",
+                 "Assets/Music/The Arcane Golem.mp3",
+                 "Assets/Music/The Bat Matriarch.mp3"]
+    sorteio = random.randint(0, 3)
+    song = song_list[sorteio]
+
 
     slowmo = [Sound("Assets/SFX/SlowMotionIn.mp3"), Sound("Assets/SFX/SlowMotionOut.mp3")]
+
     bgm = Sound(song)
     print(f"\nPlaying: {song[13:len(song) - 4]} \n")
     bgm.set_volume(save.BGM_vol * save.Master_vol)
     bgm.set_repeat(True)
-    bgm.play()
+
+    if save.stage_no == 1:
+        bgm.play()
 
     # cria o objeto maze
     maze = Maze(walltype, janela, powerups_no)
@@ -77,7 +98,11 @@ def play_game(screen_width, screen_height, save):
     blinky.set_sequence_time(0, 12, 100, True)
     blinky.set_sequence(0, 1, True)
 
-
+    # Fade-to-Black sprite
+    blackout = Sprite("Assets/Sprites/VFX/Fade_To_Black.png", 10)
+    blackout.set_position(0,0)
+    blackout.set_sequence_time(0, 10, 100, False)
+    blackout.pause()
 
     # Enemy Creation
     enemies_list = create_pacmans(janela, maze, numero_inimigos, save)
@@ -147,10 +172,25 @@ def play_game(screen_width, screen_height, save):
             maze.level = maze.fill_level()  # Atualiza o level do maze para incluir a walltype nova
             grid_toggle = False
 
+            # Portal_Esquerdo
+            portal_esquerdo = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_L_mask.png", 3)
+            portal_esquerdo.set_sequence_time(0, 3, 100, True)
+            portal_esquerdo.set_sequence(0, 3, True)
+            portal_esquerdo.set_position(janela.width / 2 - maze.half_maze_width - maze.wall.width - 40,
+                                         janela.height / 2 - maze.half_maze_height + 13.5 * maze.wall.height - 1)
 
-            for i in range(numero_inimigos):
-                enemies_list[i].get_next_closest_point()
-                enemies_list[i].maze.level[enemies_list[i].nearest_point[1][0]][enemies_list[i].nearest_point[1][1]].get_flow_field()
+            # Portal_Direito
+            portal_direito = Sprite("Assets/Sprites/Walls/" + walltype + "/Portal_D_mask.png", 3)
+            portal_direito.set_sequence_time(0, 3, 100, True)
+            portal_direito.set_sequence(0, 3, True)
+            portal_direito.set_position(janela.width / 2 + maze.half_maze_width,
+                                        janela.height / 2 - maze.half_maze_height + 13.5 * maze.wall.height - 1)
+
+
+            for pacman in enemies_list:
+                pacman.maze = maze
+                pacman.get_next_closest_point()
+                pacman.maze.level[pacman.nearest_point[1][0]][pacman.nearest_point[1][1]].get_flow_field()
 
 
 
@@ -179,10 +219,11 @@ def play_game(screen_width, screen_height, save):
         just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
 # <============================================================ DEBUG AREA END
 
+        blinky_out = level_finished and blinky.matrix_coordinates == (15, 27) and blinky.vx > 0
 
         # Atualiza buffer de inputs
         blinky.buffer += dt
-        if not pause and not level_start:
+        if not pause and not level_start and not blinky_out:
             blinky.move1()
             blinky.x += blinky.vx * dt
             blinky.y += blinky.vy * dt
@@ -195,10 +236,20 @@ def play_game(screen_width, screen_height, save):
                 pacman.update()
 
 
+
         for pacman in enemies_list:
-            # print(pacman.is_dead)
             if pacman.is_dead:
                 enemies_list.remove(pacman)
+
+        # Displays and updates player credits at the end of the level.
+        if len(enemies_list) == 0 and not level_finished:
+            level_finished = True
+            save.stage_no += 1
+            previous_credits = save.credits
+            credits_received = len(maze.list_of_points)
+            save.credits += len(maze.list_of_points)
+            credits_rollup = f"credits: {save.credits}"
+        snip = font.render(credits_rollup, True, 'white')
 
 
         # FPS
@@ -208,33 +259,83 @@ def play_game(screen_width, screen_height, save):
             tempo = 0
             FPS = cont
             cont = 0
+        fps_msg = f"{FPS} FPS"
+        frames_per_second = font.render(fps_msg, True, 'white')
 
-        janela.set_background_color((0, 0, 0))
-        janela.draw_text(str(FPS), 10, janela.height - 50, size=25, color=(255, 255, 0))
+
+
+
+
+        janela.set_background_color((0, 0, 0))                                  # Fundo preto.
+
+
+
+
+
+
+
+
+
+
+
+
+        janela.screen.blit(frames_per_second, (10, janela.height - 50))         # Draw no FPS.
         maze.draw()
-        if not level_start:
-            fake_blinky.hide()
-            blinky.unhide()
-            blinky.draw()
-            for pacman in enemies_list:
-                pacman.draw()
-        else:
+
+        if level_start:
             fake_blinky.x += 25 * dt
             blinky.hide()
             if level_clock // 0.1 in [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]:
                 for pacman in enemies_list:
                     pacman.draw()
+        else:
+            blinky.draw()
 
+        # Blinky is hidden, Fake_Blinky walks out thought portal and screen fades to black.
+        if blinky_out:
+            blackout.play()
+            fake_blinky.x += 25 * dt
+            fake_blinky.unhide()
+            blinky.hide()
+            print(blackout.is_playing())
+            if blackout.get_curr_frame() == 9:
+                return["play", save]
+
+
+        if not level_start and not level_finished:
+            blinky.unhide()
+            fake_blinky.hide()
+            fake_blinky.set_position(873, 323)
+            for pacman in enemies_list:
+                pacman.draw()
+
+
+
+
+
+
+
+
+
+        janela.screen.blit(snip, (930, 630))                                    # Mostra Credits.
+        janela.screen.blit(stage_render, (930, 600))
         fake_blinky.draw()
         fake_blinky.update()
-        portal_esquerdo.draw()
         portal_esquerdo.update()
-        portal_direito.draw()
+        portal_esquerdo.draw()
         portal_direito.update()
+        portal_direito.draw()
+
+
+
+        blackout.update()
+        blackout.draw()
+
+
+
+
+
+
+
+
         janela.update()
-
-
-
-
-
-

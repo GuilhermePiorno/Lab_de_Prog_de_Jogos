@@ -150,7 +150,7 @@ def open_options(screen_width, screen_height, save):
                         nav_level = options_items[nav_level].index(options_items[nav_level][option_item_select])
                     else:
                         save.write_save_to_file()
-                        return save
+                        return ["menu", save]
                 if options_items[nav_level][option_item_select] == "Volume":
                     sfx_confirm.play()
                     # nav_level recebe a "coluna" da opção, como 'volume' é o segundo item da lista, nav_level = 1.
@@ -185,7 +185,7 @@ def open_options(screen_width, screen_height, save):
                         nav_level = 0  # Volta ao inicio do options (pode ser feito porque nenhum menu tem mais de 1 de profundidade)
                     else:
                         save.write_save_to_file()
-                        return save
+                        return ["menu", save]
 
         if not teclado.key_pressed(last_input):
             button_state = False

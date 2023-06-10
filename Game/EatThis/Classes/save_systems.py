@@ -4,13 +4,18 @@ import os
 class SaveFile:
     def __init__(self, path):
         self.path = path
-        # Variáveis internas para armazenar valores padrão de inicialização. (usado para restar save)
+        # SOM
         self._Master_vol = 0.5
         self._BGM_vol = 50
         self._SFX_vol = 50
         self.Master_vol = self._Master_vol
         self.BGM_vol = self._BGM_vol
         self.SFX_vol = self._SFX_vol
+        # Uso entre fases
+        self._stage_no = 1
+        self.stage_no = self._stage_no
+        self._credits = 0
+        self.credits = self._credits
 
     def read_save_from_file(self):
         """
@@ -27,7 +32,6 @@ class SaveFile:
                     aux = linha.rstrip('\n')  # retorna uma lista sem os \n
                     aux = list(map(float, aux.split()))  # aplica float em todos elementos.
                     data.append(aux)
-
             # Linha 0 => [master_vol, bgm_vol, sfx_vol]
             self.Master_vol = data[0][0]
             self.BGM_vol = data[0][1]

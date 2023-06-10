@@ -97,28 +97,29 @@ def open_menu(screen_width, screen_height, save):
         if not teclado.key_pressed(last_input) and not teclado.key_pressed("return"):
             button_state = False
 
+        cursor_x_pos = janela.width / 2 - newgame.get_width() / 2 - cursor.width - 10
         if selection_index == 0:
-            cursor.set_position(janela.width / 2 - newgame.get_width() / 2 - cursor.width - 10, 450)
+            cursor.set_position(cursor_x_pos, 450)
             loadgame = font.render(message0, True, 'yellow')
             newgame = font.render(message1, True, 'white')
             options = font.render(message2, True, 'white')
             quit_game = font.render(message3, True, 'white')
         elif selection_index == 1:
-            cursor.set_position(janela.width / 2 - newgame.get_width() / 2 - cursor.width - 10, 520)
+            cursor.set_position(cursor_x_pos, 520)
 
             loadgame = font.render(message0, True, 'white')
             newgame = font.render(message1, True, 'yellow')
             options = font.render(message2, True, 'white')
             quit_game = font.render(message3, True, 'white')
         elif selection_index == 2:
-            cursor.set_position(janela.width / 2 - newgame.get_width() / 2 - cursor.width - 10, 590)
+            cursor.set_position(cursor_x_pos, 590)
 
             loadgame = font.render(message0, True, 'white')
             newgame = font.render(message1, True, 'white')
             options = font.render(message2, True, 'yellow')
             quit_game = font.render(message3, True, 'white')
         elif selection_index == 3:
-            cursor.set_position(janela.width / 2 - newgame.get_width() / 2 - cursor.width - 10, 660)
+            cursor.set_position(cursor_x_pos, 660)
             loadgame = font.render(message0, True, 'white')
             newgame = font.render(message1, True, 'white')
             options = font.render(message2, True, 'white')
