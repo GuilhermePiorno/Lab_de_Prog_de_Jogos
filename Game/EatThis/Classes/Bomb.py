@@ -3,9 +3,9 @@ from EatThis.Classes.Blast import *
 
 class Bomb(Sprite):
     def __init__(self, game_image, maze, player):
-        super().__init__(game_image, frames=2)
+        super().__init__(game_image, frames=4)
         self.timer = 0
-        self.explode_time = 5
+        self.explode_time = 3
         self.exploded = False
         self.maze = maze
         self.window = player.window
@@ -16,29 +16,46 @@ class Bomb(Sprite):
     def explode(self):
         self.exploded = True
         blast_list = []
-        blast = Blast("Assets\Sprites\VFX\explosion.png")
+        blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Center.png", 7)
+        blast.set_sequence_time(0, 7, 50, True)
         blast.set_position(self.x, self.y)
         blast_list.append(blast)
         blast_radius = self.generate_blast_radius()
         
         #desenha as explosões para cima, para baixo, para a esquerda e para a direita
-        for i in range(blast_radius[0]):
-            blast = Blast("Assets\Sprites\VFX\explosion.png")
+        for i in range(1, blast_radius[0]): #cima
+            if i == blast_radius[0] - 1:
+                blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Up_End.png", 7)
+            else:
+                blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Up.png", 7)
+            blast.set_sequence_time(0, 7, 50, True)
             blast.set_position(self.x, self.y - i*20)
             blast_list.append(blast)
 
-        for i in range(blast_radius[1]):
-            blast = Blast("Assets\Sprites\VFX\explosion.png")
+        for i in range(1, blast_radius[1]): #baixo
+            if i == blast_radius[1] - 1:
+                blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Down_End.png", 7)
+            else:
+                blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Down.png", 7)
+            blast.set_sequence_time(0, 7, 50, True)
             blast.set_position(self.x, self.y + i*20)
             blast_list.append(blast)
 
-        for i in range(blast_radius[2]):
-            blast = Blast("Assets\Sprites\VFX\explosion.png")
+        for i in range(1, blast_radius[2]):  # esquerda
+            if i == blast_radius[2] - 1:
+                blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Left_End.png", 7)
+            else:
+                blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Left.png", 7)
+            blast.set_sequence_time(0, 7, 50, True)
             blast.set_position(self.x - i*20, self.y)
             blast_list.append(blast)
 
-        for i in range(blast_radius[3]):
-            blast = Blast("Assets\Sprites\VFX\explosion.png")
+        for i in range(1, blast_radius[3]): # direita
+            if i == blast_radius[3] - 1:
+                blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Right_End.png", 7)
+            else:
+                blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Right.png", 7)
+            blast.set_sequence_time(0, 7, 50, True)
             blast.set_position(self.x + i*20, self.y)
             blast_list.append(blast)
 

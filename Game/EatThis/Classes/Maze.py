@@ -4,6 +4,17 @@ from EatThis.Classes.Point import *
 from EatThis.Classes.PowerUp import *
 import random
 
+def createshop():
+    with open('./EatThis/maze.txt', mode='w', encoding='utf-8') as fout:
+        fout.write("\n")
+        for linha in range(3):
+            for elemento in range(64):
+                if linha == 1:
+                    fout.write(".")
+                else:
+                    fout.write("|")
+            fout.write("\n")
+
 # Auxilia na criação da matriz pathing (apenas 0 e 1)
 # Provavelmente é possível criar esta matriz durante a execução de fill_level() em vez de criar uma função separada.
 def create_path_matrix(): # Cria uma matriz com 0 e 1 para auxiliar na criação do pathing
@@ -29,6 +40,7 @@ def create_path_matrix(): # Cria uma matriz com 0 e 1 para auxiliar na criação
 
 class Maze:
     def __init__(self, walltype, window, powerup_no):
+        createlevel()
         self.window = window
         self.keyboard = self.window.get_keyboard()
         self.list_of_points = []
@@ -36,7 +48,6 @@ class Maze:
         self.wall = GameImage("Assets/Sprites/Walls/" + self.walltype + "/Wall_URDL.png")
         self.half_maze_height = (self.wall.height * 31) / 2
         self.half_maze_width = (self.wall.width * 28) / 2
-        createlevel()
         self.level = self.fill_level()
         self.powerup_num = powerup_no
         self.create_powerups()

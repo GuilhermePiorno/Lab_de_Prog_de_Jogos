@@ -244,8 +244,8 @@ def play_game(screen_width, screen_height, save):
                 pacman.y += pacman.vy * dt * time_ratio
                 pacman.update()
 
-            if (teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len)):
-                if(blinky.shot_timer > blinky.reload_time):
+            if teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len):
+                if blinky.shot_timer > blinky.reload_time:
                     blinky.shot_timer = 0
                     shot = Shot("Assets\Sprites\VFX\\blue fireball_32x32_omni.png", blinky, 8)
                     shots_list.append(shot)
@@ -257,27 +257,28 @@ def play_game(screen_width, screen_height, save):
 
             for shot in shots_list:
                 for enemy in enemies_list:
-                    if (shot.collided(enemy) and not enemy.is_dead):
+                    if shot.collided(enemy) and not enemy.is_dead:
                         enemy.die()
                         shot.hit_enemy = True
 
             for shot in shots_list:
-                if(shot.hit_enemy or shot.hit_wall):
+                if shot.hit_enemy or shot.hit_wall:
                     shots_list.remove(shot)
 
-            if(teclado.key_pressed("A") and len(traps_list) < 1):
+            if teclado.key_pressed("A") and len(traps_list) < 1:
                 trap = Trap("Assets\Sprites\PickUps\\trap_20_108_196_98.png", blinky)
                 traps_list.append(trap)
 
-            if (teclado.key_pressed("X") and len(bombs_list) < 1):
-                bomb = Bomb("Assets\Sprites\VFX\\bomb.png", maze, blinky)
+            if teclado.key_pressed("X") and len(bombs_list) < 1:
+                bomb = Bomb("Assets\Sprites\VFX\\Bomb_Animated.png", maze, blinky)
+                bomb.set_sequence_time(0, 4, 1000, True)
                 bombs_list.append(bomb)
 
             for bomb in bombs_list:
                 bomb.timer += dt
 
             for bomb in bombs_list:
-                if(bomb.timer > bomb.explode_time):
+                if bomb.timer > bomb.explode_time:
                     blasts_list = bomb.explode()
 
             for enemy in enemies_list:
@@ -286,21 +287,21 @@ def play_game(screen_width, screen_height, save):
                         enemy.die()
 
             for blast in blasts_list:
-                if ((time() - blast.creation_instant) > blast.delta_time):
+                if (time() - blast.creation_instant) > blast.delta_time:
                     blasts_list.remove(blast)
 
             for bomb in bombs_list:
-                if (bomb.exploded):
+                if bomb.exploded:
                     bombs_list.remove(bomb)
 
             for trap in traps_list:
                 for enemy in enemies_list:
-                    if (trap.collided(enemy) and not enemy.is_dead):
+                    if trap.collided(enemy) and not enemy.is_dead:
                         enemy.die()
                         trap.was_eaten = True
 
             for trap in traps_list:
-                if (trap.was_eaten):
+                if trap.was_eaten:
                     traps_list.remove(trap)
 
 
@@ -369,9 +370,12 @@ def play_game(screen_width, screen_height, save):
             fake_blinky.x += 25 * dt
             fake_blinky.unhide()
             blinky.hide()
-            print(blackout.is_playing())
             if blackout.get_curr_frame() == 9:
+                if save.stage_no % 5 == 0:
+                    bgm.fadeout(1000)
+                    return ["shop", save]
                 return["play", save]
+
 
 
         if not level_start and not level_finished:
@@ -392,6 +396,7 @@ def play_game(screen_width, screen_height, save):
 
         for blast in blasts_list:
             blast.draw()
+            blast.update()
 
 
 

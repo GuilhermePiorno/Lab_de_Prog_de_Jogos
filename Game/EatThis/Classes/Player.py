@@ -97,8 +97,6 @@ class Player(Sprite):
         can_go_left = (self.maze.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] - 1)] == 0)
         can_go_right = (self.maze.pathing[int(self.matrix_coordinates[0])][int(self.matrix_coordinates[1] + 1)] == 0)
 
-
-
         # Determina as tolerâncias de movimento (até quantos pixels errados blinky aceita para fazer curva)
         delta_x = 1
         delta_y = 1
