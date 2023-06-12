@@ -5,6 +5,7 @@ class Bomb(Sprite):
     def __init__(self, game_image, maze, player):
         super().__init__(game_image, frames=4)
         self.timer = 0
+        self.range = 4
         self.explode_time = 3
         self.exploded = False
         self.maze = maze
@@ -23,8 +24,8 @@ class Bomb(Sprite):
         blast_radius = self.generate_blast_radius()
         
         #desenha as explosões para cima, para baixo, para a esquerda e para a direita
-        for i in range(1, blast_radius[0]): #cima
-            if i == blast_radius[0] - 1:
+        for i in range(1, blast_radius[0]+1): #cima
+            if i == blast_radius[0]:
                 blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Up_End.png", 7)
             else:
                 blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Up.png", 7)
@@ -32,8 +33,8 @@ class Bomb(Sprite):
             blast.set_position(self.x, self.y - i*20)
             blast_list.append(blast)
 
-        for i in range(1, blast_radius[1]): #baixo
-            if i == blast_radius[1] - 1:
+        for i in range(1, blast_radius[1]+1): #baixo
+            if i == blast_radius[1]:
                 blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Down_End.png", 7)
             else:
                 blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Down.png", 7)
@@ -41,8 +42,8 @@ class Bomb(Sprite):
             blast.set_position(self.x, self.y + i*20)
             blast_list.append(blast)
 
-        for i in range(1, blast_radius[2]):  # esquerda
-            if i == blast_radius[2] - 1:
+        for i in range(1, blast_radius[2]+1):  # esquerda
+            if i == blast_radius[2]:
                 blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Left_End.png", 7)
             else:
                 blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Left.png", 7)
@@ -50,8 +51,8 @@ class Bomb(Sprite):
             blast.set_position(self.x - i*20, self.y)
             blast_list.append(blast)
 
-        for i in range(1, blast_radius[3]): # direita
-            if i == blast_radius[3] - 1:
+        for i in range(1, blast_radius[3]+1): # direita
+            if i == blast_radius[3]:
                 blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Right_End.png", 7)
             else:
                 blast = Blast("Assets\Sprites\VFX\Bomb_Explosion_Right.png", 7)
@@ -75,25 +76,25 @@ class Bomb(Sprite):
 
         #checa se tem corredor para cima
         matrix_cell = level[bomb_coordinates[0] - 1][bomb_coordinates[1]]
-        while(matrix_cell != 1):
+        while(matrix_cell != 1 and up <= self.range):
             up += 1
             matrix_cell = level[bomb_coordinates[0] - 1 - up][bomb_coordinates[1]]
 
         #checa se tem corredor para baixo
         matrix_cell = level[bomb_coordinates[0] + 1][bomb_coordinates[1]]
-        while(matrix_cell != 1):
+        while(matrix_cell != 1 and down <= self.range):
             down += 1
             matrix_cell = level[bomb_coordinates[0] + 1 + down][bomb_coordinates[1]]
 
         #checa se tem corredor para a direita
         matrix_cell = level[bomb_coordinates[0]][bomb_coordinates[1] + 1]
-        while(matrix_cell != 1):
+        while(matrix_cell != 1 and right <= self.range and bomb_coordinates[1] + 1 + right < 29):
             right += 1
             matrix_cell = level[bomb_coordinates[0]][bomb_coordinates[1] + 1 + right]
 
         #checa se tem corredor para a esquerda
         matrix_cell = level[bomb_coordinates[0]][bomb_coordinates[1] - 1]
-        while(matrix_cell != 1):
+        while(matrix_cell != 1 and left <= self.range and bomb_coordinates[1] - 1 - left >= 1):
             left += 1
             matrix_cell = level[bomb_coordinates[0]][bomb_coordinates[1] - 1 - left]
         
