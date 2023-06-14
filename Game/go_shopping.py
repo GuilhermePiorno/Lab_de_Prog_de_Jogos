@@ -12,8 +12,31 @@ def measure_longest_message(msg, font_name='Assets/Fonts/MinimalPixel v2.ttf', s
             longest = snip.get_width()
     return longest
 
+def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.ttf', size=24):
 
+    # Retrato de quem fala.
+    if who.lower() == 'shopkeeper':
+        speaker_portrait = Sprite('Assets/Sprites/Characters/Shopkeeper_Portrait_Simple_BIG.png', 1)
+        what.insert(0, "Shopkeeper: ")
+    else:
+        what.insert(0, "Blinky: ")
+        speaker_portrait = Sprite("Assets/Sprites/Characters/Blinky_Portrait_02_Simple_BIG.png", 1)
+    speaker_portrait.set_position(60, 70)
+    speaker_portrait.draw()
 
+    # Transforma vetor de texto em vetor de superfícies.
+    fonte = pygame.font.Font(font_name, size)
+    for i in range(len(what)):
+        what[i] = fonte.render(what[i], True, 'white')
+
+    # posições das linhas.
+    pos_linha = []
+    for i in range(6):
+        pos_linha.append(((janela.width - text_box.width) / 2 + 180, 80 + 30 * i))
+
+    # Dá 'blit' nas linhas de texto.
+    for i in range(len(what)):
+        janela.screen.blit(what[i], pos_linha[i])
 
 def go_shopping(screen_width, screen_height, save):
     tempo = 0
@@ -32,12 +55,22 @@ def go_shopping(screen_width, screen_height, save):
         ["Why do programmers always mix up Halloween and Christmas?", "Because Oct 31 == Dec 25."],
         ["To understand what recursion is, you must first understand recursion."]
     ]
-    test_length = "loooooooooooooooooooooooooooooooooooooooooooooooooooooooooongest message"
-    sample_text = ["Shopkeeper: ", "Hi, I'm the shopkeeper!", "Well, I actually work at the ship's warehouse, but I can sell you stuff."]
+
+
     teclado = janela.get_keyboard()
     in_dialogue_area = False
     in_dialogue = False
     enter_released = False
+    song_start = "Assets/Music/Shop_Start.mp3"
+    bgm_start = Sound(song_start)
+    bgm_start.set_volume(save.BGM_vol * save.Master_vol)
+    bgm_start.set_repeat(False)
+    bgm_start.play()
+    song_loop = "Assets/Music/Shop_Loop.mp3"
+    bgm_loop = Sound(song_loop)
+    bgm_loop.set_volume(save.BGM_vol * save.Master_vol)
+    bgm_loop.set_repeat(True)
+
 
 
     #============layer 0=================SPACE==========================================================================
@@ -145,9 +178,12 @@ def go_shopping(screen_width, screen_height, save):
     blinky.set_sequence(0, 1, True)
     blinky_speed = 0
     facing = "afk"
-
+    chat_depth = 0
 
     while True:
+        if tempo >= 58 and not bgm_loop.is_playing():
+            bgm_loop.play()
+
         dt = janela.delta_time()
         if dt > 0.1:
             dt = 0
@@ -190,9 +226,9 @@ def go_shopping(screen_width, screen_height, save):
 
 
         # Resolve in_dialogue_area switch
-        if 575 < blinky.x < 720 and not in_dialogue_area:
+        if 500 < blinky.x < 720 and not in_dialogue_area:
             in_dialogue_area = True
-        if  (575 > blinky.x or blinky.x > 720) and in_dialogue_area:
+        if  (500 > blinky.x or blinky.x > 720) and in_dialogue_area:
             in_dialogue_area = False
 
         # Shows bubble when in dialogue area
@@ -203,6 +239,8 @@ def go_shopping(screen_width, screen_height, save):
 
         # Detecta Enter.
         if enter_released == False and teclado.key_pressed("enter"):
+            if in_dialogue:
+                chat_depth += 1
             enter_released = True
             print(enter_released)
 
@@ -217,14 +255,11 @@ def go_shopping(screen_width, screen_height, save):
                 blinky.set_sequence(6, 8, True)         # Sets blinky's sequence to up-left look
 
 
-        if teclado.key_pressed("esc"):
+        if teclado.key_pressed("esc") and in_dialogue:
             text_box.set_sequence_time(7, 13, 50, False)
             text_box.play()
             in_dialogue = False
-
-        snip0 = font.render("Shopkeeper: ", True, "white")
-        snip = font.render(test_length, True, "white")
-
+            chat_depth = 0
 
 
 
@@ -234,77 +269,10 @@ def go_shopping(screen_width, screen_height, save):
             print_char_count += 1
 
 
-        list_page_lenghts = []
-        for page in messages:
-            chars_in_page = 0
-            for line in page:
-                chars_in_page += len(line)
-            list_page_lenghts.append(chars_in_page)
 
-
-        # snip = font.render(messages[active_message][0:print_char_count], True, 'white')
-
-
-
-
-
-        # # Dialogue
-        # if in_dialogue_area and teclado.key_pressed("up") and not in_dialogue:
-        #     in_dialogue = True                      # Updates in_dialogue variable
-        #     if blinky.x < 640:
-        #         blinky.set_sequence(4, 6, True)         # Sets blinky's sequence to up-right look
-        #     else:
-        #         blinky.set_sequence(6, 8, True)         # Sets blinky's sequence to up-left look
-        #
-        #
-        # # resets print_char_count, active_message, and is_done_printing after "enter" is pressed.
-        # if enter_released and in_dialogue and is_done_printing and active_message < len(messages) -1:
-        #     print_char_count = 0
-        #     active_message += 1
-        #     is_done_printing = False
-        #
-        #
-        #
-        # tempo_por_char = tempo - tic
-        # if in_dialogue and tempo_por_char > (1 / text_speed) and print_char_count < len(messages[active_message]):
-        #     tic = tempo             # reseta marcador de tempo.
-        #     print_char_count += 1   # Avança um caractere para impressão.
-        # elif print_char_count >= len(messages[active_message]) and not is_done_printing:
-        #     is_done_printing = True
-        #
-        # snip = font.render(messages[active_message][0:print_char_count], True, 'white')
-        #
-        #
-        # if is_done_printing and in_dialogue and enter_released and active_message == len(messages) - 1:
-        #     in_dialogue = False
-        #
-        # if teclado.key_pressed("esc"):
-        #     in_dialogue = False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        greetings1 = ["Hi there little one!"]
+        greetings2 = ["..."]
+        greetings3 = ["Anyway... can I help you with something?"]
 
 
         # Set Screen Boundries
@@ -312,6 +280,10 @@ def go_shopping(screen_width, screen_height, save):
             blinky.x = 0
 
         if blinky.x >= 1215:
+            bgm_start.stop()
+            bgm_start.pause()
+            bgm_loop.stop()
+            bgm_loop.pause()
             save.stage_no += 1
             return ["play", save]
 
@@ -368,27 +340,12 @@ def go_shopping(screen_width, screen_height, save):
         text_box.update()
         text_box.draw()
 
-
-
-        # longest_msg = measure_longest_message(messages)
-        # janela.screen.blit(snip, ((janela.width - longest_msg)/2, 360))
-
-
-
         if in_dialogue and not text_box.is_playing():
-            shopkeeper_portrait.draw()
-            teste = [snip0, snip, snip, snip, snip0, snip]
-            for i in range(len(teste)):
-                if snip.get_width() > 1000:
-                    print(f"Text {i} is too long ({snip.get_width()}")
-                janela.screen.blit(teste[i], ((janela.width - text_box.width) / 2 + 180, 80 + 30*i))
-
-
-
-
+            if chat_depth == 0:
+                talk("Shopkeeper", greetings1, janela, text_box)
+            elif chat_depth == 1:
+                talk("Blinky", greetings2, janela, text_box)
+            elif chat_depth == 2:
+                talk("Shopkeeper", greetings3, janela, text_box)
 
         janela.update()
-
-
-
-

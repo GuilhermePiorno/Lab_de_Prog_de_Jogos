@@ -35,6 +35,7 @@ def open_options(screen_width, screen_height, save):
 
     # Text init.
     font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 30)
+    small_font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 20)
 
     options_items = [
         ["Back", "Volume", "Credits"],
@@ -222,6 +223,8 @@ def open_options(screen_width, screen_height, save):
             vol_bar_layer1.draw()
             vol_bar_layer2.set_position(bar_posx, bar_posy)
             vol_bar_layer2.draw()
+            aux_surface = small_font.render(str(int(100*save.Master_vol)), True, 'white')
+            janela.screen.blit(aux_surface, (630, 300))
         elif controlling_BGM_volume:
             for i in range(len(options_item_text)):
                 space = 0
@@ -236,6 +239,8 @@ def open_options(screen_width, screen_height, save):
             vol_bar_layer1.draw()
             vol_bar_layer2.set_position(bar_posx, bar_posy + 50)
             vol_bar_layer2.draw()
+            aux_surface = small_font.render(str(save.BGM_vol), True, 'white')
+            janela.screen.blit(aux_surface, (630, 350))
 
         elif controlling_SFX_volume:
             for i in range(len(options_item_text)):
@@ -248,6 +253,8 @@ def open_options(screen_width, screen_height, save):
             vol_bar_layer1.draw()
             vol_bar_layer2.set_position(bar_posx, bar_posy + 100)
             vol_bar_layer2.draw()
+            aux_surface = small_font.render(str(save.SFX_vol), True, 'white')
+            janela.screen.blit(aux_surface, (630, 400))
         else:
             # renderiza todas as opções da lista option_item_text
             for i in range(len(options_item_text)):

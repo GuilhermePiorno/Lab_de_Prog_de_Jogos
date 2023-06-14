@@ -336,21 +336,7 @@ def play_game(screen_width, screen_height, save):
         frames_per_second = font.render(fps_msg, True, 'white')
 
 
-
-
-
         janela.set_background_color((0, 0, 0))                                  # Fundo preto.
-
-
-
-
-
-
-
-
-
-
-
 
         janela.screen.blit(frames_per_second, (10, janela.height - 50))         # Draw no FPS.
         maze.draw()
@@ -372,7 +358,7 @@ def play_game(screen_width, screen_height, save):
             blinky.hide()
             if blackout.get_curr_frame() == 9:
                 if save.stage_no % 5 == 0:
-                    bgm.fadeout(1000)
+                    bgm.pause()
                     return ["shop", save]
                 return["play", save]
 
@@ -399,11 +385,6 @@ def play_game(screen_width, screen_height, save):
             blast.update()
 
 
-
-
-
-
-
         janela.screen.blit(snip, (930, 630))                                    # Mostra Credits.
         janela.screen.blit(stage_render, (930, 600))
         fake_blinky.draw()
@@ -412,8 +393,6 @@ def play_game(screen_width, screen_height, save):
         portal_esquerdo.draw()
         portal_direito.update()
         portal_direito.draw()
-
-
 
         blackout.update()
         blackout.draw()
