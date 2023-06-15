@@ -3,16 +3,20 @@ from PPlay.gameimage import *
 from EatThis.Classes.Point import *
 from copy import deepcopy
 
+
 class Player(Sprite):
     def __init__(self, window, maze, image_file, frames=1):
         super().__init__(image_file, frames)
         self.state = "invulnerable"
-        self.vx = 0
-        self.vy = 0
-        self.base_speed = 120
-        self.cmd = ''
         self.vulnerability_timer = 0
         self.base_vulnerability_time = 2
+        self.vx = 0
+        self.vy = 0
+        self.base_speed = 100
+        self.grip_factor = 2  # 1 vira em 1 segundo, 100 vira em 0.01 segundo (instantaneamente)
+        self.shoe_grip = self.base_speed * self.grip_factor
+        self.has_shoes = True
+        self.cmd = ''
         self.transition_timer = 0
         self.transition_base_time = 2
         self.window = window
@@ -25,9 +29,10 @@ class Player(Sprite):
         self.maze_axis = (self.x - (window.width / 2 - maze.half_maze_width) + self.width / 2,
                           self.y - (window.height / 2 - maze.half_maze_height) + self.height / 2)
         self.matrix_coordinates = (
-            (self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1,
+            (self.y - (
+                        self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1,
             (self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1
-            )
+        )
         self.reload_time = 0.5
         self.shot_timer = self.reload_time + 1
 
@@ -35,13 +40,12 @@ class Player(Sprite):
         # Como primeira ação blinky atualiza sua sinkmatrix/flowfield.
         self.get_flow_field()
 
-
         if self.vulnerability_timer > 0:
             self.vulnerability_timer -= self.window.delta_time()
 
         if self.vulnerability_timer <= 0 and self.state == "vulnerable":
             self.state = "transition"
-            #self.set_sequence(8, 12, True)
+            # self.set_sequence(8, 12, True)
             self.update_sequence()
             self.state_transition()
 
@@ -49,10 +53,6 @@ class Player(Sprite):
             self.transition_timer -= self.window.delta_time()
         if self.transition_timer <= 0 and self.state == "transition":
             self.change_state()
-
-
-
-
 
         if self.state == "invulnerable":
             # Mudança de animação de Blinky nas 4 direções cardinais.
@@ -68,9 +68,6 @@ class Player(Sprite):
             if self.vx > 0 and self.facing != 'R':
                 self.facing = 'R'
                 self.set_sequence(0, 2, True)
-
-
-
 
         if self.keyboard.key_pressed("UP"):
             self.buffer = 0
@@ -88,9 +85,8 @@ class Player(Sprite):
         # Coordenadas do pacman em relação ao 0 da fase
         self.maze_axis = self.get_maze_axis()
 
-        #Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
+        # Versão discretizada das coordenadas do pacman com ajuste (+1) para correspondencia a matriz "level".
         self.matrix_coordinates = self.get_matrix_coordinates()
-        
 
         can_go_down = (self.maze.pathing[int(self.matrix_coordinates[0] + 1)][int(self.matrix_coordinates[1])] == 0)
         can_go_up = (self.maze.pathing[int(self.matrix_coordinates[0] - 1)][int(self.matrix_coordinates[1])] == 0)
@@ -109,25 +105,62 @@ class Player(Sprite):
         # Condição para aceitar qualquer input de movimento.
         if self.buffer < 0.5:
             # Movimento VERTICAL (REQUERIMENTO DE POSIÇÃO HORIZONTAL)
+            # Movimentos básicos sem meia volta.
             if x_window:
-                if self.cmd == 'd' and can_go_down:
+                if self.cmd == 'd' and can_go_down and self.facing != 'U':
                     self.cmd = ''
                     self.vx = 0
                     self.vy = self.base_speed
-                if self.cmd == 'u' and can_go_up:
+                if self.cmd == 'u' and can_go_up and self.facing != 'D':
                     self.cmd = ''
                     self.vx = 0
                     self.vy = -self.base_speed
 
+                # Apenas a meia volta.
+                if self.cmd == 'd' and can_go_down and self.facing == 'U' and self.has_shoes:
+                    self.cmd = ''
+                    if self.vy < self.base_speed:
+                        self.vy += self.shoe_grip * self.window.delta_time()
+                    elif self.vy > self.base_speed:
+                        self.vy = self.base_speed
+                    self.vx = 0
+
+                if self.cmd == 'u' and can_go_up and self.facing == 'D' and self.has_shoes:
+                    self.cmd = ''
+                    if self.vy > -self.base_speed:
+                        self.vy -= self.shoe_grip * self.window.delta_time()
+                    elif self.vy < -self.base_speed:
+                        self.vy = -self.base_speed
+                    self.vx = 0
+
             # Movimento HORIZONTAL (REQUERIMENTO DE POSIÇÃO VERTICAL)
             if y_window:
-                if self.cmd == 'r' and can_go_right:
+                # Movimentos básicos sem meia volta.
+                if self.cmd == 'r' and can_go_right and self.facing != 'L':
                     self.cmd = ''
                     self.vx = self.base_speed
                     self.vy = 0
-                if self.cmd == 'l' and can_go_left:
+
+                if self.cmd == 'l' and can_go_left and self.facing != 'R':
                     self.cmd = ''
                     self.vx = -self.base_speed
+                    self.vy = 0
+
+                # Apenas a meia volta.
+                if self.cmd == 'r' and can_go_right and self.facing == 'L' and self.has_shoes:
+                    self.cmd = ''
+                    if self.vx < self.base_speed:
+                        self.vx += self.shoe_grip * self.window.delta_time()
+                    elif self.vx > self.base_speed:
+                        self.vx = self.base_speed
+                    self.vy = 0
+
+                if self.cmd == 'l' and can_go_left and self.facing == 'R' and self.has_shoes:
+                    self.cmd = ''
+                    if self.vx > -self.base_speed:
+                        self.vx -= self.shoe_grip * self.window.delta_time()
+                    elif self.vx < -self.base_speed:
+                        self.vx = -self.base_speed
                     self.vy = 0
 
         # TODO: As vezes blinky anda demais antes de sua velocidade ser reduzida a zero,
@@ -152,23 +185,24 @@ class Player(Sprite):
             self.vy = 0
 
         # Checa colisão de blinky com portal esquerdo.
-        if self.maze_axis[0] < 0: # + self.maze.wall.width / 2:  # aka: 0 + 20/2 = 10
+        if self.maze_axis[0] < 0:  # + self.maze.wall.width / 2:  # aka: 0 + 20/2 = 10
             self.x += 2 * self.maze.half_maze_width - self.maze.wall.width
 
         # Checa colisão de blinky com portal direito.
-        if self.maze_axis[0] > 28 * self.maze.wall.width - self.maze.wall.width/ 4:  # aka: 28*20 - 20/2 550
+        if self.maze_axis[0] > 28 * self.maze.wall.width - self.maze.wall.width / 4:  # aka: 28*20 - 20/2 550
             self.x -= 2 * self.maze.half_maze_width - self.maze.wall.width
 
     def get_maze_axis(self):
         return (self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2,
                 self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2)
 
-
     def get_matrix_coordinates(self):
-        return ( 
-            int((self.y - (self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1),
-            int((self.x - (self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1)
-            )
+        return (
+            int((self.y - (
+                        self.window.height / 2 - self.maze.half_maze_height) + self.height / 2) // self.maze.wall.width + 1),
+            int((self.x - (
+                        self.window.width / 2 - self.maze.half_maze_width) + self.width / 2) // self.maze.wall.width + 1)
+        )
 
     def set_maze_axis(self):
         pass
@@ -198,23 +232,25 @@ class Player(Sprite):
         # nexttargets é o argumento que será utilizado na recursão. ou seja é a lista de coordenadas que serão analisadas.
         nexttargets = []
         for i in range(len(lista)):  # para cada coordenada na lista
-            for j in range(4):      # para cada direção cardeal
+            for j in range(4):  # para cada direção cardeal
                 linha = lista[i][0] + cardinallookups[j][0]  # linha = linha + direção cardeal
-                coluna = lista[i][1] + cardinallookups[j][1] # coluna = coluna + direção cardeal
+                coluna = lista[i][1] + cardinallookups[j][1]  # coluna = coluna + direção cardeal
 
                 # Correções de out of index e solução para teletransporte ao mesmo tempo.
-                if linha > len(self.sinkmatrix) - 1: # se linha está prestes a exceder a matriz, volta para o começo
+                if linha > len(self.sinkmatrix) - 1:  # se linha está prestes a exceder a matriz, volta para o começo
                     linha = 0
-                if coluna > len(self.sinkmatrix[0]) - 1: # se coluna está prestes a exceder a matriz, volta para o começo
+                if coluna > len(
+                        self.sinkmatrix[0]) - 1:  # se coluna está prestes a exceder a matriz, volta para o começo
                     coluna = 0
                 # lados de linha <0 e coluna <0 não precisam ser corrigidos pois o python aceita index negativo.
 
-                if self.sinkmatrix[linha][coluna] == 0: # se a posição é um caminho
-                    self.sinkmatrix[linha][coluna] = self.sinkmatrix[lista[i][0]][lista[i][1]] + 1 # seta a posição para o valor da posição anterior + 1
-                    nexttargets.append([linha, coluna]) # adiciona a posição na lista de coordenadas a serem analisadas
+                if self.sinkmatrix[linha][coluna] == 0:  # se a posição é um caminho
+                    self.sinkmatrix[linha][coluna] = self.sinkmatrix[lista[i][0]][lista[i][
+                        1]] + 1  # seta a posição para o valor da posição anterior + 1
+                    nexttargets.append([linha, coluna])  # adiciona a posição na lista de coordenadas a serem analisadas
 
-        if len(nexttargets) != 0: # se a lista de coordenadas a serem analisadas não está vazia
-            self.get_flow_field(nexttargets) # recursão
+        if len(nexttargets) != 0:  # se a lista de coordenadas a serem analisadas não está vazia
+            self.get_flow_field(nexttargets)  # recursão
         else:  # se a lista de coordenadas a serem analisadas está vazia quer dizer que o processo chegou ao fim.
             return
 
@@ -235,8 +271,6 @@ class Player(Sprite):
     def state_transition(self):
         self.transition_timer = self.transition_base_time
 
-
-
     def update_sequence(self):
         if self.state == "invulnerable":
             if self.facing == 'U':
@@ -252,4 +286,3 @@ class Player(Sprite):
         if self.state == "transition":
             self.set_sequence(8, 12, True)
             self.set_total_duration(50)
-

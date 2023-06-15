@@ -69,7 +69,7 @@ def play_game(screen_width, screen_height, save):
 
     # Variáveis que impactam dificuldade.
     powerups_no = 2
-    numero_inimigos = 1
+    numero_inimigos = save.stage_no
 
     # Background Music.
     song_list = ["Assets/Music/Unreal Super Hero 3 by Kenet & Rez.mp3",
@@ -105,6 +105,8 @@ def play_game(screen_width, screen_height, save):
     blinky.set_position(player_start_pos[0], player_start_pos[1])
     blinky.set_sequence_time(0, 12, 100, True)
     blinky.set_sequence(0, 1, True)
+    # transfer information from save into blinky.
+    blinky.has_shoes = save.has_shoes
 
     # Fade-to-Black sprite
     blackout = Sprite("Assets/Sprites/VFX/Fade_To_Black.png", 10)

@@ -11,6 +11,9 @@ class SaveFile:
         self.Master_vol = self._Master_vol
         self.BGM_vol = self._BGM_vol
         self.SFX_vol = self._SFX_vol
+        # Upgrades Permanentes
+        self._has_shoes = 0
+        self.has_shoes = self._has_shoes
         # Uso entre fases
         self._stage_no = 1
         self.stage_no = self._stage_no
@@ -36,7 +39,8 @@ class SaveFile:
             self.Master_vol = data[0][0]
             self.BGM_vol = data[0][1]
             self.SFX_vol = data[0][2]
-            # Linha 1 => ??
+            # Linha 1 => [has_shoes]
+            self.has_shoes = data[1][0]
             print("Loaded Save Data.")
             return True
         else:
@@ -50,6 +54,7 @@ class SaveFile:
         """
         with open('./EatThis/savegame.txt', mode='w', encoding='utf-8') as fout:
             fout.write(f'{self.Master_vol} {self.BGM_vol} {self.SFX_vol} \n')
+            fout.write(f'{self.has_shoes} \n')
         print("Game was saved.")
 
     def reset_save_data(self):
