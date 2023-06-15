@@ -1,6 +1,7 @@
 from PPlay.window import *
 from EatThis.enemy_spawn import *
 from EatThis.Classes.rolling_text import *
+from random import *
 
 
 def measure_longest_message(msg, font_name='Assets/Fonts/MinimalPixel v2.ttf', size=24):
@@ -38,7 +39,40 @@ def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.tt
     for i in range(len(what)):
         janela.screen.blit(what[i], pos_linha[i])
 
+def get_possible_upgrades():
+    persistent_upgrades = ["Blinky Speed", "Dash", "Piggy Bank", "Resistance"]
+    possible_upgrades_example = ["Bomb", "Pill"]
+    bomb_upgrades = ["Range", "Ammount", "Fuse"]
+    pill_upgrades = ["Ammount"]
+    hadouken_upgrades = ["Speed", "Ammo"]
+    teletransporte = ["Cooldown"]
+
+    list = []
+    # 2 upgrades + 1 persistent offer.
+
+    # list.append(choices(possible_upgrades_example)[0])
+
+    return list
+
+def get_shop_inventory():
+    price_table = {
+        "Speed Up": 1,
+        "Hadouken Ammo": 1,
+        "Bomb CDR": 1,
+        "Bomb Range": 1,
+        "Invulnerability Res.": 1,
+        "Poison Pill": 999999
+    }
+    get_possible_upgrades()
+
+
 def go_shopping(screen_width, screen_height, save):
+    font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 24)
+    save.credits += 3141592653
+    credits_string = f"credits: {save.credits}"
+    credits_surface = font.render(credits_string, True, 'white')
+    shop_inventory = get_shop_inventory()
+
     tempo = 0
     tic = 0
     print_char_count = 0
@@ -47,7 +81,6 @@ def go_shopping(screen_width, screen_height, save):
     is_done_printing = False
     janela = Window(screen_width, screen_height)
     janela.set_title("Shop Time!")
-    font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 24)
     active_message = 0
     messages = [
         ["The quick brown fox jumps over the lazy dog.", "The slow black dog bows before the regal fox.", "Get it?."],
@@ -60,7 +93,10 @@ def go_shopping(screen_width, screen_height, save):
     teclado = janela.get_keyboard()
     in_dialogue_area = False
     in_dialogue = False
-    enter_released = False
+    esc_pressed = False
+    enter_pressed = False
+    right_pressed = False
+    left_pressed = False
     song_start = "Assets/Music/Shop_Start.mp3"
     bgm_start = Sound(song_start)
     bgm_start.set_volume(save.BGM_vol * save.Master_vol)
@@ -71,7 +107,13 @@ def go_shopping(screen_width, screen_height, save):
     bgm_loop.set_volume(save.BGM_vol * save.Master_vol)
     bgm_loop.set_repeat(True)
 
+    select_sound = Sound("Assets/SFX/Shop_Select.ogg")
+    select_sound.set_volume(save.SFX_vol * save.Master_vol)
+    select_sound.set_repeat(False)
 
+    confirm_sound = Sound("Assets/SFX/Shop_Confirm_Echo.ogg")
+    confirm_sound.set_volume(save.SFX_vol * save.Master_vol)
+    confirm_sound.set_repeat(False)
 
     #============layer 0=================SPACE==========================================================================
     # Background
@@ -172,15 +214,27 @@ def go_shopping(screen_width, screen_height, save):
     blinky_portrait = Sprite("Assets/Sprites/Characters/Blinky_Portrait_02_Simple.png", 1)
     blinky_portrait.set_position((janela.width - text_box.width) / 2, 50)
 
+    # Blinky's Sprite
     blinky = Sprite("Assets/Sprites/Characters/Blinky_Shop.png", 12)
     blinky.set_position(50, 625)
     blinky.set_sequence_time(0, 12, 100, True)
     blinky.set_sequence(0, 1, True)
     blinky_speed = 0
     facing = "afk"
-    chat_depth = 0
 
+    # Shop Cursor
+    shop_cursor = Sprite("Assets/Sprites/Shop/Shop_Cursor_BIG2.png", 3)
+    shop_cursor.set_sequence_time(0, 3, 700, True)
+
+    upgrade_selection = 0
+    num_options = 3
+
+    chat_depth = 0
     while True:
+        greetings1 = ["Hi there little one!"]
+        greetings2 = ["..."]
+        greetings3 = ["Anyway... can I help you with something?"]
+
         if tempo >= 58 and not bgm_loop.is_playing():
             bgm_loop.play()
 
@@ -189,17 +243,8 @@ def go_shopping(screen_width, screen_height, save):
             dt = 0
         tempo += dt
 
-        if not teclado.key_pressed("enter"):
-            enter_released = False
 
 
-
-
-        if not in_dialogue:
-            if teclado.key_pressed("right"):
-                blinky_speed = base_speed
-            if teclado.key_pressed("left"):
-                blinky_speed = -base_speed
 
         if not teclado.key_pressed("right") and not teclado.key_pressed("left"):
             blinky_speed = 0
@@ -237,13 +282,71 @@ def go_shopping(screen_width, screen_height, save):
         else:
             chat_bubble.hide()
 
-        # Detecta Enter.
-        if enter_released == False and teclado.key_pressed("enter"):
-            if in_dialogue:
-                chat_depth += 1
-            enter_released = True
-            print(enter_released)
+        # /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        # /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_input management/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+        # /_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
+        # ===================Manages "Esc" keypress
+        if not teclado.key_pressed("esc"):
+            esc_pressed = False
+
+        if teclado.key_pressed("esc") and not esc_pressed and in_dialogue:
+            esc_pressed = True
+            upgrade_selection = 0
+            if chat_depth == 3:
+                text_box.set_sequence_time(7, 13, 50, False)
+                text_box.play()
+                in_dialogue = False
+                chat_depth = 0
+            else:
+                chat_depth = 3
+
+        # ===================Manages "Enter" keypress
+        if not teclado.key_pressed("enter"):
+            enter_pressed = False
+
+        if teclado.key_pressed("enter") and not enter_pressed:
+            enter_pressed = True
+            if in_dialogue and chat_depth == 3:
+                confirm_sound.play()
+                print(upgrade_selection)
+            if in_dialogue and chat_depth < 3:  # Limita o "Enter" de navegar o chat a partir até as escolhas de upgrade.
+                chat_depth += 1
+
+
+        # ===================Manages "Side Arrows" keypress
+        if not in_dialogue:
+            if teclado.key_pressed("right"):
+                blinky_speed = base_speed
+            if teclado.key_pressed("left"):
+                blinky_speed = -base_speed
+
+
+        # ==== In Dialogue Right
+        if not teclado.key_pressed("right"):
+            right_pressed = False
+
+        if not right_pressed and teclado.key_pressed("right"):
+            right_pressed = True
+            # print(right_pressed)
+            if chat_depth == 3:
+                select_sound.play()
+                upgrade_selection = (upgrade_selection + 1) % 3
+
+
+        # ==== In Dialogue Left
+        if not teclado.key_pressed("left"):
+            left_pressed = False
+
+        if not left_pressed and teclado.key_pressed("left"):
+            left_pressed = True
+            # print(left_pressed)
+            if chat_depth == 3:
+                select_sound.play()
+                upgrade_selection = (upgrade_selection - 1) % 3
+
+
+        # ===================Manages "Up Arrows" keypress
         # Animação de olhar para o Shopkeeper
         if in_dialogue_area and teclado.key_pressed("up") and not in_dialogue:
             text_box.set_sequence_time(0, 7, 50, False)
@@ -255,14 +358,6 @@ def go_shopping(screen_width, screen_height, save):
                 blinky.set_sequence(6, 8, True)         # Sets blinky's sequence to up-left look
 
 
-        if teclado.key_pressed("esc") and in_dialogue:
-            text_box.set_sequence_time(7, 13, 50, False)
-            text_box.play()
-            in_dialogue = False
-            chat_depth = 0
-
-
-
         time_after_last_char_print = tempo - tic
         if in_dialogue and time_after_last_char_print > (1 / text_speed):
             tic = tempo                 # reseta referencial.
@@ -270,9 +365,6 @@ def go_shopping(screen_width, screen_height, save):
 
 
 
-        greetings1 = ["Hi there little one!"]
-        greetings2 = ["..."]
-        greetings3 = ["Anyway... can I help you with something?"]
 
 
         # Set Screen Boundries
@@ -340,6 +432,9 @@ def go_shopping(screen_width, screen_height, save):
         text_box.update()
         text_box.draw()
 
+
+        janela.screen.blit(credits_surface, (930, 680))
+
         if in_dialogue and not text_box.is_playing():
             if chat_depth == 0:
                 talk("Shopkeeper", greetings1, janela, text_box)
@@ -347,5 +442,11 @@ def go_shopping(screen_width, screen_height, save):
                 talk("Blinky", greetings2, janela, text_box)
             elif chat_depth == 2:
                 talk("Shopkeeper", greetings3, janela, text_box)
+            elif chat_depth == 3:
+                # Shop Cursor
+                shop_cursor.set_position(300 + 300*upgrade_selection, 150)
+                shop_cursor.draw()
+                shop_cursor.update()
+
 
         janela.update()
