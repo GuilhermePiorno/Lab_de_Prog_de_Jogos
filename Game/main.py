@@ -325,10 +325,7 @@ def play_game(screen_width, screen_height, save):
             for enemy in enemies_list:
                 if blinky.state == "vulnerable" and (blinky.get_matrix_coordinates() == enemy.get_matrix_coordinates()) and not blinky.is_dead:
                     blinky.is_dead = True
-                    return
-
-        # morte do blinky
-        
+                    return ["menu", save]
 
         # Displays and updates player credits at the end of the level.
         if len(enemies_list) == 0 and not level_finished:
@@ -383,8 +380,7 @@ def play_game(screen_width, screen_height, save):
                 for pacman in enemies_list:
                     pacman.draw()
         else:
-            if not blinky.is_dead:
-                blinky.draw()
+            blinky.draw()
 
         # Blinky is hidden, Fake_Blinky walks out thought portal and screen fades to black.
         if blinky_out:
@@ -445,4 +441,10 @@ def play_game(screen_width, screen_height, save):
 
 
 
+        janela.update()
+
+def end_game(janela, blinky):
+    while(blinky.y > 0):
+        blinky.y -= 0.001
+        blinky.draw()
         janela.update()

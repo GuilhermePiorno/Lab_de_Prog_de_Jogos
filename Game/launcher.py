@@ -21,8 +21,7 @@ while next_step[0] != "close":
     if next_step[0] == "menu":
         next_step = open_menu(screen_width, screen_height, save)
     if next_step[0] == "play":
-        play_game(screen_width, screen_height, save)
-        next_step[0] = "menu"
+        next_step = play_game(screen_width, screen_height, save)
     if next_step[0] == "options":
         next_step = open_options(screen_width, screen_height, save)
 print("Game closed by launcher.")
