@@ -312,9 +312,8 @@ def play_game(screen_width, screen_height, save):
 
             if not blinky.teleport_able and teclado.key_pressed("O"):
                 blinky.teleport_able = True
-                teleport_sprite = Sprite("Assets\Sprites\VFX\\teleport.png")
-                teleport_sprite.set_position(blinky.x + blinky.width/2 - teleport_sprite.width/2, blinky.y + blinky.height/2 - teleport_sprite.height/2)
-                teleport_sprite.set_sequence_time(0, 2, 100, True)
+                teleport_sprite = Sprite("Assets\Sprites\Characters\Blinky_transparente.png")
+                teleport_sprite.set_position(blinky.x, blinky.y)
                 teleport_sprite.draw()
 
             if blinky.teleport_able and teclado.key_pressed("I"):
@@ -417,7 +416,6 @@ def play_game(screen_width, screen_height, save):
 
         if blinky.teleport_able:
             teleport_sprite.draw()
-            teleport_sprite.update()
 
 
 
