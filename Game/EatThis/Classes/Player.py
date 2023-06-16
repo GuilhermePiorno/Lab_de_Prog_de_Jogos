@@ -256,3 +256,6 @@ class Player(Sprite):
         if self.state == "transition":
             self.set_sequence(8, 12, True)
             self.set_total_duration(50)
+
+    def die(self):
+        self.state = "vulnerable"
