@@ -256,10 +256,3 @@ class Player(Sprite):
         if self.state == "transition":
             self.set_sequence(8, 12, True)
             self.set_total_duration(50)
-
-    def die(self):
-        while(self.y > 0):
-            self.y -= 0.1
-            self.window.set_background_color((0,0,0))
-            self.draw()
-            self.window.update()

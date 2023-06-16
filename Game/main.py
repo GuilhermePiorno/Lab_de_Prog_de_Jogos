@@ -329,11 +329,6 @@ def play_game(screen_width, screen_height, save):
             for enemy in enemies_list:
                 if blinky.state == "vulnerable" and (blinky.get_matrix_coordinates() == enemy.get_matrix_coordinates()) and not blinky.is_dead:
                     blinky.is_dead = True
-
-        # morte do blinky
-        if blinky.is_dead:
-            blinky.die()
-            return ["menu", save]
         
         # Displays and updates player credits at the end of the level.
         if len(enemies_list) == 0 and not level_finished:
@@ -451,8 +446,26 @@ def play_game(screen_width, screen_height, save):
 
         janela.update()
 
-def end_game(janela, blinky):
-    while(blinky.y > 0):
-        blinky.y -= 0.001
-        blinky.draw()
-        janela.update()
+        # morte do blinky
+        if blinky.is_dead:
+            blinky.state = "vulnerable"
+            blinky.update_sequence()
+            while(blinky.y > 0):
+                janela.set_background_color((0, 0, 0))
+                janela.screen.blit(frames_per_second, (10, janela.height - 50))         # Draw no FPS.
+                maze.draw()
+                for enemy in enemies_list:
+                    enemy.draw()
+                for blast in blasts_list:
+                    blast.draw()
+                janela.screen.blit(snip, (930, 630))                                    # Mostra Credits.
+                janela.screen.blit(stage_render, (930, 600))
+                portal_esquerdo.update()
+                portal_esquerdo.draw()
+                portal_direito.update()
+                portal_direito.draw()
+                blinky.y -= 0.5
+                blinky.draw()
+                blinky.update()
+                janela.update()
+            return ["menu", save]
