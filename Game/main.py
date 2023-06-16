@@ -325,6 +325,7 @@ def play_game(screen_width, screen_height, save):
             for enemy in enemies_list:
                 if blinky.state == "vulnerable" and (blinky.get_matrix_coordinates() == enemy.get_matrix_coordinates()) and not blinky.is_dead:
                     blinky.is_dead = True
+                    return
 
         # morte do blinky
         
@@ -394,7 +395,6 @@ def play_game(screen_width, screen_height, save):
             print(blackout.is_playing())
             if blackout.get_curr_frame() == 9:
                 return["play", save]
-
 
         if not level_start and not level_finished:
             blinky.unhide()
