@@ -232,7 +232,7 @@ def play_game(screen_width, screen_height, save):
         # Atualiza buffer de inputs
         blinky.buffer += dt
         blinky.shot_timer += dt
-        if not pause and not level_start and not blinky_out and not blinky.is_dead:
+        if not pause and not level_start and not blinky_out:
             blinky.move1()
             blinky.x += blinky.vx * dt
             blinky.y += blinky.vy * dt
@@ -284,6 +284,10 @@ def play_game(screen_width, screen_height, save):
                 for blast in blasts_list:
                     if blast.collided(enemy):
                         enemy.die()
+            
+            for blast in blasts_list:
+                if blinky.collided(blast):
+                    blinky.is_dead = True
 
             for blast in blasts_list:
                 if ((time() - blast.creation_instant) > blast.delta_time):
@@ -325,8 +329,12 @@ def play_game(screen_width, screen_height, save):
             for enemy in enemies_list:
                 if blinky.state == "vulnerable" and (blinky.get_matrix_coordinates() == enemy.get_matrix_coordinates()) and not blinky.is_dead:
                     blinky.is_dead = True
-                    return ["menu", save]
 
+        # morte do blinky
+        if blinky.is_dead:
+            blinky.die()
+            return ["menu", save]
+        
         # Displays and updates player credits at the end of the level.
         if len(enemies_list) == 0 and not level_finished:
             level_finished = True
