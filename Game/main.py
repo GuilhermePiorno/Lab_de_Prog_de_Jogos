@@ -303,10 +303,28 @@ def play_game(screen_width, screen_height, save):
                 if (trap.was_eaten):
                     traps_list.remove(trap)
 
-
             for pacman in enemies_list:
                 if pacman.is_dead:
                     enemies_list.remove(pacman)
+
+
+
+
+            if not blinky.teleport_able and teclado.key_pressed("O"):
+                blinky.teleport_able = True
+                teleport_sprite = Sprite("Assets\Sprites\VFX\\teleport.png")
+                teleport_sprite.set_position(blinky.x + blinky.width/2 - teleport_sprite.width/2, blinky.y + blinky.height/2 - teleport_sprite.height/2)
+                teleport_sprite.set_sequence_time(0, 2, 100, True)
+                teleport_sprite.draw()
+
+            if blinky.teleport_able and teclado.key_pressed("I"):
+                blinky.set_position(teleport_sprite.x - blinky.width/2 + teleport_sprite.width/2, 
+                                    teleport_sprite.y - blinky.height/2 + teleport_sprite.height/2)
+                blinky.teleport_able = False
+
+
+
+
 
         # Displays and updates player credits at the end of the level.
         if len(enemies_list) == 0 and not level_finished:
@@ -392,6 +410,10 @@ def play_game(screen_width, screen_height, save):
 
         for blast in blasts_list:
             blast.draw()
+
+        if blinky.teleport_able:
+            teleport_sprite.draw()
+            teleport_sprite.update()
 
 
 

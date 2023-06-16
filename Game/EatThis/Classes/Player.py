@@ -30,6 +30,7 @@ class Player(Sprite):
             )
         self.reload_time = 0.5
         self.shot_timer = self.reload_time + 1
+        self.teleport_able = False
 
     def move1(self):
         # Como primeira ação blinky atualiza sua sinkmatrix/flowfield.
@@ -254,4 +255,3 @@ class Player(Sprite):
         if self.state == "transition":
             self.set_sequence(8, 12, True)
             self.set_total_duration(50)
-
