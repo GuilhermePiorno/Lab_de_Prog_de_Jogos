@@ -322,7 +322,10 @@ def play_game(screen_width, screen_height, save):
                                     teleport_sprite.y - blinky.height/2 + teleport_sprite.height/2)
                 blinky.teleport_able = False
 
-
+            
+            for enemy in enemies_list:
+                if blinky.state == "vulnerable" and blinky.collided(enemy) and not blinky.is_dead:
+                    blinky.is_dead = True
 
 
 
@@ -379,7 +382,8 @@ def play_game(screen_width, screen_height, save):
                 for pacman in enemies_list:
                     pacman.draw()
         else:
-            blinky.draw()
+            if not blinky.is_dead:
+                blinky.draw()
 
         # Blinky is hidden, Fake_Blinky walks out thought portal and screen fades to black.
         if blinky_out:
