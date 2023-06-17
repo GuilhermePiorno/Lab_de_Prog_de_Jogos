@@ -468,4 +468,5 @@ def play_game(screen_width, screen_height, save):
                 blinky.draw()
                 blinky.update()
                 janela.update()
+                bgm.stop()
             return ["menu", save]
