@@ -448,6 +448,9 @@ def play_game(screen_width, screen_height, save):
 
         # morte do blinky
         if blinky.is_dead:
+            bgm.stop()
+            blinky_death_sound = Sound("Assets\SFX\\BlinkyDeath.mp3")
+            blinky_death_sound.play()
             blinky.state = "vulnerable"
             blinky.update_sequence()
             while(blinky.y > 0):
@@ -464,9 +467,8 @@ def play_game(screen_width, screen_height, save):
                 portal_esquerdo.draw()
                 portal_direito.update()
                 portal_direito.draw()
-                blinky.y -= 0.5
+                blinky.y -= 1
                 blinky.draw()
                 blinky.update()
                 janela.update()
-                bgm.stop()
             return ["menu", save]
