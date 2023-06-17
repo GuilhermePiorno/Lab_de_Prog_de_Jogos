@@ -449,11 +449,15 @@ def play_game(screen_width, screen_height, save):
         # morte do blinky
         if blinky.is_dead:
             bgm.stop()
+            blinky.hide()
+            dead_blinky = Sprite("Assets\Sprites\Characters\\blinky_morto.png", 1)
+            dead_blinky.x = blinky.x
+            dead_blinky.y = blinky.y
             blinky_death_sound = Sound("Assets\SFX\\BlinkyDeath.mp3")
             blinky_death_sound.play()
-            blinky.state = "vulnerable"
-            blinky.update_sequence()
-            while(blinky.y > 0):
+            #blinky.state = "vulnerable"
+            #blinky.update_sequence()
+            while(dead_blinky.y > 0):
                 janela.set_background_color((0, 0, 0))
                 janela.screen.blit(frames_per_second, (10, janela.height - 50))         # Draw no FPS.
                 maze.draw()
@@ -467,8 +471,8 @@ def play_game(screen_width, screen_height, save):
                 portal_esquerdo.draw()
                 portal_direito.update()
                 portal_direito.draw()
-                blinky.y -= 1
-                blinky.draw()
-                blinky.update()
+                dead_blinky.y -= 1
+                dead_blinky.draw()
+                #blinky.update()
                 janela.update()
             return ["menu", save]
