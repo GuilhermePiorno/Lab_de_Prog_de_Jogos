@@ -287,6 +287,14 @@ def play_game(screen_width, screen_height, save):
                 for blast in blasts_list:
                     if blast.collided(enemy):
                         enemy.die()
+                        
+            for blast in blasts_list:
+                if blinky.collided(blast):
+                    blinky.is_dead = True
+
+            for blast in blasts_list:
+                if blinky.collided(blast):
+                    blinky.is_dead = True
 
             for blast in blasts_list:
                 if (time() - blast.creation_instant) > blast.delta_time:
@@ -306,11 +314,29 @@ def play_game(screen_width, screen_height, save):
                 if trap.was_eaten:
                     traps_list.remove(trap)
 
-
             for pacman in enemies_list:
                 if pacman.is_dead:
                     enemies_list.remove(pacman)
 
+
+
+
+            if not blinky.teleport_able and teclado.key_pressed("O"):
+                blinky.teleport_able = True
+                teleport_sprite = Sprite("Assets\Sprites\Characters\Blinky_transparente.png")
+                teleport_sprite.set_position(blinky.x, blinky.y)
+                teleport_sprite.draw()
+
+            if blinky.teleport_able and teclado.key_pressed("I"):
+                blinky.set_position(teleport_sprite.x - blinky.width/2 + teleport_sprite.width/2, 
+                                    teleport_sprite.y - blinky.height/2 + teleport_sprite.height/2)
+                blinky.teleport_able = False
+
+            
+            for enemy in enemies_list:
+                if blinky.state == "vulnerable" and (blinky.get_matrix_coordinates() == enemy.get_matrix_coordinates()) and not blinky.is_dead:
+                    blinky.is_dead = True
+        
         # Displays and updates player credits at the end of the level.
         if len(enemies_list) == 0 and not level_finished:
             level_finished = True
@@ -365,7 +391,6 @@ def play_game(screen_width, screen_height, save):
                 return["play", save]
 
 
-
         if not level_start and not level_finished:
             blinky.unhide()
             fake_blinky.hide()
@@ -384,7 +409,14 @@ def play_game(screen_width, screen_height, save):
 
         for blast in blasts_list:
             blast.draw()
-            blast.update()
+
+        if blinky.teleport_able:
+            teleport_sprite.draw()
+
+
+
+
+
 
 
         janela.screen.blit(snip, (930, 630))                                    # Mostra Credits.
@@ -407,3 +439,34 @@ def play_game(screen_width, screen_height, save):
 
 
         janela.update()
+
+        # morte do blinky
+        if blinky.is_dead:
+            bgm.stop()
+            blinky.hide()
+            dead_blinky = Sprite("Assets\Sprites\Characters\\blinky_morto.png", 1)
+            dead_blinky.x = blinky.x
+            dead_blinky.y = blinky.y
+            blinky_death_sound = Sound("Assets\SFX\\BlinkyDeath.mp3")
+            blinky_death_sound.play()
+            #blinky.state = "vulnerable"
+            #blinky.update_sequence()
+            while(dead_blinky.y > 0):
+                janela.set_background_color((0, 0, 0))
+                janela.screen.blit(frames_per_second, (10, janela.height - 50))         # Draw no FPS.
+                maze.draw()
+                for enemy in enemies_list:
+                    enemy.draw()
+                for blast in blasts_list:
+                    blast.draw()
+                janela.screen.blit(snip, (930, 630))                                    # Mostra Credits.
+                janela.screen.blit(stage_render, (930, 600))
+                portal_esquerdo.update()
+                portal_esquerdo.draw()
+                portal_direito.update()
+                portal_direito.draw()
+                dead_blinky.y -= 1
+                dead_blinky.draw()
+                #blinky.update()
+                janela.update()
+            return ["menu", save]
