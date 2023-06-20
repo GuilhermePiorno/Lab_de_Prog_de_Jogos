@@ -2,10 +2,10 @@ from PPlay.sprite import *
 from EatThis.Classes.Blast import *
 
 class Bomb(Sprite):
-    def __init__(self, game_image, maze, player):
+    def __init__(self, game_image, maze, player, bomb_range):
         super().__init__(game_image, frames=4)
         self.timer = 0
-        self.range = 4
+        self.range = bomb_range
         self.explode_time = 3
         self.exploded = False
         self.maze = maze
@@ -60,7 +60,7 @@ class Bomb(Sprite):
             blast.set_position(self.x + i*20, self.y)
             blast_list.append(blast)
 
-        print(len(blast_list))
+        # print(len(blast_list))
         return blast_list
 
     def generate_blast_radius(self):
@@ -73,7 +73,6 @@ class Bomb(Sprite):
         down = 0
         right = 0
         left = 0
-
         #checa se tem corredor para cima
         matrix_cell = level[bomb_coordinates[0] - 1][bomb_coordinates[1]]
         while(matrix_cell != 1 and up <= self.range):

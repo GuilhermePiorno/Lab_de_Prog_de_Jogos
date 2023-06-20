@@ -14,6 +14,24 @@ class SaveFile:
         # Upgrades Permanentes
         self._has_shoes = 0
         self.has_shoes = self._has_shoes
+        # Upgrades Temporários
+        self._grip_factor = 1
+        self.grip_factor = self._grip_factor
+        self._has_bomb_ability = 0
+        self.has_bomb_ability = self._has_bomb_ability
+        self._max_bombs = 1
+        self.max_bombs = self._max_bombs
+        self._bomb_range_upgrade = 0
+        self.bomb_range_upgrade = self._bomb_range_upgrade
+        self.speed_upgrade = 0
+        self._has_fireball_ability = 0
+        self.has_fireball_ability = self._has_fireball_ability
+        self._fireball_ammo = 0
+        self.fireball_ammo = self._fireball_ammo
+        self._fireball_mult_spd = 1
+        self.fireball_mult_spd = self._fireball_mult_spd
+        self._vuln_res = 0
+        self.vuln_res = self._vuln_res
         # Uso entre fases
         self._stage_no = 1
         self.stage_no = self._stage_no
@@ -54,7 +72,7 @@ class SaveFile:
         """
         with open('./EatThis/savegame.txt', mode='w', encoding='utf-8') as fout:
             fout.write(f'{self.Master_vol} {self.BGM_vol} {self.SFX_vol} \n')
-            fout.write(f'{self.has_shoes} \n')
+            fout.write(f'{+self.has_shoes} \n')     # +var faz com que True retorne 1 e False retorne 0
         print("Game was saved.")
 
     def reset_save_data(self):
@@ -66,3 +84,5 @@ class SaveFile:
         self.Master_vol = self._Master_vol
         self.BGM_vol = self._BGM_vol
         self.SFX_vol = self._SFX_vol
+        self.has_shoes = self._has_shoes
+

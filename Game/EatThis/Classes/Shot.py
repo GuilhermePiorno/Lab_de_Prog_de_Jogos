@@ -8,7 +8,6 @@ class Shot(Sprite):
         self.base_speed = max(abs(shooter.vx), abs(shooter.vy)) + 40
         self.hit_enemy = False
         self.hit_wall = False
-        self.out_of_bounds = False
         self.window = shooter.window
         self.maze = shooter.maze
         self.set_total_duration(1000)
@@ -44,11 +43,6 @@ class Shot(Sprite):
         coordinate = self.get_matrix_coordinates()
         if(not(isinstance(self.maze.level[coordinate[0]][coordinate[1]], Point) or self.maze.level[coordinate[0]][coordinate[1]] == 0)):
             self.hit_wall = True
-
-    def check_inside_maze_boundary(self):
-        coordinate = self.get_matrix_coordinates()
-        if(coordinate[0] > 30 or coordinate[0] < 1 or coordinate[1] > 28 or coordinate[1] < 1):
-            self.out_of_bounds = True
 
     def get_matrix_coordinates(self):
         return ( 

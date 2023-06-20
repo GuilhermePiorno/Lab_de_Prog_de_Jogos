@@ -39,39 +39,55 @@ def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.tt
     for i in range(len(what)):
         janela.screen.blit(what[i], pos_linha[i])
 
-def get_possible_upgrades():
-    persistent_upgrades = ["Blinky Speed", "Dash", "Piggy Bank", "Resistance"]
-    possible_upgrades_example = ["Bomb", "Pill"]
-    bomb_upgrades = ["Range", "Ammount", "Fuse"]
-    pill_upgrades = ["Ammount"]
-    hadouken_upgrades = ["Speed", "Ammo"]
-    teletransporte = ["Cooldown"]
-
-    list = []
+def get_possible_upgrades(save):
+    set_upgrades = {"speed", "vul_res", "grip_factor"}
     # 2 upgrades + 1 persistent offer.
+    if save.has_bomb_ability:
+        set_upgrades.update({"bomb amount", "bomb range"})
+    if save.has_fireball_ability:
+        set_upgrades.update({"fireball ammo", "fireball speed"})
 
-    # list.append(choices(possible_upgrades_example)[0])
+    shopping_list = []
+    for i in range(3):
+        random_upgrade = choices(list(set_upgrades))[0]
+        set_upgrades = set_upgrades - {random_upgrade}
+        shopping_list.append([random_upgrade])
 
-    return list
+    return shopping_list
 
-def get_shop_inventory():
+def get_shop_inventory(save):
     price_table = {
-        "Speed Up": 1,
-        "Hadouken Ammo": 1,
-        "Bomb CDR": 1,
-        "Bomb Range": 1,
-        "Invulnerability Res.": 1,
-        "Poison Pill": 999999
+        "speed": 100,
+        "vul_res": 1,
+        "grip_factor": 1,
+        "bomb amount": 1,
+        "bomb range": 1,
+        "fireball ammo": 1,
+        "fireball speed": 1
     }
-    get_possible_upgrades()
+
+    offer_list = get_possible_upgrades(save)
+    for i in range(3):
+        offer_list[i].append(price_table[offer_list[i][0]])
+
+    return offer_list
 
 
 def go_shopping(screen_width, screen_height, save):
+    save.credits += 99
     font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 24)
-    save.credits += 3141592653
     credits_string = f"credits: {save.credits}"
     credits_surface = font.render(credits_string, True, 'white')
-    shop_inventory = get_shop_inventory()
+    shop_inventory = get_shop_inventory(save)
+    image_correspondence = {
+        "speed":"speed_up.png",
+        "vul_res":"vulnerability_res.png",
+        "grip_factor":"boots_spiked_box.png",
+        "bomb amount":"bomb_box.png",
+        "bomb range":"bomb_upgrade_box.png",
+        "fireball ammo":"fireball_box.png",
+        "fireball speed":"fireball_speed_box.png"
+    }
 
     tempo = 0
     tic = 0
@@ -114,6 +130,10 @@ def go_shopping(screen_width, screen_height, save):
     confirm_sound = Sound("Assets/SFX/Shop_Confirm_Echo.ogg")
     confirm_sound.set_volume(save.SFX_vol * save.Master_vol)
     confirm_sound.set_repeat(False)
+
+    deny_sound = Sound("Assets/SFX/Shop_Deny_Echo.ogg")
+    deny_sound.set_volume(save.SFX_vol * save.Master_vol)
+    deny_sound.set_repeat(False)
 
     #============layer 0=================SPACE==========================================================================
     # Background
@@ -308,8 +328,13 @@ def go_shopping(screen_width, screen_height, save):
         if teclado.key_pressed("enter") and not enter_pressed:
             enter_pressed = True
             if in_dialogue and chat_depth == 3:
-                confirm_sound.play()
+                if shop_inventory[upgrade_selection][1] <= save.credits:
+                    confirm_sound.play()
+                else:
+                    deny_sound.play()
+
                 print(upgrade_selection)
+                print(f"upgrade: {shop_inventory[upgrade_selection][0]}, price: {shop_inventory[upgrade_selection][1]}")
             if in_dialogue and chat_depth < 3:  # Limita o "Enter" de navegar o chat a partir até as escolhas de upgrade.
                 chat_depth += 1
 
@@ -443,8 +468,17 @@ def go_shopping(screen_width, screen_height, save):
             elif chat_depth == 2:
                 talk("Shopkeeper", greetings3, janela, text_box)
             elif chat_depth == 3:
+                # Shop Items
+                for i in range(3):
+                    price_str = f"{shop_inventory[i][1]} cred"
+                    price_surface = font.render(price_str, True, 'white')
+                    janela.screen.blit(price_surface, (310 + 300*i, 110))
+                    item = Sprite(f"Assets/Sprites/UI Icons/{image_correspondence[shop_inventory[i][0]]}")
+                    item.set_position(340 + 300 * i, 155)
+                    item.draw()
+
                 # Shop Cursor
-                shop_cursor.set_position(300 + 300*upgrade_selection, 150)
+                shop_cursor.set_position(300 + 300 * upgrade_selection, 150)
                 shop_cursor.draw()
                 shop_cursor.update()
 

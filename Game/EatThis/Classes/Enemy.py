@@ -36,10 +36,6 @@ class Enemy(Sprite):
         self.nearest_point = self.get_next_closest_point()
 
     def move1(self, target):
-        if target.is_dead:
-            self.base_speed = 0
-            return
-
         if len(self.maze.list_of_points) == 0:
             print("game over")
 

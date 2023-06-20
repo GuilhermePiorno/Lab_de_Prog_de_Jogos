@@ -5,24 +5,23 @@ from copy import deepcopy
 
 
 class Player(Sprite):
-    def __init__(self, window, maze, image_file, frames=1):
+    def __init__(self, window, maze, save, image_file, frames=1):
         super().__init__(image_file, frames)
         self.state = "invulnerable"
         self.vulnerability_timer = 0
-        self.base_vulnerability_time = 2
+        self.base_vulnerability_time = 2 * (1 - save.vuln_res)
         self.vx = 0
         self.vy = 0
-        self.base_speed = 100
-        self.grip_factor = 2  # 1 vira em 1 segundo, 100 vira em 0.01 segundo (instantaneamente)
+        self.base_speed = 100 + 10 * save.speed_upgrade
+        self.grip_factor = save.grip_factor  # 1 vira em 1 segundo, 100 vira em 0.01 segundo (instantaneamente)
         self.shoe_grip = self.base_speed * self.grip_factor
-        self.has_shoes = True
+        self.has_shoes = save.has_shoes
         self.cmd = ''
         self.transition_timer = 0
-        self.transition_base_time = 2
+        self.transition_base_time = 2 * (1 - save.vuln_res)
         self.window = window
         self.keyboard = self.window.get_keyboard()
         self.maze = maze
-        # self.sinkmatrix = self.level.pathing.copy()
         self.sinkmatrix = deepcopy(self.maze.pathing)
         self.buffer = 0
         self.facing = 'AFK'
@@ -35,8 +34,6 @@ class Player(Sprite):
         )
         self.reload_time = 0.5
         self.shot_timer = self.reload_time + 1
-        self.teleport_able = False
-        self.is_dead = False
 
     def move1(self):
         # Como primeira ação blinky atualiza sua sinkmatrix/flowfield.
