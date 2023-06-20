@@ -100,13 +100,15 @@ def play_game(screen_width, screen_height, save):
     fake_blinky.set_sequence(0, 2, True)
 
     # Cria o sprite de Blinky e define o número de frames de sua animação.
-    blinky = Player(janela, maze, "Assets/Sprites/Characters/Blinky.png", 12)
+    blinky = Player(janela, maze, save, "Assets/Sprites/Characters/Blinky.png", 12)
     player_start_pos = maze.get_spawn_coordinates((15, 1), blinky.width, blinky.height)
     blinky.set_position(player_start_pos[0], player_start_pos[1])
     blinky.set_sequence_time(0, 12, 100, True)
     blinky.set_sequence(0, 1, True)
+
     # transfer information from save into blinky.
-    blinky.has_shoes = save.has_shoes
+    # blinky.has_shoes = save.has_shoes
+
 
     # Fade-to-Black sprite
     blackout = Sprite("Assets/Sprites/VFX/Fade_To_Black.png", 10)
@@ -133,14 +135,49 @@ def play_game(screen_width, screen_height, save):
     portal_direito.set_position(janela.width / 2 + maze.half_maze_width,
                                 janela.height / 2 - maze.half_maze_height + 13.5 * maze.wall.height - 1)
 
+
+
+
+
+    cheat_guide_1 = Sprite("Assets/Sprites/CheatStuff/123.png")
+    cheat_guide_1.set_position(0, 50)
+
+    cheat_guide_2 = Sprite("Assets/Sprites/CheatStuff/4.png")
+    cheat_guide_2.set_position(150, 50)
+
+    cheat_guide_3 = Sprite("Assets/Sprites/CheatStuff/567.png")
+    cheat_guide_3.set_position(0, 200)
+
+    cheat_guide_4 = Sprite("Assets/Sprites/CheatStuff/890.png")
+    cheat_guide_4.set_position(0, 400)
+
     # Inicia variáveis para o FPS.
     FPS = 0
     tempo = 0
     cont = 0
+    x_state = False
+
+    cheat_toggle_aux = False
+    cheat_toggle = False
+    cheat_sequence = ["U", "U", "D", "D", "L", "R", "L", "R"]
+    input_sequence = []
+    state_1 = False
+    state_2 = False
+    state_3 = False
+    state_4 = False
+    state_5 = False
+    state_6 = False
+    state_7 = False
+    state_8 = False
+    state_9 = False
+    state_0 = False
+
     # Game-loop
+    notagain = False
     while True:
         # Leitura de Entradas
         dt = janela.delta_time()
+        blinky.dt = dt
 
         # Se algum carregamento gerar um dt muito grande, considerar dt=0 para evitar movimentos "pulados".
         if dt > 0.1:
@@ -151,7 +188,230 @@ def play_game(screen_width, screen_height, save):
         if level_start and level_clock >= 2:
             level_start = False
 
+        # UPGRADE ICONS
+        upgrade_draw_list = []
+
+        if save.speed_upgrade > 0:
+            speed_increase_icon = Sprite("Assets/Sprites/UI Icons/speed_up.png")
+            speed_increase_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            speed_increase_level = Sprite("Assets/Sprites/UI Icons/amount_box_black_and_white_borders.png", 10)
+            speed_increase_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            speed_increase_level.set_curr_frame(save.speed_upgrade)
+            upgrade_draw_list.append(speed_increase_icon)
+            upgrade_draw_list.append(speed_increase_level)
+
+        if save.has_shoes:
+            boots = Sprite("Assets/Sprites/UI Icons/boots_box.png")
+            boots.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(boots)
+            upgrade_draw_list.append(boots)
+
+        if 1 < save.grip_factor < 99:
+            grip_icon = Sprite("Assets/Sprites/UI Icons/boots_spiked_box.png")
+            grip_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            grip_level_icon = Sprite("Assets/Sprites/UI Icons/amount_box_up.png", 10)
+            grip_level_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            grip_level_icon.set_curr_frame((save.grip_factor - 1)//0.5)
+            upgrade_draw_list.append(grip_icon)
+            upgrade_draw_list.append(grip_level_icon)
+        elif save.grip_factor == 100:
+            grip_icon = Sprite("Assets/Sprites/UI Icons/golden_boots_spiked_box.png")
+            grip_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            grip_level_icon = Sprite("Assets/Sprites/UI Icons/amount_box_max.png", 2)
+            grip_level_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            grip_level_icon.set_curr_frame(1)
+            upgrade_draw_list.append(grip_icon)
+            upgrade_draw_list.append(grip_level_icon)
+
+        if save.has_bomb_ability:
+            # bomb enable icon
+            bomb_box = Sprite("Assets/Sprites/UI Icons/bomb_box.png")
+            bomb_box.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            # bomb max quantity
+            bomb_amount = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            bomb_amount.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            bomb_amount.set_curr_frame(save.max_bombs)
+            upgrade_draw_list.append(bomb_box)
+            upgrade_draw_list.append(bomb_amount)
+            b_range = Sprite("Assets/Sprites/UI Icons/bomb_upgrade_box.png")
+            b_range.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            b_range_level = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            b_range_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            b_range_level.set_curr_frame(save.bomb_range_upgrade + 1)
+            upgrade_draw_list.append(b_range)
+            upgrade_draw_list.append(b_range_level)
+
+
+        if save.has_fireball_ability:
+            fireball_icon = Sprite("Assets/Sprites/UI Icons/fireball_box.png")
+            fireball_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            fireball_ammo = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            fireball_ammo.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            fireball_ammo.set_curr_frame(save.fireball_ammo)
+            upgrade_draw_list.append(fireball_icon)
+            upgrade_draw_list.append(fireball_ammo)
+
+        if save.fireball_mult_spd > 1:
+            fireball_spd_icon = Sprite("Assets/Sprites/UI Icons/fireball_speed_box.png")
+            fireball_spd_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            fireball_spd_level = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            fireball_spd_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            fireball_spd_level.set_curr_frame((save.fireball_mult_spd-1)//0.1)
+            upgrade_draw_list.append(fireball_spd_icon)
+            upgrade_draw_list.append(fireball_spd_level)
+
+        if save.vuln_res != 0:
+            vulnerability_res = Sprite("Assets/Sprites/UI Icons/vulnerability_res2.png")
+            vulnerability_res.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            resistance_level =  Sprite("Assets/Sprites/UI Icons/amount_box_down.png", 10)
+            resistance_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            resistance_level.set_curr_frame(save.vuln_res*10)
+            upgrade_draw_list.append(vulnerability_res)
+            upgrade_draw_list.append(resistance_level)
+
+
+
+
+
+
+
 # <============================================================ DEBUG AREA START
+        # cheat enable/diable
+        if cheat_sequence == input_sequence:
+            cheat_toggle = True
+
+        #input detection for sequence
+        if teclado.key_pressed("UP") and not cheat_toggle_aux:
+            cheat_toggle_aux = True
+            if len(input_sequence) >= 8:
+                del input_sequence[0]
+            input_sequence.append("U")
+        # input detection for sequence
+        if teclado.key_pressed("DOWN") and not cheat_toggle_aux:
+            cheat_toggle_aux = True
+            if len(input_sequence) >= 8:
+                del input_sequence[0]
+            input_sequence.append("D")
+        # input detection for sequence
+        if teclado.key_pressed("LEFT") and not cheat_toggle_aux:
+            cheat_toggle_aux = True
+            if len(input_sequence) >= 8:
+                del input_sequence[0]
+            input_sequence.append("L")
+        # input detection for sequence
+        if teclado.key_pressed("RIGHT") and not cheat_toggle_aux:
+            cheat_toggle_aux = True
+            if len(input_sequence) >= 8:
+                del input_sequence[0]
+            input_sequence.append("R")
+        # input detection for sequence
+        if not teclado.key_pressed("UP") and not teclado.key_pressed("DOWN") and not teclado.key_pressed("LEFT") and not teclado.key_pressed("RIGHT"):
+            cheat_toggle_aux = False
+
+        if cheat_toggle:
+            # toggle bomb ability
+            if teclado.key_pressed("1") and not state_1:
+                state_1 = True
+                save.has_bomb_ability = not save.has_bomb_ability
+                if save.has_bomb_ability:
+                    print("Bombs unlocked!")
+                else:
+                    print("Bombs disabled! :(")
+            if not teclado.key_pressed("1"):
+                state_1 = False
+
+            # increase maximum bombs +
+            if teclado.key_pressed("2") and not state_2:
+                state_2 = True
+                save.max_bombs += 1
+                if save.max_bombs > 9:
+                    save.max_bombs = 1
+                print(f"Your max bombs: {save.max_bombs}")
+            if not teclado.key_pressed("2"):
+                state_2 = False
+
+            # increase bomb range
+            if teclado.key_pressed("3") and not state_3:
+                state_3 = True
+                save.bomb_range_upgrade += 1
+                if save.bomb_range_upgrade > 9:
+                    save.bomb_range_upgrade = 0
+                print(f"Your bomb range was upgraded to: {save.bomb_range_upgrade + 1}")
+            if not teclado.key_pressed("3"):
+                state_3 = False
+
+            # Move speed.
+            if teclado.key_pressed("4") and not state_4:
+                state_4 = True
+                save.speed_upgrade += 1
+                blinky.base_speed = 100 + 10 * save.speed_upgrade
+                print(f"Blinky's new speed: {blinky.base_speed}")
+            if not teclado.key_pressed("4"):
+                state_4 = False
+
+            # Has fireball
+            if teclado.key_pressed("5") and not state_5:
+                state_5 = True
+                save.has_fireball_ability = not save.has_fireball_ability
+                if save.has_fireball_ability:
+                    print("Fireball unlocked!")
+                else:
+                    print("Fireball disabled! :(")
+
+            if not teclado.key_pressed("5"):
+                state_5 = False
+
+            # Fireball ammo.
+            if teclado.key_pressed("6") and not state_6:
+                state_6 = True
+                save.fireball_ammo += 1
+                print(f"Current fireball ammmo: {save.fireball_ammo}")
+            if not teclado.key_pressed("6"):
+                state_6 = False
+
+            # Fireball sppeed.
+            if teclado.key_pressed("7") and not state_7:
+                save.fireball_mult_spd += 0.1
+                print(f"Fireballs are {int(save.fireball_mult_spd*100)}%")
+                state_7 = True
+            if not teclado.key_pressed("7"):
+                state_7 = False
+
+            # Vulnerability resistance.
+            if teclado.key_pressed("8") and not state_8:
+                save.vuln_res += 0.1
+                if save.vuln_res > 1:
+                    save.vuln_res = 0
+                print(f"Vulnerability Resistance: {int(save.vuln_res * 100)}%")
+                state_8 = True
+            if not teclado.key_pressed("8"):
+                state_8 = False
+
+            # Boots.
+            if teclado.key_pressed("9") and not state_9:
+                save.has_shoes = not save.has_shoes
+                blinky.has_shoes = save.has_shoes
+                state_9 = True
+                if save.has_shoes:
+                    print(f"Shoes ON!")
+                else:
+                    print(f"Shoes OFF.")
+            if not teclado.key_pressed("9"):
+                state_9 = False
+
+            # Boots grip.
+            if teclado.key_pressed("0") and not state_0:
+                if save.grip_factor < 5.5:
+                    save.grip_factor += 0.5
+                else:
+                    save.grip_factor = 100
+                blinky.grip_factor = save.grip_factor
+                blinky.shoe_grip = blinky.base_speed * blinky.grip_factor
+                print(f"Grip factor: {save.grip_factor}")
+                state_0 = True
+            if not teclado.key_pressed("0"):
+                state_0 = False
+
         # Se nada tiver sido pressionado, checa inputs.
         if not just_pressed:
             bullet_time = var_toggle(bullet_time, "B", teclado)
@@ -245,18 +505,20 @@ def play_game(screen_width, screen_height, save):
                 pacman.x += pacman.vx * dt * time_ratio
                 pacman.y += pacman.vy * dt * time_ratio
                 pacman.update()
-
-            if teclado.key_pressed("SPACE") and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len):
+            # TODO: quando colado numa parede é possivel atirar para fora da fase e o jogo crasha (sem resolvido com verificação de velocidade, testar mais)
+            # TODO: Blinky crasha ao jogo se atirar em direção do portal direito.
+            #if teclado.key_pressed("SPACE") and save.has_fireball_ability and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len):
+            if teclado.key_pressed("SPACE") and save.has_fireball_ability and blinky.facing != 'AFK' and save.fireball_ammo > 0 and (blinky.vx != 0 or blinky.vy != 0):
                 if blinky.shot_timer > blinky.reload_time:
                     blinky.shot_timer = 0
-                    shot = Shot("Assets\Sprites\VFX\\blue fireball_32x32_omni.png", blinky, 8)
+                    shot = Shot("Assets/Sprites/VFX/blue_fireball_32x32_omni.png", blinky, 8)
                     shots_list.append(shot)
+                    save.fireball_ammo -= 1
 
             for shot in shots_list:
-                shot.x += shot.vx * dt
-                shot.y += shot.vy * dt
+                shot.x += shot.vx * save.fireball_mult_spd * dt
+                shot.y += shot.vy * save.fireball_mult_spd * dt
                 shot.check_collision_with_wall()
-                shot.check_inside_maze_boundary()
 
             for shot in shots_list:
                 for enemy in enemies_list:
@@ -265,17 +527,23 @@ def play_game(screen_width, screen_height, save):
                         shot.hit_enemy = True
 
             for shot in shots_list:
-                if shot.hit_enemy or shot.hit_wall or shot.out_of_bounds:
+                if shot.hit_enemy or shot.hit_wall:
                     shots_list.remove(shot)
 
             if teclado.key_pressed("A") and len(traps_list) < 1:
-                trap = Trap("Assets\Sprites\PickUps\\trap_20_108_196_98.png", blinky)
+                trap = Trap("Assets/Sprites/PickUps/trap_20_108_196_98.png", blinky)
                 traps_list.append(trap)
 
-            if teclado.key_pressed("X") and len(bombs_list) < 1:
-                bomb = Bomb("Assets\Sprites\VFX\\Bomb_Animated.png", maze, blinky)
+
+            if teclado.key_pressed("X") and save.has_bomb_ability and not x_state and len(bombs_list) < save.max_bombs:
+                x_state = True
+                bomb = Bomb("Assets/Sprites/VFX/Bomb_Animated.png", maze, blinky, save.bomb_range_upgrade)
                 bomb.set_sequence_time(0, 4, 1000, True)
                 bombs_list.append(bomb)
+            if not teclado.key_pressed("X"):
+                x_state = False
+
+
 
             for bomb in bombs_list:
                 bomb.timer += dt
@@ -288,14 +556,6 @@ def play_game(screen_width, screen_height, save):
                 for blast in blasts_list:
                     if blast.collided(enemy):
                         enemy.die()
-                        
-            for blast in blasts_list:
-                if blinky.collided(blast):
-                    blinky.is_dead = True
-
-            for blast in blasts_list:
-                if blinky.collided(blast):
-                    blinky.is_dead = True
 
             for blast in blasts_list:
                 if (time() - blast.creation_instant) > blast.delta_time:
@@ -315,29 +575,11 @@ def play_game(screen_width, screen_height, save):
                 if trap.was_eaten:
                     traps_list.remove(trap)
 
+
             for pacman in enemies_list:
                 if pacman.is_dead:
                     enemies_list.remove(pacman)
 
-
-
-
-            if not blinky.teleport_able and teclado.key_pressed("O"):
-                blinky.teleport_able = True
-                teleport_sprite = Sprite("Assets\Sprites\Characters\Blinky_transparente.png")
-                teleport_sprite.set_position(blinky.x, blinky.y)
-                teleport_sprite.draw()
-
-            if blinky.teleport_able and teclado.key_pressed("I"):
-                blinky.set_position(teleport_sprite.x - blinky.width/2 + teleport_sprite.width/2, 
-                                    teleport_sprite.y - blinky.height/2 + teleport_sprite.height/2)
-                blinky.teleport_able = False
-
-            
-            for enemy in enemies_list:
-                if blinky.state == "vulnerable" and (blinky.get_matrix_coordinates() == enemy.get_matrix_coordinates()) and not blinky.is_dead:
-                    blinky.is_dead = True
-        
         # Displays and updates player credits at the end of the level.
         if len(enemies_list) == 0 and not level_finished:
             level_finished = True
@@ -370,6 +612,7 @@ def play_game(screen_width, screen_height, save):
         janela.screen.blit(frames_per_second, (10, janela.height - 50))         # Draw no FPS.
         maze.draw()
 
+        # walks fake blink into the maze and makes enemies blink.
         if level_start:
             fake_blinky.x += 25 * dt
             blinky.hide()
@@ -410,15 +653,10 @@ def play_game(screen_width, screen_height, save):
 
         for blast in blasts_list:
             blast.draw()
+            blast.update()
 
-        if blinky.teleport_able:
-            teleport_sprite.draw()
-
-
-
-
-
-
+        for item in upgrade_draw_list:
+            item.draw()
 
         janela.screen.blit(snip, (930, 630))                                    # Mostra Credits.
         janela.screen.blit(stage_render, (930, 600))
@@ -428,46 +666,15 @@ def play_game(screen_width, screen_height, save):
         portal_esquerdo.draw()
         portal_direito.update()
         portal_direito.draw()
+        if cheat_toggle:
+            cheat_guide_1.draw()
+            cheat_guide_2.draw()
+            cheat_guide_3.draw()
+            cheat_guide_4.draw()
 
         blackout.update()
         blackout.draw()
 
 
 
-
-
-
-
-
         janela.update()
-
-        # morte do blinky
-        if blinky.is_dead or (len(maze.list_of_points) == 0):
-            bgm.stop()
-            blinky.hide()
-            dead_blinky = Sprite("Assets\Sprites\Characters\\blinky_morto.png", 1)
-            dead_blinky.x = blinky.x
-            dead_blinky.y = blinky.y
-            blinky_death_sound = Sound("Assets\SFX\\BlinkyDeath.mp3")
-            blinky_death_sound.play()
-            #blinky.state = "vulnerable"
-            #blinky.update_sequence()
-            while(dead_blinky.y > 0):
-                janela.set_background_color((0, 0, 0))
-                janela.screen.blit(frames_per_second, (10, janela.height - 50))         # Draw no FPS.
-                maze.draw()
-                for enemy in enemies_list:
-                    enemy.draw()
-                for blast in blasts_list:
-                    blast.draw()
-                janela.screen.blit(snip, (930, 630))                                    # Mostra Credits.
-                janela.screen.blit(stage_render, (930, 600))
-                portal_esquerdo.update()
-                portal_esquerdo.draw()
-                portal_direito.update()
-                portal_direito.draw()
-                dead_blinky.y -= 1
-                dead_blinky.draw()
-                #blinky.update()
-                janela.update()
-            return ["menu", save]
