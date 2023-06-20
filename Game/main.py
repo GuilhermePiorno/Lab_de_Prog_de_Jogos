@@ -443,6 +443,7 @@ def play_game(screen_width, screen_height, save):
 
         # morte do blinky
         if blinky.is_dead or (len(maze.list_of_points) == 0):
+            bgm.pause()
             bgm.stop()
             blinky.hide()
             dead_blinky = Sprite("Assets\Sprites\Characters\\blinky_morto.png", 1)
