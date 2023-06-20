@@ -256,6 +256,7 @@ def play_game(screen_width, screen_height, save):
                 shot.x += shot.vx * dt
                 shot.y += shot.vy * dt
                 shot.check_collision_with_wall()
+                shot.check_inside_maze_boundary()
 
             for shot in shots_list:
                 for enemy in enemies_list:
@@ -264,7 +265,7 @@ def play_game(screen_width, screen_height, save):
                         shot.hit_enemy = True
 
             for shot in shots_list:
-                if shot.hit_enemy or shot.hit_wall:
+                if shot.hit_enemy or shot.hit_wall or shot.out_of_bounds:
                     shots_list.remove(shot)
 
             if teclado.key_pressed("A") and len(traps_list) < 1:
@@ -441,7 +442,7 @@ def play_game(screen_width, screen_height, save):
         janela.update()
 
         # morte do blinky
-        if blinky.is_dead:
+        if blinky.is_dead or (len(maze.list_of_points) == 0):
             bgm.stop()
             blinky.hide()
             dead_blinky = Sprite("Assets\Sprites\Characters\\blinky_morto.png", 1)
