@@ -4,6 +4,30 @@ from EatThis.Classes.rolling_text import *
 from random import *
 
 
+def purchase_item(item, save):
+    name = item[0]
+    cost = item[1]
+    save.credits -= cost
+    if name == "speed":
+        save.speed_upgrade += 1
+    elif name == "vul_res":
+        save.vuln_res += 0.1
+    elif name == "grip_factor":
+        save.grip_factor += 0.5
+    elif name == "bomb amount":
+        save.max_bombs += 1
+    elif name == "bomb range":
+        save.bomb_range_upgrade += 1
+    elif name == "fireball ammo":
+        save.fireball_ammo += 1
+    elif name == "fireball speed":
+        save.fireball_mult_spd += 0.1
+    elif name == "teleport":
+        save.has_teleport = 1
+    elif name == "poison pill":
+        save.has_poison_pill = 1
+
+
 def measure_longest_message(msg, font_name='Assets/Fonts/MinimalPixel v2.ttf', size=24):
     longest = 0
     font = pygame.font.Font(font_name, size)
@@ -13,8 +37,8 @@ def measure_longest_message(msg, font_name='Assets/Fonts/MinimalPixel v2.ttf', s
             longest = snip.get_width()
     return longest
 
-def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.ttf', size=24):
 
+def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.ttf', size=24):
     # Retrato de quem fala.
     if who.lower() == 'shopkeeper':
         speaker_portrait = Sprite('Assets/Sprites/Characters/Shopkeeper_Portrait_Simple_BIG.png', 1)
@@ -39,7 +63,8 @@ def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.tt
     for i in range(len(what)):
         janela.screen.blit(what[i], pos_linha[i])
 
-def get_possible_upgrades(save):
+
+def get_possible_upgrades(save, stock_size):
     set_upgrades = {"speed", "vul_res", "grip_factor", "teleport", "poison pill"}
     # 2 upgrades + 1 persistent offer.
     if save.has_bomb_ability:
@@ -48,12 +73,13 @@ def get_possible_upgrades(save):
         set_upgrades.update({"fireball ammo", "fireball speed"})
 
     shopping_list = []
-    for i in range(3):
+    for i in range(stock_size):
         random_upgrade = choices(list(set_upgrades))[0]
         set_upgrades = set_upgrades - {random_upgrade}
         shopping_list.append([random_upgrade])
 
     return shopping_list
+
 
 def get_shop_inventory(save):
     price_table = {
@@ -64,12 +90,12 @@ def get_shop_inventory(save):
         "bomb range": 1,
         "fireball ammo": 1,
         "fireball speed": 1,
-        "teleport":1,
-        "poison pill":1
+        "teleport": 1,
+        "poison pill": 1
     }
-
-    offer_list = get_possible_upgrades(save)
-    for i in range(3):
+    stock_size = 3  # alterar stocksize não está implementando, foi implementado para compatibilidade futura.
+    offer_list = get_possible_upgrades(save, stock_size)
+    for i in range(stock_size):
         offer_list[i].append(price_table[offer_list[i][0]])
 
     return offer_list
@@ -82,21 +108,21 @@ def go_shopping(screen_width, screen_height, save):
     credits_surface = font.render(credits_string, True, 'white')
     shop_inventory = get_shop_inventory(save)
     image_correspondence = {
-        "speed":"speed_up.png",
-        "vul_res":"vulnerability_res.png",
-        "grip_factor":"boots_spiked_box.png",
-        "bomb amount":"bomb_box.png",
-        "bomb range":"bomb_upgrade_box.png",
-        "fireball ammo":"fireball_box.png",
-        "fireball speed":"fireball_speed_box.png",
-        "teleport":"teleport.png",
-        "poison pill":"Poison_Pill.png"
+        "speed": "speed_up.png",
+        "vul_res": "vulnerability_res.png",
+        "grip_factor": "boots_spiked_box.png",
+        "bomb amount": "bomb_box.png",
+        "bomb range": "bomb_upgrade_box.png",
+        "fireball ammo": "fireball_box.png",
+        "fireball speed": "fireball_speed_box.png",
+        "teleport": "teleport.png",
+        "poison pill": "Poison_Pill.png"
     }
 
     tempo = 0
     tic = 0
     print_char_count = 0
-    text_speed = 50   # character per second
+    text_speed = 50  # character per second
     base_speed = 300
     is_done_printing = False
     janela = Window(screen_width, screen_height)
@@ -108,7 +134,6 @@ def go_shopping(screen_width, screen_height, save):
         ["Why do programmers always mix up Halloween and Christmas?", "Because Oct 31 == Dec 25."],
         ["To understand what recursion is, you must first understand recursion."]
     ]
-
 
     teclado = janela.get_keyboard()
     in_dialogue_area = False
@@ -139,17 +164,17 @@ def go_shopping(screen_width, screen_height, save):
     deny_sound.set_volume(save.SFX_vol * save.Master_vol)
     deny_sound.set_repeat(False)
 
-    #============layer 0=================SPACE==========================================================================
+    # ============layer 0=================SPACE=========================================================================
     # Background
     background = Sprite("Assets/Sprites/Shop/Background_Sky.png", 2)
     background.set_sequence_time(0, 2, 1000, True)
     background.set_curr_frame(0)
-    # ============layer 1================3D WALLS========================================================================
+    # ============layer 1================3D WALLS=======================================================================
     # Background Walls
     bg_walls = Sprite("Assets/Sprites/Shop/Background_Walls.png", 2)
     bg_walls.set_sequence_time(0, 2, 1000, True)
     bg_walls.set_curr_frame(0)
-    # ============layer 2================================================================================================
+    # ============layer 2===============================================================================================
     # Rightside Portal
     portal_r = Sprite("Assets/Sprites/Shop/Portal_R.png", 4)
     portal_r.set_sequence_time(0, 4, 200, True)
@@ -181,7 +206,7 @@ def go_shopping(screen_width, screen_height, save):
     # Locker
     locker = Sprite("Assets/Sprites/Shop/Locker.png", 1)
     locker.set_position(250, 420)
-    # ============layer 3================================================================================================
+    # ============layer 3===============================================================================================
     # Broom
     broom = Sprite("Assets/Sprites/Shop/Broom.png", 1)
     broom.set_position(350, 500)
@@ -199,7 +224,7 @@ def go_shopping(screen_width, screen_height, save):
     # Shop Counter
     shop_counter = Sprite("Assets/Sprites/Shop/ShopCounter.png", 1)
     shop_counter.set_position(503, 575)
-    # ============layer 4================================================================================================
+    # ============layer 4===============================================================================================
     # Rightside Shop Door
     shop_door_r = Sprite("Assets/Sprites/Shop/ShopDoor_R.png", 1)
     shop_door_r.set_position(1056, 400)
@@ -213,7 +238,7 @@ def go_shopping(screen_width, screen_height, save):
     # Shop Counter Item 1
     shop_counter_item_1 = Sprite("Assets/Sprites/Shop/ShopCounterItems.png", 1)
     shop_counter_item_1.set_position(515, 500)
-    # ============layer 5================================================================================================
+    # ============layer 5===============================================================================================
     # Rightside Shop Door Front
     shop_door_r_front = Sprite("Assets/Sprites/Shop/ShopDoorFront_R.png", 1)
     shop_door_r_front.set_position(1056, 400)
@@ -226,13 +251,13 @@ def go_shopping(screen_width, screen_height, save):
 
     # Caixa de texto
     text_box = Sprite("Assets/Sprites/Shop/Text_Box_Sprites_Transparency.png", 13)
-    text_box.set_position((janela.width - text_box.width)/2, 50)
+    text_box.set_position((janela.width - text_box.width) / 2, 50)
     text_box.set_sequence_time(0, 7, 50, False)
     text_box.stop()
 
     # Shopkeeper Portrait
     shopkeeper_portrait = Sprite("Assets/Sprites/Characters/Shopkeeper_Portrait_Simple_BIG.png", 1)
-    shopkeeper_portrait.set_position((janela.width - text_box.width)/2 + 20, 70)
+    shopkeeper_portrait.set_position((janela.width - text_box.width) / 2 + 20, 70)
 
     # Blinky Portrait
     blinky_portrait = Sprite("Assets/Sprites/Characters/Blinky_Portrait_02_Simple.png", 1)
@@ -267,9 +292,6 @@ def go_shopping(screen_width, screen_height, save):
             dt = 0
         tempo += dt
 
-
-
-
         if not teclado.key_pressed("right") and not teclado.key_pressed("left"):
             blinky_speed = 0
 
@@ -293,11 +315,10 @@ def go_shopping(screen_width, screen_height, save):
                 facing = 'L'
                 blinky.set_sequence(2, 4, True)
 
-
         # Resolve in_dialogue_area switch
         if 500 < blinky.x < 720 and not in_dialogue_area:
             in_dialogue_area = True
-        if  (500 > blinky.x or blinky.x > 720) and in_dialogue_area:
+        if (500 > blinky.x or blinky.x > 720) and in_dialogue_area:
             in_dialogue_area = False
 
         # Shows bubble when in dialogue area
@@ -332,16 +353,18 @@ def go_shopping(screen_width, screen_height, save):
         if teclado.key_pressed("enter") and not enter_pressed:
             enter_pressed = True
             if in_dialogue and chat_depth == 3:
-                if shop_inventory[upgrade_selection][1] <= save.credits:
+                item_purchased = shop_inventory[upgrade_selection][0]
+                item_cost = shop_inventory[upgrade_selection][1]
+                if item_cost <= save.credits:
                     confirm_sound.play()
+                    purchase_item(shop_inventory[upgrade_selection], save)
                 else:
                     deny_sound.play()
 
                 print(upgrade_selection)
-                print(f"upgrade: {shop_inventory[upgrade_selection][0]}, price: {shop_inventory[upgrade_selection][1]}")
-            if in_dialogue and chat_depth < 3:  # Limita o "Enter" de navegar o chat a partir até as escolhas de upgrade.
+                print(f"upgrade: {item_purchased}, price: {item_cost}")
+            if in_dialogue and chat_depth < 3:  # Limita o "Enter" de navegar o chat a partir até as escolhas de upgrade
                 chat_depth += 1
-
 
         # ===================Manages "Side Arrows" keypress
         if not in_dialogue:
@@ -349,7 +372,6 @@ def go_shopping(screen_width, screen_height, save):
                 blinky_speed = base_speed
             if teclado.key_pressed("left"):
                 blinky_speed = -base_speed
-
 
         # ==== In Dialogue Right
         if not teclado.key_pressed("right"):
@@ -362,7 +384,6 @@ def go_shopping(screen_width, screen_height, save):
                 select_sound.play()
                 upgrade_selection = (upgrade_selection + 1) % 3
 
-
         # ==== In Dialogue Left
         if not teclado.key_pressed("left"):
             left_pressed = False
@@ -374,27 +395,21 @@ def go_shopping(screen_width, screen_height, save):
                 select_sound.play()
                 upgrade_selection = (upgrade_selection - 1) % 3
 
-
         # ===================Manages "Up Arrows" keypress
         # Animação de olhar para o Shopkeeper
         if in_dialogue_area and teclado.key_pressed("up") and not in_dialogue:
             text_box.set_sequence_time(0, 7, 50, False)
             text_box.play()
-            in_dialogue = True                      # Updates in_dialogue variable
+            in_dialogue = True  # Updates in_dialogue variable
             if blinky.x < 640:
-                blinky.set_sequence(4, 6, True)         # Sets blinky's sequence to up-right look
+                blinky.set_sequence(4, 6, True)  # Sets blinky's sequence to up-right look
             else:
-                blinky.set_sequence(6, 8, True)         # Sets blinky's sequence to up-left look
-
+                blinky.set_sequence(6, 8, True)  # Sets blinky's sequence to up-left look
 
         time_after_last_char_print = tempo - tic
         if in_dialogue and time_after_last_char_print > (1 / text_speed):
-            tic = tempo                 # reseta referencial.
+            tic = tempo  # reseta referencial.
             print_char_count += 1
-
-
-
-
 
         # Set Screen Boundries
         if blinky.x <= 0:
@@ -407,7 +422,6 @@ def go_shopping(screen_width, screen_height, save):
             bgm_loop.pause()
             save.stage_no += 1
             return ["play", save]
-
 
         # Background
         background.draw()
@@ -436,7 +450,6 @@ def go_shopping(screen_width, screen_height, save):
         # Broom
         broom.draw()
 
-
         # Rightside Shop Door
         shop_door_r.draw()
         # Leftside Shop Door
@@ -444,12 +457,10 @@ def go_shopping(screen_width, screen_height, save):
         # Shop Counter Item 1
         shop_counter_item_1.draw()
 
-
         # Blinky
         blinky.x += blinky_speed * dt
         blinky.update()
         blinky.draw()
-
 
         # Rightside Shop Door Front
         shop_door_r_front.draw()
@@ -461,7 +472,8 @@ def go_shopping(screen_width, screen_height, save):
         text_box.update()
         text_box.draw()
 
-
+        credits_string = f"credits: {save.credits}"
+        credits_surface = font.render(credits_string, True, 'white')
         janela.screen.blit(credits_surface, (930, 680))
 
         if in_dialogue and not text_box.is_playing():
@@ -476,7 +488,7 @@ def go_shopping(screen_width, screen_height, save):
                 for i in range(3):
                     price_str = f"{shop_inventory[i][1]} cred"
                     price_surface = font.render(price_str, True, 'white')
-                    janela.screen.blit(price_surface, (310 + 300*i, 110))
+                    janela.screen.blit(price_surface, (310 + 300 * i, 110))
                     item = Sprite(f"Assets/Sprites/UI Icons/{image_correspondence[shop_inventory[i][0]]}")
                     item.set_position(340 + 300 * i, 155)
                     item.draw()
@@ -485,6 +497,5 @@ def go_shopping(screen_width, screen_height, save):
                 shop_cursor.set_position(300 + 300 * upgrade_selection, 150)
                 shop_cursor.draw()
                 shop_cursor.update()
-
 
         janela.update()

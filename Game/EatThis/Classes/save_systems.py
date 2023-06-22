@@ -15,23 +15,38 @@ class SaveFile:
         self._has_shoes = 0
         self.has_shoes = self._has_shoes
         # Upgrades Temporários
+        #   Grip
         self._grip_factor = 1
         self.grip_factor = self._grip_factor
+        #   Bomb Enable
         self._has_bomb_ability = 0
         self.has_bomb_ability = self._has_bomb_ability
+        #   Bomb quantity
         self._max_bombs = 1
         self.max_bombs = self._max_bombs
+        #   Bomb range
         self._bomb_range_upgrade = 0
         self.bomb_range_upgrade = self._bomb_range_upgrade
+        #   Speed
         self.speed_upgrade = 0
+        #   Fireball Enable
         self._has_fireball_ability = 0
         self.has_fireball_ability = self._has_fireball_ability
+        #   Fireball Ammo
         self._fireball_ammo = 0
         self.fireball_ammo = self._fireball_ammo
+        #   Fireball projectile speed
         self._fireball_mult_spd = 1
         self.fireball_mult_spd = self._fireball_mult_spd
+        #   Vulnerability Resistance
         self._vuln_res = 0
         self.vuln_res = self._vuln_res
+        #   Teleport
+        self._has_teleport = 0
+        self.has_teleport = self._has_teleport
+        #   Poison Pill
+        self._has_poison_pill = 0
+        self.has_poison_pill = self._has_poison_pill
         # Uso entre fases
         self._stage_no = 1
         self.stage_no = self._stage_no
