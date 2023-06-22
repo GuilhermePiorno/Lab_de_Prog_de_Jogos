@@ -66,6 +66,7 @@ def play_game(screen_width, screen_height, save):
     bombs_list = []
     blasts_list = []
     level_finished = False
+    tp_button = False
 
     # Variáveis que impactam dificuldade.
     powerups_no = 2
@@ -589,19 +590,20 @@ def play_game(screen_width, screen_height, save):
                 if pacman.is_dead:
                     enemies_list.remove(pacman)
 
+            if not teclado.key_pressed("T"):
+                tp_button = False
 
+            if not tp_button and teclado.key_pressed("T"):
+                tp_button = True
+                if not blinky.teleport_able:
+                    teleport_sprite = Sprite("Assets\Sprites\Characters\Blinky_transparente.png")
+                    teleport_sprite.set_position(blinky.x, blinky.y)
+                    teleport_sprite.draw()
+                else:
+                    blinky.set_position(teleport_sprite.x - blinky.width / 2 + teleport_sprite.width / 2,
+                                        teleport_sprite.y - blinky.height / 2 + teleport_sprite.height / 2)
+                blinky.teleport_able = not blinky.teleport_able
 
-
-            if not blinky.teleport_able and teclado.key_pressed("O"):
-                blinky.teleport_able = True
-                teleport_sprite = Sprite("Assets\Sprites\Characters\Blinky_transparente.png")
-                teleport_sprite.set_position(blinky.x, blinky.y)
-                teleport_sprite.draw()
-
-            if blinky.teleport_able and teclado.key_pressed("I"):
-                blinky.set_position(teleport_sprite.x - blinky.width/2 + teleport_sprite.width/2,
-                                    teleport_sprite.y - blinky.height/2 + teleport_sprite.height/2)
-                blinky.teleport_able = False
 
 
             for enemy in enemies_list:
@@ -718,6 +720,7 @@ def play_game(screen_width, screen_height, save):
             save.stage_no = 1
             save.credits = 0
             bgm.stop()
+            bgm.pause()
             blinky.hide()
             dead_blinky = Sprite("Assets/Sprites/Characters/blinky_morto.png", 1)
             dead_blinky.x = blinky.x
