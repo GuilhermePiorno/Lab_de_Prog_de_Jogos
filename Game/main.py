@@ -685,8 +685,8 @@ def play_game(screen_width, screen_height, save):
         if blinky.is_dead or (len(maze.list_of_points) == 0):
             save.stage_no = 1
             save.credits = 0
-            bgm.stop()
-            bgm.pause()
+            while bgm.is_playing():
+                bgm.stop()
             blinky.hide()
             dead_blinky = Sprite("Assets/Sprites/Characters/blinky_morto.png", 1)
             dead_blinky.x = blinky.x

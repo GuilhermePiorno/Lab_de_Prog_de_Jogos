@@ -81,7 +81,7 @@ def get_possible_upgrades(save, stock_size):
     return shopping_list
 
 
-def get_shop_inventory(save):
+def get_shop_inventory(save, stock_size):
     price_table = {
         "speed": 100,
         "vul_res": 1,
@@ -93,7 +93,6 @@ def get_shop_inventory(save):
         "teleport": 1,
         "poison pill": 1
     }
-    stock_size = 3  # alterar stocksize não está implementando, foi implementado para compatibilidade futura.
     offer_list = get_possible_upgrades(save, stock_size)
     for i in range(stock_size):
         offer_list[i].append(price_table[offer_list[i][0]])
@@ -102,11 +101,9 @@ def get_shop_inventory(save):
 
 
 def go_shopping(screen_width, screen_height, save):
-    save.credits += 99
     font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 24)
-    credits_string = f"credits: {save.credits}"
-    credits_surface = font.render(credits_string, True, 'white')
-    shop_inventory = get_shop_inventory(save)
+    offer_qty = 3
+    shop_inventory = get_shop_inventory(save, offer_qty)
     image_correspondence = {
         "speed": "speed_up.png",
         "vul_res": "vulnerability_res.png",
@@ -353,7 +350,7 @@ def go_shopping(screen_width, screen_height, save):
         if teclado.key_pressed("enter") and not enter_pressed:
             enter_pressed = True
             if in_dialogue and chat_depth == 3:
-                item_purchased = shop_inventory[upgrade_selection][0]
+                item_selected = shop_inventory[upgrade_selection][0]
                 item_cost = shop_inventory[upgrade_selection][1]
                 if item_cost <= save.credits:
                     confirm_sound.play()
@@ -362,7 +359,7 @@ def go_shopping(screen_width, screen_height, save):
                     deny_sound.play()
 
                 print(upgrade_selection)
-                print(f"upgrade: {item_purchased}, price: {item_cost}")
+                print(f"upgrade: {item_selected}, price: {item_cost}")
             if in_dialogue and chat_depth < 3:  # Limita o "Enter" de navegar o chat a partir até as escolhas de upgrade
                 chat_depth += 1
 
@@ -382,7 +379,7 @@ def go_shopping(screen_width, screen_height, save):
             # print(right_pressed)
             if chat_depth == 3:
                 select_sound.play()
-                upgrade_selection = (upgrade_selection + 1) % 3
+                upgrade_selection = (upgrade_selection + 1) % offer_qty
 
         # ==== In Dialogue Left
         if not teclado.key_pressed("left"):
@@ -393,7 +390,7 @@ def go_shopping(screen_width, screen_height, save):
             # print(left_pressed)
             if chat_depth == 3:
                 select_sound.play()
-                upgrade_selection = (upgrade_selection - 1) % 3
+                upgrade_selection = (upgrade_selection - 1) % offer_qty
 
         # ===================Manages "Up Arrows" keypress
         # Animação de olhar para o Shopkeeper
@@ -485,17 +482,20 @@ def go_shopping(screen_width, screen_height, save):
                 talk("Shopkeeper", greetings3, janela, text_box)
             elif chat_depth == 3:
                 # Shop Items
-                for i in range(3):
+                for i in range(offer_qty):
                     price_str = f"{shop_inventory[i][1]} cred"
                     price_surface = font.render(price_str, True, 'white')
-                    janela.screen.blit(price_surface, (310 + 300 * i, 110))
+                    janela.screen.blit(price_surface, (310 + 600/(offer_qty-1) * i, 110))
                     item = Sprite(f"Assets/Sprites/UI Icons/{image_correspondence[shop_inventory[i][0]]}")
-                    item.set_position(340 + 300 * i, 155)
+                    item.set_position(340 + 600/(offer_qty-1) * i, 155)
                     item.draw()
 
                 # Shop Cursor
-                shop_cursor.set_position(300 + 300 * upgrade_selection, 150)
+                shop_cursor.set_position(300 + 600/(offer_qty-1) * upgrade_selection, 150)
                 shop_cursor.draw()
                 shop_cursor.update()
+                selection_name = f"{shop_inventory[upgrade_selection][0]}"
+                surface_select_name = font.render(selection_name, True, 'white')
+                janela.screen.blit(surface_select_name, ((janela.width - surface_select_name.get_width())/2, 220))
 
         janela.update()
