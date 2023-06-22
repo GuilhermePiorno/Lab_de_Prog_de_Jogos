@@ -40,7 +40,7 @@ def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.tt
         janela.screen.blit(what[i], pos_linha[i])
 
 def get_possible_upgrades(save):
-    set_upgrades = {"speed", "vul_res", "grip_factor"}
+    set_upgrades = {"speed", "vul_res", "grip_factor", "teleport", "poison pill"}
     # 2 upgrades + 1 persistent offer.
     if save.has_bomb_ability:
         set_upgrades.update({"bomb amount", "bomb range"})
@@ -63,7 +63,9 @@ def get_shop_inventory(save):
         "bomb amount": 1,
         "bomb range": 1,
         "fireball ammo": 1,
-        "fireball speed": 1
+        "fireball speed": 1,
+        "teleport":1,
+        "poison pill":1
     }
 
     offer_list = get_possible_upgrades(save)
@@ -86,7 +88,9 @@ def go_shopping(screen_width, screen_height, save):
         "bomb amount":"bomb_box.png",
         "bomb range":"bomb_upgrade_box.png",
         "fireball ammo":"fireball_box.png",
-        "fireball speed":"fireball_speed_box.png"
+        "fireball speed":"fireball_speed_box.png",
+        "teleport":"teleport.png",
+        "poison pill":"Poison_Pill.png"
     }
 
     tempo = 0

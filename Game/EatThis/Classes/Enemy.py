@@ -15,7 +15,7 @@ class Enemy(Sprite):
         self.fear_timer = 0.0
         self.vx = 0
         self.vy = 0
-        self.base_speed = 100
+        self.base_speed = 90
         self.cmd = ''
         self.window = window
         self.maze = maze
