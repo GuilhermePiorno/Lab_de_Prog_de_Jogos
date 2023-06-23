@@ -28,7 +28,8 @@ class SaveFile:
         self._bomb_range_upgrade = 0
         self.bomb_range_upgrade = self._bomb_range_upgrade
         #   Speed
-        self.speed_upgrade = 0
+        self._speed_upgrade = 0
+        self.speed_upgrade = self._speed_upgrade
         #   Fireball Enable
         self._has_fireball_ability = 0
         self.has_fireball_ability = self._has_fireball_ability
@@ -47,6 +48,10 @@ class SaveFile:
         #   Poison Pill
         self._has_poison_pill = 0
         self.has_poison_pill = self._has_poison_pill
+        #   Piggy Bank
+        self._piggy_bank = 0
+        self.piggy_bank = self._piggy_bank
+
         # Uso entre fases
         self._stage_no = 1
         self.stage_no = self._stage_no
@@ -96,8 +101,29 @@ class SaveFile:
 
         :return:
         """
-        self.Master_vol = self._Master_vol
-        self.BGM_vol = self._BGM_vol
-        self.SFX_vol = self._SFX_vol
-        self.has_shoes = self._has_shoes
+        # self.Master_vol = self._Master_vol
+        # self.BGM_vol = self._BGM_vol
+        # self.SFX_vol = self._SFX_vol
 
+        self.has_shoes = self._has_shoes
+        self.grip_factor = self._grip_factor
+        self.speed_upgrade = self._speed_upgrade
+
+        self.has_bomb_ability = self._has_bomb_ability
+        self.max_bombs = self._max_bombs
+        self.bomb_range_upgrade = self._bomb_range_upgrade
+
+        self.has_fireball_ability = self._has_fireball_ability
+        self.fireball_ammo = self._fireball_ammo
+        self.fireball_mult_spd = self._fireball_mult_spd
+
+        self.vuln_res = self._vuln_res
+        self.has_teleport = self._has_teleport
+        self.has_poison_pill = self._has_poison_pill
+
+        self.piggy_bank = self._piggy_bank
+
+        self._stage_no = 1
+        self.stage_no = self._stage_no
+        self._credits = 0
+        self.credits = self._credits

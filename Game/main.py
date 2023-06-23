@@ -69,25 +69,23 @@ def play_game(screen_width, screen_height, save):
     tp_button = False
 
     # Variáveis que impactam dificuldade.
-    powerups_no = 2
-    numero_inimigos = save.stage_no
+    powerups_no = save.stage_no - 1
+    numero_inimigos = 1 + save.stage_no//2
 
     # Background Music.
-    song_list = ["Assets/Music/Unreal Super Hero 3 by Kenet & Rez.mp3",
-                 "Assets/Music/FLCTR4 (feat. Zabutom).mp3",
-                 "Assets/Music/The Arcane Golem.mp3",
-                 "Assets/Music/The Bat Matriarch.mp3"]
+    song_list = ["Assets/Music/Unreal Super Hero 3 by Kenet & Rez.ogg",
+                 "Assets/Music/FLCTR4 (feat. Zabutom).ogg",
+                 "Assets/Music/The Arcane Golem.ogg",
+                 "Assets/Music/The Bat Matriarch.ogg"]
     sorteio = random.randint(0, 3)
     song = song_list[sorteio]
 
-    slowmo = [Sound("Assets/SFX/SlowMotionIn.mp3"), Sound("Assets/SFX/SlowMotionOut.mp3")]
+    slowmo = [Sound("Assets/SFX/SlowMotionIn.ogg"), Sound("Assets/SFX/SlowMotionOut.ogg")]
     bgm = Sound(song)
     print(f"\nPlaying: {song[13:len(song) - 4]} \n")
     bgm.set_volume(save.BGM_vol * save.Master_vol)
     bgm.set_repeat(True)
-
-    if save.stage_no == 1:
-        bgm.play()
+    bgm.play()
 
     # cria o objeto maze
     maze = Maze(walltype, janela, powerups_no)
@@ -261,6 +259,24 @@ def play_game(screen_width, screen_height, save):
             upgrade_draw_list.append(vulnerability_res)
             upgrade_draw_list.append(resistance_level)
 
+        if save.has_poison_pill != 0:
+            poison_pill = Sprite("Assets/Sprites/UI Icons/Poison_Pill.png")
+            poison_pill.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(poison_pill)
+            upgrade_draw_list.append(poison_pill)
+
+        if save.has_teleport != 0:
+            teleport_ability = Sprite("Assets/Sprites/UI Icons/teleport.png")
+            teleport_ability.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(teleport_ability)
+            upgrade_draw_list.append(teleport_ability)
+
+        if save.piggy_bank != 0:
+            piggy_bank_icon = Sprite("Assets/Sprites/UI Icons/Piggy_Bank.png")
+            piggy_bank_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(piggy_bank_icon)
+            upgrade_draw_list.append(piggy_bank_icon)
+
         # <============================================================ DEBUG AREA START
         # cheat enable/diable
         if cheat_sequence == input_sequence:
@@ -367,7 +383,7 @@ def play_game(screen_width, screen_height, save):
             # Vulnerability resistance.
             if teclado.key_pressed("8") and not state_8:
                 save.vuln_res += 0.1
-                if save.vuln_res > 1:
+                if save.vuln_res > 0.5:
                     save.vuln_res = 0
                 print(f"Vulnerability Resistance: {int(save.vuln_res * 100)}%")
                 state_8 = True
@@ -631,8 +647,8 @@ def play_game(screen_width, screen_height, save):
             fake_blinky.unhide()
             blinky.hide()
             if blackout.get_curr_frame() == 9:
-                if save.stage_no % 2 == 0:
-                    bgm.pause()
+                bgm.stop()
+                if save.stage_no % 3 == 0:
                     return ["shop", save]
                 return ["play", save]
 
@@ -684,18 +700,17 @@ def play_game(screen_width, screen_height, save):
         # morte do blinky
         if blinky.is_dead or (len(maze.list_of_points) == 0):
             save.stage_no = 1
-            save.credits = 0
-            while bgm.is_playing():
-                bgm.stop()
+            temp_wallet = int(save.piggy_bank * save.credits)
+            save.reset_save_data()
+            save.credits = temp_wallet
+            bgm.stop()
             blinky.hide()
             dead_blinky = Sprite("Assets/Sprites/Characters/blinky_morto.png", 1)
             dead_blinky.x = blinky.x
             dead_blinky.y = blinky.y
-            blinky_death_sound = Sound("Assets/SFX/BlinkyDeath.mp3")
+            blinky_death_sound = Sound("Assets/SFX/BlinkyDeath.ogg")
             blinky_death_sound.set_volume(save.SFX_vol * save.Master_vol)
             blinky_death_sound.play()
-            # blinky.state = "vulnerable"
-            # blinky.update_sequence()
             while dead_blinky.y > 0:
                 janela.set_background_color((0, 0, 0))
                 janela.screen.blit(frames_per_second, (10, janela.height - 50))  # Draw no FPS.
@@ -705,7 +720,7 @@ def play_game(screen_width, screen_height, save):
                 for blast in blasts_list:
                     blast.draw()
                     blast.update()
-                janela.screen.blit(snip, (930, 630))  # Mostra Credits.
+                janela.screen.blit(snip, (930, 630))    # Mostra Credits.
                 janela.screen.blit(stage_render, (930, 600))
                 portal_esquerdo.update()
                 portal_esquerdo.draw()

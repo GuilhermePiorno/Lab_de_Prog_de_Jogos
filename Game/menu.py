@@ -18,11 +18,11 @@ def open_menu(screen_width, screen_height, save):
     # print("Sava Data found!" if save_found else "No Save Data found..")
 
     # Sounds
-    sfx_select = Sound('Assets/SFX/Select_0.wav')
+    sfx_select = Sound('Assets/SFX/Select_0.ogg')
     sfx_select.set_volume(save.SFX_vol * save.Master_vol)
-    sfx_confirm = Sound('Assets/SFX/Confirm_0.wav')
+    sfx_confirm = Sound('Assets/SFX/Confirm_0.ogg')
     sfx_confirm.set_volume(save.SFX_vol * save.Master_vol)
-    sfx_cancel = Sound('Assets/SFX/Cancel_0.wav')
+    sfx_cancel = Sound('Assets/SFX/Cancel_0.ogg')
     sfx_cancel.set_volume(save.SFX_vol * save.Master_vol)
 
 
@@ -81,18 +81,18 @@ def open_menu(screen_width, screen_height, save):
                     return ["play", save]
                 if menu_selection[selection_index] == "newgame":
                     print("New game selected.")
-                    aux = [save.Master_vol, save.BGM_vol, save.SFX_vol]
-                    save.reset_save_data() # resta o save
-                    save.Master_vol = aux[0]
-                    save.BGM_vol = aux[1]
-                    save.SFX_vol = aux[2]
-                    save.write_save_to_file() # escreve save em arquivo.
+                    # aux = [save.Master_vol, save.BGM_vol, save.SFX_vol]
+                    save.reset_save_data()      # resta o save
+                    # save.Master_vol = aux[0]
+                    # save.BGM_vol = aux[1]
+                    # save.SFX_vol = aux[2]
+                    save.write_save_to_file()   # escreve save em arquivo ao iniciar novo jogo.
                     return ["play", save]
                 elif menu_selection[selection_index] == "options":
                     print("Options selected.")
                     return ["options", save]
                 elif menu_selection[selection_index] == "exit":
-                    save.write_save_to_file()
+                    save.write_save_to_file() # escreve save em arquivo ao sair do jogo.
                     return ["close", save]
         if not teclado.key_pressed(last_input) and not teclado.key_pressed("return"):
             button_state = False

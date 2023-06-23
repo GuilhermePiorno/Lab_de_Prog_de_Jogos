@@ -4,6 +4,84 @@ from EatThis.Classes.rolling_text import *
 from random import *
 
 
+def can_purchase(save, shop_inventory, selection):
+    upgrade_ceiling = {
+        "speed": 5,
+        "vul_res": 0.5,
+        "grip_factor": 5,
+        "bomb amount": 9,
+        "bomb range": 9,
+        "fireball ammo": 9,
+        "fireball speed": 9,
+        "teleport": 1,
+        "poison pill": 1,
+        "piggy_bank": 0.5
+    }
+
+    attribute = shop_inventory[selection][0]
+    max_values = upgrade_ceiling[attribute]
+
+    if attribute == "speed":
+        if save.speed_upgrade < 5:
+            return True
+        else:
+            return False
+
+    if attribute == "vul_res":
+        if save.vuln_res < 0.5:
+            return True
+        else:
+            return False
+
+    if attribute == "grip_factor":
+        if save.grip_factor < 5:
+            return True
+        else:
+            return False
+
+    if attribute == "bomb amount":
+        if save.max_bombs < 9:
+            return True
+        else:
+            return False
+
+    if attribute == "bomb range":
+        if save.bomb_range_upgrade < 9:
+            return True
+        else:
+            return False
+
+    if attribute == "fireball ammo":
+        if save.fireball_ammo < 9:
+            return True
+        else:
+            return False
+
+    if attribute == "fireball speed":
+        if save.fireball_mult_spd < 9:
+            return True
+        else:
+            return False
+
+    if attribute == "teleport":
+        if not save.has_teleport:
+            return True
+        else:
+            return False
+
+    if attribute == "poison pill":
+        if not save.has_poison_pill:
+            return True
+        else:
+            return False
+
+    if attribute == "piggy_bank":
+        if not save.piggy_bank:
+            return True
+        else:
+            return False
+
+
 def purchase_item(item, save):
     name = item[0]
     cost = item[1]
@@ -26,6 +104,8 @@ def purchase_item(item, save):
         save.has_teleport = 1
     elif name == "poison pill":
         save.has_poison_pill = 1
+    elif name == "piggy_bank":
+        save.piggy_bank += 0.1
 
 
 def measure_longest_message(msg, font_name='Assets/Fonts/MinimalPixel v2.ttf', size=24):
@@ -65,7 +145,7 @@ def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.tt
 
 
 def get_possible_upgrades(save, stock_size):
-    set_upgrades = {"speed", "vul_res", "grip_factor", "teleport", "poison pill"}
+    set_upgrades = {"speed", "vul_res", "grip_factor", "teleport", "poison pill", "piggy_bank"}
     # 2 upgrades + 1 persistent offer.
     if save.has_bomb_ability:
         set_upgrades.update({"bomb amount", "bomb range"})
@@ -84,14 +164,15 @@ def get_possible_upgrades(save, stock_size):
 def get_shop_inventory(save, stock_size):
     price_table = {
         "speed": 100,
-        "vul_res": 1,
-        "grip_factor": 1,
-        "bomb amount": 1,
-        "bomb range": 1,
-        "fireball ammo": 1,
-        "fireball speed": 1,
-        "teleport": 1,
-        "poison pill": 1
+        "vul_res": 10,
+        "grip_factor": 10,
+        "bomb amount": 10,
+        "bomb range": 10,
+        "fireball ammo": 10,
+        "fireball speed": 10,
+        "teleport": 10,
+        "poison pill": 10,
+        "piggy_bank":200
     }
     offer_list = get_possible_upgrades(save, stock_size)
     for i in range(stock_size):
@@ -113,7 +194,8 @@ def go_shopping(screen_width, screen_height, save):
         "fireball ammo": "fireball_box.png",
         "fireball speed": "fireball_speed_box.png",
         "teleport": "teleport.png",
-        "poison pill": "Poison_Pill.png"
+        "poison pill": "Poison_Pill.png",
+        "piggy_bank": "Piggy_Bank.png"
     }
 
     tempo = 0
@@ -139,12 +221,12 @@ def go_shopping(screen_width, screen_height, save):
     enter_pressed = False
     right_pressed = False
     left_pressed = False
-    song_start = "Assets/Music/Shop_Start.mp3"
+    song_start = "Assets/Music/Shop_Start.ogg"
     bgm_start = Sound(song_start)
     bgm_start.set_volume(save.BGM_vol * save.Master_vol)
     bgm_start.set_repeat(False)
     bgm_start.play()
-    song_loop = "Assets/Music/Shop_Loop.mp3"
+    song_loop = "Assets/Music/Shop_Loop.ogg"
     bgm_loop = Sound(song_loop)
     bgm_loop.set_volume(save.BGM_vol * save.Master_vol)
     bgm_loop.set_repeat(True)
@@ -352,7 +434,7 @@ def go_shopping(screen_width, screen_height, save):
             if in_dialogue and chat_depth == 3:
                 item_selected = shop_inventory[upgrade_selection][0]
                 item_cost = shop_inventory[upgrade_selection][1]
-                if item_cost <= save.credits:
+                if item_cost <= save.credits and can_purchase(save, shop_inventory, upgrade_selection):
                     confirm_sound.play()
                     purchase_item(shop_inventory[upgrade_selection], save)
                 else:
