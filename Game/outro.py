@@ -22,6 +22,7 @@ def play_outro():
     sair = False
 
     pacman_dt = 3
+    escolheu_pacman_dt = True
     pacman_timer = 0
 
     som_pacman_morte = Sound("Assets\SFX\PacmanDeath.ogg")
@@ -32,6 +33,10 @@ def play_outro():
 
         dt = janela.delta_time()
 
+        if not escolheu_pacman_dt:
+            pacman_dt = random.randint(2, 5)
+            escolheu_pacman_dt = True
+            
         pacman_timer += dt
         
         # movimenta as estrelas
@@ -68,6 +73,7 @@ def play_outro():
 
         # ejeta um pacman de algum lugar da nave
         if pacman_timer > pacman_dt:
+            escolheu_pacman_dt = False
             pacman = Sprite("Assets\Sprites\Characters\pacman_movimento_e_morte.png", 22)
             x = random.randint(int(nave.x), int(nave.x + nave.width))
             y = random.randint(int(nave.y), int(nave.y + nave.height))
