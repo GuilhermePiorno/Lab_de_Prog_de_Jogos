@@ -26,11 +26,11 @@ def open_options(screen_width, screen_height, save):
 
 
     # SFX init.
-    sfx_select = Sound('Assets/SFX/Select_0.wav')
+    sfx_select = Sound('Assets/SFX/Select_0.ogg')
     sfx_select.set_volume(save.SFX_vol)
-    sfx_confirm = Sound('Assets/SFX/Confirm_0.wav')
+    sfx_confirm = Sound('Assets/SFX/Confirm_0.ogg')
     sfx_confirm.set_volume(save.SFX_vol)
-    sfx_cancel = Sound('Assets/SFX/Cancel_0.wav')
+    sfx_cancel = Sound('Assets/SFX/Cancel_0.ogg')
     sfx_cancel.set_volume(save.SFX_vol)
 
     # Text init.
@@ -150,7 +150,7 @@ def open_options(screen_width, screen_height, save):
                         # volta nav_level para a "coluna" da opção, como 'back' está sempre na coluna zero. nav_level = 0
                         nav_level = options_items[nav_level].index(options_items[nav_level][option_item_select])
                     else:
-                        save.write_save_to_file()
+                        save.write_save_to_file() # escreve save em arquivo ao retornar ao menu.
                         return ["menu", save]
                 if options_items[nav_level][option_item_select] == "Volume":
                     sfx_confirm.play()
@@ -185,7 +185,7 @@ def open_options(screen_width, screen_height, save):
                         option_item_select = 0  # retorna cursor para a primeira opção
                         nav_level = 0  # Volta ao inicio do options (pode ser feito porque nenhum menu tem mais de 1 de profundidade)
                     else:
-                        save.write_save_to_file()
+                        save.write_save_to_file() # escreve save em arquivo ao retornar ao menu via "esc"
                         return ["menu", save]
 
         if not teclado.key_pressed(last_input):

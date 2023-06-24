@@ -49,7 +49,7 @@ def play_intro(screen_width, screen_height, save):
     actor_list.append(ship)
 
     # Music
-    song = "Assets/Music/FTL - Lanius (Explore).mp3"
+    song = "Assets/Music/FTL - Lanius (Explore).ogg"
     bgm = Sound(song)
     print(f"\nPlaying: {song[13:len(song) - 4]} \n")
     bgm.set_volume(50)

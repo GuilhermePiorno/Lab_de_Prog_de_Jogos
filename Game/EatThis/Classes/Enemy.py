@@ -315,6 +315,6 @@ class Enemy(Sprite):
         return ((self.matrix_coordinates[0] - tupla[0]) ** 2 + (self.matrix_coordinates[1] - tupla[1]) ** 2)**0.5
 
     def death_rattle(self):
-        DeathCry = Sound("Assets/SFX/PacmanDeath.mp3")
+        DeathCry = Sound("Assets/SFX/PacmanDeath.ogg")
         DeathCry.set_volume(self.save.SFX_vol * self.save.Master_vol)
         DeathCry.play()
