@@ -23,7 +23,7 @@ def play_outro():
 
     pacman_dt = 3
     escolheu_pacman_dt = True
-    pacman_timer = 0
+    pacman_timer_ejecao = 0
 
     som_pacman_morte = Sound("Assets\SFX\PacmanDeath.ogg")
 
@@ -32,12 +32,13 @@ def play_outro():
     while True:
 
         dt = janela.delta_time()
-
+        
+        # usado para adicionar aleatoriedade nos intervalos entre ejeções de pacmans
         if not escolheu_pacman_dt:
             pacman_dt = random.randint(2, 5)
             escolheu_pacman_dt = True
-            
-        pacman_timer += dt
+
+        pacman_timer_ejecao += dt
         
         # movimenta as estrelas
         for estrela in estrelas:
@@ -62,6 +63,7 @@ def play_outro():
             if teclado.key_pressed("DOWN"):
                 nave.y += velocidade_nave * dt
         else:
+            # após a nave chegar ao meio da tela, se espaço for pressionado a nave irá sair da tela pela extremidade direita
             if teclado.key_pressed("SPACE"):
                 sair = True
 
@@ -72,7 +74,7 @@ def play_outro():
             janela.close()
 
         # ejeta um pacman de algum lugar da nave
-        if pacman_timer > pacman_dt:
+        if pacman_timer_ejecao > pacman_dt:
             escolheu_pacman_dt = False
             pacman = Sprite("Assets\Sprites\Characters\pacman_movimento_e_morte.png", 22)
             x = random.randint(int(nave.x), int(nave.x + nave.width))
@@ -83,7 +85,7 @@ def play_outro():
             vy = random.randint(-500, 500)
             pacmans_ejetados.append([pacman, vx, vy])
             som_pacman_morte.play()
-            pacman_timer = 0
+            pacman_timer_ejecao = 0
 
         # movimenta os pacmans ejetados
         for pacman in pacmans_ejetados:
