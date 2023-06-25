@@ -12,53 +12,55 @@ def can_purchase(save, shop_inventory, selection):
         "bomb amount": 9,
         "bomb range": 9,
         "fireball ammo": 9,
-        "fireball speed": 9,
+        "fireball speed": 0.5,
         "teleport": 1,
         "poison pill": 1,
-        "piggy_bank": 0.5
+        "piggy_bank": 0.5,
+        "bullet_time": 1,
+        "reverse_states": 5
     }
 
     attribute = shop_inventory[selection][0]
     max_values = upgrade_ceiling[attribute]
 
     if attribute == "speed":
-        if save.speed_upgrade < 5:
+        if save.speed_upgrade < max_values:
             return True
         else:
             return False
 
     if attribute == "vul_res":
-        if save.vuln_res < 0.5:
+        if save.vuln_res < max_values:
             return True
         else:
             return False
 
     if attribute == "grip_factor":
-        if save.grip_factor < 5:
+        if save.grip_factor < max_values:
             return True
         else:
             return False
 
     if attribute == "bomb amount":
-        if save.max_bombs < 9:
+        if save.max_bombs < max_values:
             return True
         else:
             return False
 
     if attribute == "bomb range":
-        if save.bomb_range_upgrade < 9:
+        if save.bomb_range_upgrade < max_values:
             return True
         else:
             return False
 
     if attribute == "fireball ammo":
-        if save.fireball_ammo < 9:
+        if save.fireball_ammo < max_values:
             return True
         else:
             return False
 
     if attribute == "fireball speed":
-        if save.fireball_mult_spd < 9:
+        if save.fireball_mult_spd < max_values:
             return True
         else:
             return False
@@ -76,7 +78,19 @@ def can_purchase(save, shop_inventory, selection):
             return False
 
     if attribute == "piggy_bank":
-        if not save.piggy_bank:
+        if save.piggy_bank < max_values:
+            return True
+        else:
+            return False
+
+    if attribute == "bullet_time":
+        if save.has_bullet_time < max_values:
+            return True
+        else:
+            return False
+
+    if attribute == "reverse_states":
+        if save.reverse_state < max_values:
             return True
         else:
             return False
@@ -106,6 +120,10 @@ def purchase_item(item, save):
         save.has_poison_pill = 1
     elif name == "piggy_bank":
         save.piggy_bank += 0.1
+    elif name == "bullet_time":
+        save.has_bullet_time = 1
+    elif name == "reverse_states":
+        save.reverse_state += 1
 
 
 def measure_longest_message(msg, font_name='Assets/Fonts/MinimalPixel v2.ttf', size=24):
@@ -145,7 +163,7 @@ def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.tt
 
 
 def get_possible_upgrades(save, stock_size):
-    set_upgrades = {"speed", "vul_res", "grip_factor", "teleport", "poison pill", "piggy_bank"}
+    set_upgrades = {"speed", "vul_res", "grip_factor", "teleport", "poison pill", "piggy_bank", "bullet_time", "reverse_states"}
     # 2 upgrades + 1 persistent offer.
     if save.has_bomb_ability:
         set_upgrades.update({"bomb amount", "bomb range"})
@@ -172,7 +190,9 @@ def get_shop_inventory(save, stock_size):
         "fireball speed": 10,
         "teleport": 10,
         "poison pill": 10,
-        "piggy_bank":200
+        "piggy_bank":200,
+        "bullet_time":100,
+        "reverse_states": 300
     }
     offer_list = get_possible_upgrades(save, stock_size)
     for i in range(stock_size):
@@ -183,7 +203,7 @@ def get_shop_inventory(save, stock_size):
 
 def go_shopping(screen_width, screen_height, save):
     font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 24)
-    offer_qty = 3
+    offer_qty = 4 # stock size
     shop_inventory = get_shop_inventory(save, offer_qty)
     image_correspondence = {
         "speed": "speed_up.png",
@@ -195,7 +215,9 @@ def go_shopping(screen_width, screen_height, save):
         "fireball speed": "fireball_speed_box.png",
         "teleport": "teleport.png",
         "poison pill": "Poison_Pill.png",
-        "piggy_bank": "Piggy_Bank.png"
+        "piggy_bank": "Piggy_Bank.png",
+        "bullet_time": "bullet_time_box.png",
+        "reverse_states": "reverse_states0.png"
     }
 
     tempo = 0
@@ -203,10 +225,8 @@ def go_shopping(screen_width, screen_height, save):
     print_char_count = 0
     text_speed = 50  # character per second
     base_speed = 300
-    is_done_printing = False
     janela = Window(screen_width, screen_height)
     janela.set_title("Shop Time!")
-    active_message = 0
     messages = [
         ["The quick brown fox jumps over the lazy dog.", "The slow black dog bows before the regal fox.", "Get it?."],
         ["I'm the shopkeeper. I sell stuff.", "You buy stuff.", "Simple as that.", "I'm not a very good shopkeeper."],

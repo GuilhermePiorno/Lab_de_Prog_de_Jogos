@@ -33,4 +33,8 @@ janela.close()
 
 
 # TODO: fazer spawn do player pelo portal esquerdo, fazer spawn de "reinforcements" do portal mais distante, fazer spawn da "cadeia".
-# TODO: fazer contagem de dinheiro e armazenamento no save.
+# TODO: poder de reversão de vulnerabilidade
+# TODO: poder de bullet time
+# TODO: venda de upgrades restantes
+# TODO: adicionar descrição dos itens (texto que aparece abaixo do item ao comprar)
+# TODO: deixar fireballs atravessar pacmans em processo de morte

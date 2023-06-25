@@ -36,6 +36,31 @@ def play_game(screen_width, screen_height, save):
                  "Curved_20_Orange", "Curved_20_White",
                  "Curved_20_Green"]
 
+    keybindings = ["Q", "W", "E", "R", "A", "S", "D", "F", "SPACE"]
+
+    key1 = keybindings[0] # default: Q -> bomba
+    key1_state = False
+    key2 = keybindings[1] # default: W -> poison pill
+    key2_state = False
+    key3 = keybindings[2] # default: E -> teleport
+    key3_state = False
+    key4 = keybindings[3] # default: R -> bullet time
+    key4_state = False
+
+    key5 = keybindings[4] # default: A
+    key5_state = False
+    key6 = keybindings[5] # default: S
+    key6_state = False
+    key7 = keybindings[6] # default: D
+    key7_state = False
+    key8 = keybindings[7] # default: F
+    key8_state = False
+
+    key9 = keybindings[8] # default: SPACE -> fireball
+    key9_state = False
+
+
+
     # Gera um indice de cor diferente por fase
     aux = 1
     while aux == 1 or aux == 3:
@@ -50,23 +75,21 @@ def play_game(screen_width, screen_height, save):
     grid_toggle = False
     new_map = False
     bgm_toggle = True
-    bullet_time = False
-    toggle_mood = False
     toggle_vulnerability = False
 
     # Variáveis do jogo.
     level_start = True
     level_clock = 0
-    pause = False
+    bullet_time_active = False
+    bullet_time_cooldown_clock = -save.bullet_time_cooldown
+    bullet_time_duration_clock = -save.bullet_time_duration
     time_ratio = 1
+    pause = False
     shots_list = []
-    shots_list_max_len = 5
-    enemies_list = []
     traps_list = []
     bombs_list = []
     blasts_list = []
     level_finished = False
-    tp_button = False
 
     # Variáveis que impactam dificuldade.
     powerups_no = save.stage_no - 1
@@ -146,7 +169,6 @@ def play_game(screen_width, screen_height, save):
     FPS = 0
     tempo = 0
     cont = 0
-    x_state = False
 
     cheat_toggle_aux = False
     cheat_toggle = False
@@ -274,8 +296,26 @@ def play_game(screen_width, screen_height, save):
         if save.piggy_bank != 0:
             piggy_bank_icon = Sprite("Assets/Sprites/UI Icons/Piggy_Bank.png")
             piggy_bank_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            piggy_bank_level = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            piggy_bank_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            piggy_bank_level.set_curr_frame(1 + save.piggy_bank//0.1)
             upgrade_draw_list.append(piggy_bank_icon)
-            upgrade_draw_list.append(piggy_bank_icon)
+            upgrade_draw_list.append(piggy_bank_level)
+
+        if save.has_bullet_time != 0:
+            bullet_time_icon = Sprite("Assets/Sprites/UI Icons/bullet_time_box.png")
+            bullet_time_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(bullet_time_icon)
+            upgrade_draw_list.append(bullet_time_icon)
+
+        if save.reverse_state != 0:
+            reverse_icon = Sprite("Assets/Sprites/UI Icons/reverse_states0.png")
+            reverse_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            reverse_amount_icon = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            reverse_amount_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            reverse_amount_icon.set_curr_frame(save.reverse_state)
+            upgrade_draw_list.append(reverse_icon)
+            upgrade_draw_list.append(reverse_amount_icon)
 
         # <============================================================ DEBUG AREA START
         # cheat enable/diable
@@ -417,12 +457,10 @@ def play_game(screen_width, screen_height, save):
 
         # Se nada tiver sido pressionado, checa inputs.
         if not just_pressed:
-            bullet_time = var_toggle(bullet_time, "B", teclado)
             bgm_toggle = var_toggle(bgm_toggle, "M", teclado)
             pause = var_toggle(pause, "P", teclado)
             grid_toggle = var_toggle(grid_toggle, "G", teclado)
             new_map = var_toggle(new_map, "N", teclado)
-            toggle_mood = var_toggle(toggle_mood, "T", teclado)
             toggle_vulnerability = var_toggle(toggle_vulnerability, "V", teclado)
             # shot_fireball = var_toggle(shot_fireball, "SPACE", teclado)
 
@@ -430,13 +468,6 @@ def play_game(screen_width, screen_height, save):
         # variável = valor_se_sim if condicao else valor_se_nao.
         bgm.unpause() if bgm_toggle else bgm.pause()  # ---DEBUG------> M
 
-        change_state = time_ratio
-        time_ratio = 0.2 if bullet_time else 1  # ---DEBUG------> B
-        if change_state != time_ratio:
-            # 0.2//1 = 0 ou 1//1 = 1, ou seja, alterna entre som de SlowMotionIn ou SlowMotionOut.
-            slowmo[int(time_ratio // 1)].play()
-            bgm.set_volume(save.BGM_vol * save.Master_vol * time_ratio)
-            # print(pacman.distance_list)
 
         if grid_toggle:  # ---DEBUG------> G
             wall_select += 1
@@ -476,8 +507,6 @@ def play_game(screen_width, screen_height, save):
 
             new_map = False
 
-        if toggle_mood:  # ---DEBUG------> T
-            pass
 
         if toggle_vulnerability:  # ---DEBUG------> V
             blinky.change_state()
@@ -485,30 +514,154 @@ def play_game(screen_width, screen_height, save):
             toggle_vulnerability = not toggle_vulnerability
 
         # Atualiza caso algo tenha sido pressionado.
-        just_pressed = check_keys(teclado, "B", "G", "M", "N", "P", "T", "V")
+        just_pressed = check_keys(teclado, "G", "M", "N", "P", "V")
         # <============================================================ DEBUG AREA END
 
+        # Atualiza flag para saida da fase.
         blinky_out = level_finished and blinky.matrix_coordinates == (15, 27) and blinky.vx > 0
 
         # Atualiza buffer de inputs
         blinky.buffer += dt
         blinky.shot_timer += dt
+
+        # Movimento dos de inimigos e jogador condicionados por pause, entrada e saída de fase.
         if not pause and not level_start and not blinky_out:
+            # Atualiza posição do player
             blinky.move1()
             blinky.x += blinky.vx * dt
             blinky.y += blinky.vy * dt
             blinky.update()
 
+            # Atualiza posição do pacman
             for pacman in enemies_list:
                 pacman.move1(blinky)
                 pacman.x += pacman.vx * dt * time_ratio
                 pacman.y += pacman.vy * dt * time_ratio
                 pacman.update()
-            # TODO: quando colado numa parede é possivel atirar para fora da fase e o jogo crasha (sem resolvido com verificação de velocidade, testar mais)
-            # TODO: Blinky crasha ao jogo se atirar em direção do portal direito.
-            # if teclado.key_pressed("SPACE") and save.has_fireball_ability and blinky.facing != 'AFK' and (len(shots_list) < shots_list_max_len):
+
+            # Remove pacman da lista de inimigos caso morto
+            for pacman in enemies_list:
+                if pacman.is_dead:
+                    enemies_list.remove(pacman)
+
+            # Mata pacman caso seja tocado enquanto vulneravel ou em transição de estados.
+            for enemy in enemies_list:
+                if (blinky.state == "vulnerable" or blinky.state == "transition") and (
+                        blinky.get_matrix_coordinates() == enemy.get_matrix_coordinates()) and not blinky.is_dead and not enemy.is_dying:
+                    blinky.is_dead = True
+
+            # ===Abilidade Bomb, key1===================================================================================
+            if teclado.key_pressed(key1) and save.has_bomb_ability and not key1_state and len(bombs_list) < save.max_bombs:
+                key1_state = True
+                bomb = Bomb("Assets/Sprites/VFX/Bomb_Animated.png", maze, blinky, save.bomb_range_upgrade)
+                bomb.set_sequence_time(0, 4, 1000, True)
+                bombs_list.append(bomb)
+            if not teclado.key_pressed(key1):
+                key1_state = False
+
+            # Atualiza timer da bomba.
+            for bomb in bombs_list:
+                bomb.timer += dt
+
+            # Executa método explosão ao compara timers.
+            for bomb in bombs_list:
+                if bomb.timer > bomb.explode_time:
+                    blasts_list = bomb.explode()
+
+            # Coloca inimigos em estado de "morto" caso haja colisão com explosão.
+            for enemy in enemies_list:
+                for blast in blasts_list:
+                    if blast.collided(enemy):
+                        enemy.die()
+
+            # Causa morte do player caso colida com explosão.
+            for blast in blasts_list:
+                if blinky.collided(blast):
+                    blinky.is_dead = True
+
+            # Remove explosão da lista de explosões caso o tempo de animação já tenha ocorrido.
+            for blast in blasts_list:
+                if (time() - blast.creation_instant) > blast.delta_time:
+                    blasts_list.remove(blast)
+
+            # Remove bomba da lista caso já tenha explodido.
+            for bomb in bombs_list:
+                if bomb.exploded:
+                    bombs_list.remove(bomb)
+
+            # ===Abilidade Poison Pill, key2============================================================================
+            if teclado.key_pressed(key2) and not key2_state and len(traps_list) < 1 and save.has_poison_pill:
+                key2_state = True
+                trap = Trap("Assets/Sprites/PickUps/Poison_Pill_Animated.png", blinky, 2)
+                trap.set_sequence_time(0, 2, 1000, True)
+                traps_list.append(trap)
+            if not teclado.key_pressed(key2):
+                key2_state = False
+
+            # Causa morte do inimigo ao tocar na pílula
+            for trap in traps_list:
+                for enemy in enemies_list:
+                    if trap.collided(enemy) and not enemy.is_dead:
+                        enemy.die()
+                        trap.was_eaten = True
+
+            # Remove a pílula/trap ao ser "comida".
+            for trap in traps_list:
+                if trap.was_eaten:
+                    traps_list.remove(trap)
+
+            # ===Abilidade Teleporte, key3==============================================================================
+            if not key3_state and teclado.key_pressed(key3) and save.has_teleport:
+                key3_state = True
+                if not blinky.teleport_able:
+                    teleport_sprite = Sprite("Assets\Sprites\Characters\Blinky_holo.png", 29)
+                    teleport_sprite.set_sequence_time(0, 29, 30, True)
+                    teleport_sprite.set_position(blinky.x, blinky.y)
+                    teleport_sprite.update()
+                    teleport_sprite.draw()
+                else:
+                    blinky.set_position(teleport_sprite.x - blinky.width / 2 + teleport_sprite.width / 2,
+                                        teleport_sprite.y - blinky.height / 2 + teleport_sprite.height / 2)
+                blinky.teleport_able = not blinky.teleport_able
+
+            if not teclado.key_pressed(key3):
+                key3_state = False
+
+            # ===Abilidade Bullet-Time, key4============================================================================
+            BT_CoolDown_Elapsed = level_clock - bullet_time_cooldown_clock
+
+            if not key4_state and teclado.key_pressed(key4) and BT_CoolDown_Elapsed > save.bullet_time_cooldown and save.has_bullet_time:
+                bullet_time_cooldown_clock = level_clock
+                bullet_time_duration_clock = level_clock
+                slowmo[0].play()
+                bullet_time_active = True
+                time_ratio = 0.2
+
+
+            BT_Time_Elapsed = level_clock -  bullet_time_duration_clock
+
+            if BT_Time_Elapsed > save.bullet_time_duration and bullet_time_active:
+                time_ratio = 1
+                slowmo[1].play()
+                bullet_time_active = False
+
+            if not teclado.key_pressed(key4):
+                key4_state = False
+
+            # ===Reverse States, key5===================================================================================
+            if not key5_state and teclado.key_pressed(key5) and save.reverse_state > 0:
+                key5_state = True
+                blinky.change_state()
+                save.reverse_state -= 1
+
+
+            if not teclado.key_pressed(key5):
+                key5_state = False
+
+            # ===Abilidade Fireball, key9===============================================================================
+            # Verificação de condições para tiro.
             if teclado.key_pressed(
-                    "SPACE") and save.has_fireball_ability and blinky.facing != 'AFK' and save.fireball_ammo > 0 and (
+                    key9) and save.has_fireball_ability and blinky.facing != 'AFK' and save.fireball_ammo > 0 and (
                     blinky.vx != 0 or blinky.vy != 0):
                 if blinky.shot_timer > blinky.reload_time:
                     blinky.shot_timer = 0
@@ -516,96 +669,29 @@ def play_game(screen_width, screen_height, save):
                     shots_list.append(shot)
                     save.fireball_ammo -= 1
 
+            # Atualiza posição dos tiros e executa métodos de atualização do estado de colisão.
             for shot in shots_list:
                 shot.x += shot.vx * save.fireball_mult_spd * dt
                 shot.y += shot.vy * save.fireball_mult_spd * dt
                 shot.check_collision_with_wall()
                 shot.check_inside_maze_boundary()
 
+            # Coloca inimigos em estado de "morto" caso haja colisão.
             for shot in shots_list:
                 for enemy in enemies_list:
-                    if shot.collided(enemy) and not enemy.is_dead:
+                    if shot.collided(enemy) and not enemy.is_dead and not enemy.is_dying:
                         enemy.die()
                         shot.hit_enemy = True
 
+            # Remove tiros caso colidam com parede ou inimigos.
             for shot in shots_list:
                 if shot.hit_enemy or shot.hit_wall or shot.out_of_bounds:
                     shots_list.remove(shot)
 
-            if teclado.key_pressed("A") and len(traps_list) < 1 and save.has_poison_pill:
-                trap = Trap("Assets/Sprites/PickUps/trap_20_108_196_98.png", blinky)
-                traps_list.append(trap)
 
-            if teclado.key_pressed("X") and save.has_bomb_ability and not x_state and len(bombs_list) < save.max_bombs:
-                x_state = True
-                bomb = Bomb("Assets/Sprites/VFX/Bomb_Animated.png", maze, blinky, save.bomb_range_upgrade)
-                bomb.set_sequence_time(0, 4, 1000, True)
-                bombs_list.append(bomb)
-            if not teclado.key_pressed("X"):
-                x_state = False
 
-            for bomb in bombs_list:
-                bomb.timer += dt
 
-            for bomb in bombs_list:
-                if bomb.timer > bomb.explode_time:
-                    blasts_list = bomb.explode()
-
-            for enemy in enemies_list:
-                for blast in blasts_list:
-                    if blast.collided(enemy):
-                        enemy.die()
-
-            for blast in blasts_list:
-                if blinky.collided(blast):
-                    blinky.is_dead = True
-
-            for blast in blasts_list:
-                if blinky.collided(blast):
-                    blinky.is_dead = True
-
-            for blast in blasts_list:
-                if (time() - blast.creation_instant) > blast.delta_time:
-                    blasts_list.remove(blast)
-
-            for bomb in bombs_list:
-                if bomb.exploded:
-                    bombs_list.remove(bomb)
-
-            for trap in traps_list:
-                for enemy in enemies_list:
-                    if trap.collided(enemy) and not enemy.is_dead:
-                        enemy.die()
-                        trap.was_eaten = True
-
-            for trap in traps_list:
-                if trap.was_eaten:
-                    traps_list.remove(trap)
-
-            for pacman in enemies_list:
-                if pacman.is_dead:
-                    enemies_list.remove(pacman)
-
-            if not teclado.key_pressed("T"):
-                tp_button = False
-
-            if not tp_button and teclado.key_pressed("T") and save.has_teleport:
-                tp_button = True
-                if not blinky.teleport_able:
-                    teleport_sprite = Sprite("Assets\Sprites\Characters\Blinky_transparente.png")
-                    teleport_sprite.set_position(blinky.x, blinky.y)
-                    teleport_sprite.draw()
-                else:
-                    blinky.set_position(teleport_sprite.x - blinky.width / 2 + teleport_sprite.width / 2,
-                                        teleport_sprite.y - blinky.height / 2 + teleport_sprite.height / 2)
-                blinky.teleport_able = not blinky.teleport_able
-
-            for enemy in enemies_list:
-                if (blinky.state == "vulnerable" or blinky.state == "transition") and (
-                        blinky.get_matrix_coordinates() == enemy.get_matrix_coordinates()) and not blinky.is_dead:
-                    blinky.is_dead = True
-
-        # Displays and updates player credits at the end of the level.
+        # Displays and updates player credits amount at the end of the level.
         if len(enemies_list) == 0 and not level_finished:
             level_finished = True
             save.stage_no += 1
@@ -640,7 +726,7 @@ def play_game(screen_width, screen_height, save):
         else:
             blinky.draw()
 
-        # Blinky is hidden, Fake_Blinky walks out thought portal and screen fades to black.
+        # Exit level:Blinky is hidden, Fake_Blinky walks out thought portal and screen fades to black.
         if blinky_out:
             blackout.play()
             fake_blinky.x += 25 * dt
@@ -663,6 +749,7 @@ def play_game(screen_width, screen_height, save):
             shot.draw()
             shot.update()
         for trap in traps_list:
+            trap.update()
             trap.draw()
         for bomb in bombs_list:
             bomb.draw()
@@ -673,6 +760,7 @@ def play_game(screen_width, screen_height, save):
             blast.update()
 
         if blinky.teleport_able:
+            teleport_sprite.update()
             teleport_sprite.draw()
 
         for item in upgrade_draw_list:
@@ -697,12 +785,16 @@ def play_game(screen_width, screen_height, save):
 
         janela.update()
 
-        # morte do blinky
+        # Game over: morte do blinky
         if blinky.is_dead or (len(maze.list_of_points) == 0):
-            save.stage_no = 1
-            temp_wallet = int(save.piggy_bank * save.credits)
-            save.reset_save_data()
-            save.credits = temp_wallet
+            # Reseta save.
+            save.soft_reset_save_data()
+
+            # Carrega upgrades permanentes.
+            save.credits = int(save.piggy_bank * save.credits)
+
+            # Salva em arquivo as informações.
+            save.write_save_to_file()
             bgm.stop()
             blinky.hide()
             dead_blinky = Sprite("Assets/Sprites/Characters/blinky_morto.png", 1)
