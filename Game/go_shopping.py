@@ -163,8 +163,16 @@ def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.tt
 
 
 def get_possible_upgrades(save, stock_size):
-    set_upgrades = {"speed", "vul_res", "grip_factor", "teleport", "poison pill", "piggy_bank", "bullet_time", "reverse_states"}
-    # 2 upgrades + 1 persistent offer.
+    set_upgrades = {"speed",
+                    "vul_res",
+                    "grip_factor",
+                    "teleport",
+                    "poison pill",
+                    "piggy_bank",
+                    "bullet_time",
+                    "reverse_states",
+                    }
+
     if save.has_bomb_ability:
         set_upgrades.update({"bomb amount", "bomb range"})
     if save.has_fireball_ability:
@@ -510,6 +518,124 @@ def go_shopping(screen_width, screen_height, save):
             tic = tempo  # reseta referencial.
             print_char_count += 1
 
+        # ==============================================================================================================
+        # UPGRADE ICONS
+        upgrade_draw_list = []
+
+        if save.speed_upgrade > 0:
+            speed_increase_icon = Sprite("Assets/Sprites/UI Icons/speed_up.png")
+            speed_increase_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            speed_increase_level = Sprite("Assets/Sprites/UI Icons/amount_box_black_and_white_borders.png", 10)
+            speed_increase_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            speed_increase_level.set_curr_frame(save.speed_upgrade)
+            upgrade_draw_list.append(speed_increase_icon)
+            upgrade_draw_list.append(speed_increase_level)
+
+        if save.has_shoes:
+            boots = Sprite("Assets/Sprites/UI Icons/boots_box.png")
+            boots.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(boots)
+            upgrade_draw_list.append(boots)
+
+        if 1 < save.grip_factor < 99:
+            grip_icon = Sprite("Assets/Sprites/UI Icons/boots_spiked_box.png")
+            grip_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            grip_level_icon = Sprite("Assets/Sprites/UI Icons/amount_box_up.png", 10)
+            grip_level_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            grip_level_icon.set_curr_frame((save.grip_factor - 1) // 0.5)
+            upgrade_draw_list.append(grip_icon)
+            upgrade_draw_list.append(grip_level_icon)
+        elif save.grip_factor == 100:
+            grip_icon = Sprite("Assets/Sprites/UI Icons/golden_boots_spiked_box.png")
+            grip_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            grip_level_icon = Sprite("Assets/Sprites/UI Icons/amount_box_max.png", 2)
+            grip_level_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            grip_level_icon.set_curr_frame(1)
+            upgrade_draw_list.append(grip_icon)
+            upgrade_draw_list.append(grip_level_icon)
+
+        if save.has_bomb_ability:
+            # bomb enable icon
+            bomb_box = Sprite("Assets/Sprites/UI Icons/bomb_box.png")
+            bomb_box.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            # bomb max quantity
+            bomb_amount = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            bomb_amount.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            bomb_amount.set_curr_frame(save.max_bombs)
+            upgrade_draw_list.append(bomb_box)
+            upgrade_draw_list.append(bomb_amount)
+            b_range = Sprite("Assets/Sprites/UI Icons/bomb_upgrade_box.png")
+            b_range.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            b_range_level = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            b_range_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            b_range_level.set_curr_frame(save.bomb_range_upgrade + 1)
+            upgrade_draw_list.append(b_range)
+            upgrade_draw_list.append(b_range_level)
+
+        if save.has_fireball_ability:
+            fireball_icon = Sprite("Assets/Sprites/UI Icons/fireball_box.png")
+            fireball_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            fireball_ammo = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            fireball_ammo.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            fireball_ammo.set_curr_frame(save.fireball_ammo)
+            upgrade_draw_list.append(fireball_icon)
+            upgrade_draw_list.append(fireball_ammo)
+
+        if save.fireball_mult_spd > 1:
+            fireball_spd_icon = Sprite("Assets/Sprites/UI Icons/fireball_speed_box.png")
+            fireball_spd_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            fireball_spd_level = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            fireball_spd_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            fireball_spd_level.set_curr_frame((save.fireball_mult_spd - 1) // 0.1)
+            upgrade_draw_list.append(fireball_spd_icon)
+            upgrade_draw_list.append(fireball_spd_level)
+
+        if save.vuln_res != 0:
+            vulnerability_res = Sprite("Assets/Sprites/UI Icons/vulnerability_res2.png")
+            vulnerability_res.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            resistance_level = Sprite("Assets/Sprites/UI Icons/amount_box_down.png", 10)
+            resistance_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            resistance_level.set_curr_frame(save.vuln_res * 10)
+            upgrade_draw_list.append(vulnerability_res)
+            upgrade_draw_list.append(resistance_level)
+
+        if save.has_poison_pill != 0:
+            poison_pill = Sprite("Assets/Sprites/UI Icons/Poison_Pill.png")
+            poison_pill.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(poison_pill)
+            upgrade_draw_list.append(poison_pill)
+
+        if save.has_teleport != 0:
+            teleport_ability = Sprite("Assets/Sprites/UI Icons/teleport.png")
+            teleport_ability.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(teleport_ability)
+            upgrade_draw_list.append(teleport_ability)
+
+        if save.piggy_bank != 0:
+            piggy_bank_icon = Sprite("Assets/Sprites/UI Icons/Piggy_Bank.png")
+            piggy_bank_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            piggy_bank_level = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            piggy_bank_level.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            piggy_bank_level.set_curr_frame(1 + save.piggy_bank // 0.1)
+            upgrade_draw_list.append(piggy_bank_icon)
+            upgrade_draw_list.append(piggy_bank_level)
+
+        if save.has_bullet_time != 0:
+            bullet_time_icon = Sprite("Assets/Sprites/UI Icons/bullet_time_box.png")
+            bullet_time_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            upgrade_draw_list.append(bullet_time_icon)
+            upgrade_draw_list.append(bullet_time_icon)
+
+        if save.reverse_state != 0:
+            reverse_icon = Sprite("Assets/Sprites/UI Icons/reverse_states0.png")
+            reverse_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            reverse_amount_icon = Sprite("Assets/Sprites/UI Icons/amount_box.png", 10)
+            reverse_amount_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            reverse_amount_icon.set_curr_frame(save.reverse_state)
+            upgrade_draw_list.append(reverse_icon)
+            upgrade_draw_list.append(reverse_amount_icon)
+        # ==============================================================================================================
+
         # Set Screen Boundries
         if blinky.x <= 0:
             blinky.x = 0
@@ -571,9 +697,27 @@ def go_shopping(screen_width, screen_height, save):
         text_box.update()
         text_box.draw()
 
+        # draw da lista de upgrades
+        for item in upgrade_draw_list:
+            item.draw()
+
         credits_string = f"credits: {save.credits}"
         credits_surface = font.render(credits_string, True, 'white')
         janela.screen.blit(credits_surface, (930, 680))
+        item_descriptions = {
+            "speed": "Aumento de velocidade.",
+            "vul_res": "Reduz tempo de vulnerabildade.",
+            "grip_factor": "Aumenta velocidade de meia-volta.",
+            "bomb amount": "Aumenta quantia máxima de bombas ao mesmo tempo.",
+            "bomb range": "Aumenta alcance das bombas.",
+            "fireball ammo": "+1 para cargas de tiros.",
+            "fireball speed": "Aumento de velocidade do tiro.",
+            "teleport": "Habilidade de teletransporte",
+            "poison pill": "Habilidade de pilula de veneno",
+            "piggy_bank": "Habilidade permanente: Guarda uma parcela dos creditos ao morrer.",
+            "bullet_time": "\"There is no spoon\"",
+            "reverse_states": "Habilidade: Troca imediatamente estado de vulnerabilidade (com cargas)."
+        }
 
         if in_dialogue and not text_box.is_playing():
             if chat_depth == 0:
@@ -596,7 +740,7 @@ def go_shopping(screen_width, screen_height, save):
                 shop_cursor.set_position(300 + 600/(offer_qty-1) * upgrade_selection, 150)
                 shop_cursor.draw()
                 shop_cursor.update()
-                selection_name = f"{shop_inventory[upgrade_selection][0]}"
+                selection_name = f"{item_descriptions[shop_inventory[upgrade_selection][0]]}"
                 surface_select_name = font.render(selection_name, True, 'white')
                 janela.screen.blit(surface_select_name, ((janela.width - surface_select_name.get_width())/2, 220))
 

@@ -1,12 +1,16 @@
 from PPlay.sprite import *
 from PPlay.gameimage import *
 from EatThis.Classes.Point import *
+from PPlay.sound import *
 from copy import deepcopy
 
 
 class Player(Sprite):
     def __init__(self, window, maze, save, image_file, frames=1):
         super().__init__(image_file, frames)
+        self.SFX_vol = save.SFX_vol
+        self.Master_vol = save.Master_vol
+        self.skid_latch = False
         self.state = "invulnerable"
         self.vulnerability_timer = 0
         self.base_vulnerability_time = 2 * (1 - save.vuln_res)
@@ -109,16 +113,23 @@ class Player(Sprite):
             # Movimentos básicos sem meia volta.
             if x_window:
                 if self.cmd == 'd' and can_go_down and self.facing != 'U':
+                    self.skid_latch = False
                     self.cmd = ''
                     self.vx = 0
                     self.vy = self.base_speed
                 if self.cmd == 'u' and can_go_up and self.facing != 'D':
+                    self.skid_latch = False
                     self.cmd = ''
                     self.vx = 0
                     self.vy = -self.base_speed
 
                 # Apenas a meia volta.
                 if self.cmd == 'd' and can_go_down and self.facing == 'U' and self.has_shoes:
+                    skidding = Sound("Assets/SFX/Skidding.ogg")
+                    skidding.set_volume(self.SFX_vol * self.Master_vol)
+                    if not self.skid_latch and self.grip_factor < 4:
+                        self.skid_latch = True
+                        skidding.play()
                     self.cmd = ''
                     if self.vy < self.base_speed:
                         self.vy += self.shoe_grip * self.window.delta_time()
@@ -127,6 +138,11 @@ class Player(Sprite):
                     self.vx = 0
 
                 if self.cmd == 'u' and can_go_up and self.facing == 'D' and self.has_shoes:
+                    skidding = Sound("Assets/SFX/Skidding.ogg")
+                    skidding.set_volume(self.SFX_vol * self.Master_vol)
+                    if not self.skid_latch and self.grip_factor < 4:
+                        self.skid_latch = True
+                        skidding.play()
                     self.cmd = ''
                     if self.vy > -self.base_speed:
                         self.vy -= self.shoe_grip * self.window.delta_time()
@@ -138,17 +154,25 @@ class Player(Sprite):
             if y_window:
                 # Movimentos básicos sem meia volta.
                 if self.cmd == 'r' and can_go_right and self.facing != 'L':
+                    self.skid_latch = False
                     self.cmd = ''
                     self.vx = self.base_speed
                     self.vy = 0
 
                 if self.cmd == 'l' and can_go_left and self.facing != 'R':
+                    self.skid_latch = False
                     self.cmd = ''
                     self.vx = -self.base_speed
                     self.vy = 0
 
+
                 # Apenas a meia volta.
                 if self.cmd == 'r' and can_go_right and self.facing == 'L' and self.has_shoes:
+                    skidding = Sound("Assets/SFX/Skidding.ogg")
+                    skidding.set_volume(self.SFX_vol * self.Master_vol)
+                    if not self.skid_latch and self.grip_factor < 4:
+                        self.skid_latch = True
+                        skidding.play()
                     self.cmd = ''
                     if self.vx < self.base_speed:
                         self.vx += self.shoe_grip * self.window.delta_time()
@@ -157,6 +181,11 @@ class Player(Sprite):
                     self.vy = 0
 
                 if self.cmd == 'l' and can_go_left and self.facing == 'R' and self.has_shoes:
+                    skidding = Sound("Assets/SFX/Skidding.ogg")
+                    skidding.set_volume(self.SFX_vol * self.Master_vol)
+                    if not self.skid_latch and self.grip_factor < 4:
+                        self.skid_latch = True
+                        skidding.play()
                     self.cmd = ''
                     if self.vx > -self.base_speed:
                         self.vx -= self.shoe_grip * self.window.delta_time()

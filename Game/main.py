@@ -59,7 +59,13 @@ def play_game(screen_width, screen_height, save):
     key9 = keybindings[8] # default: SPACE -> fireball
     key9_state = False
 
-
+    # SFX
+    place_bomb = Sound("Assets/SFX/Place Bomb.ogg")
+    place_bomb.set_volume(save.SFX_vol * save.Master_vol)
+    bomb_explodes = Sound("Assets/SFX/Bomb Explodes.ogg")
+    bomb_explodes.set_volume(save.SFX_vol * save.Master_vol)
+    fireball = Sound("Assets/SFX/Shot.ogg")
+    fireball.set_volume(save.SFX_vol * save.Master_vol)
 
     # Gera um indice de cor diferente por fase
     aux = 1
@@ -555,6 +561,7 @@ def play_game(screen_width, screen_height, save):
                 key1_state = True
                 bomb = Bomb("Assets/Sprites/VFX/Bomb_Animated.png", maze, blinky, save.bomb_range_upgrade)
                 bomb.set_sequence_time(0, 4, 1000, True)
+                place_bomb.play()
                 bombs_list.append(bomb)
             if not teclado.key_pressed(key1):
                 key1_state = False
@@ -566,6 +573,7 @@ def play_game(screen_width, screen_height, save):
             # Executa método explosão ao compara timers.
             for bomb in bombs_list:
                 if bomb.timer > bomb.explode_time:
+                    bomb_explodes.play()
                     blasts_list = bomb.explode()
 
             # Coloca inimigos em estado de "morto" caso haja colisão com explosão.
@@ -668,6 +676,7 @@ def play_game(screen_width, screen_height, save):
                     shot = Shot("Assets/Sprites/VFX/blue_fireball_32x32_omni.png", blinky, 8)
                     shots_list.append(shot)
                     save.fireball_ammo -= 1
+                    fireball.play()
 
             # Atualiza posição dos tiros e executa métodos de atualização do estado de colisão.
             for shot in shots_list:

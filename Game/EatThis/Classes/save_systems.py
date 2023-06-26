@@ -25,7 +25,7 @@ class SaveFile:
         self._max_bombs = 1
         self.max_bombs = self._max_bombs
         #   Bomb range
-        self._bomb_range_upgrade = 0
+        self._bomb_range_upgrade = 3
         self.bomb_range_upgrade = self._bomb_range_upgrade
         #   Speed
         self._speed_upgrade = 0
@@ -34,7 +34,7 @@ class SaveFile:
         self._has_fireball_ability = 0
         self.has_fireball_ability = self._has_fireball_ability
         #   Fireball Ammo
-        self._fireball_ammo = 0
+        self._fireball_ammo = 2
         self.fireball_ammo = self._fireball_ammo
         #   Fireball projectile speed
         self._fireball_mult_spd = 1
