@@ -31,7 +31,7 @@ def cockpit_scene():
     blinky.set_sequence_time(0, 2, 100, True)
     blinky.set_position(-blinky.width, janela.height - blinky.height)
 
-    while(not teclado.key_pressed("Q")):
+    while(True):
 
         dt = janela.delta_time()
 
@@ -70,6 +70,9 @@ def cockpit_scene():
         blinky.draw()
         blinky.update()
         janela.update()
+
+        if(teclado.key_pressed("Q")):
+            play_outro()
 
 def play_outro():
     janela = Window(1280, 720)
@@ -180,4 +183,3 @@ def play_outro():
         janela.update()
 
 cockpit_scene()
-play_outro()
