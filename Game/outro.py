@@ -13,7 +13,8 @@ def cockpit_scene():
     teclado = janela.get_keyboard()
 
     cockpit = Sprite("Assets\Sprites\Outro\cockpit_1080_720(1)_sem_janela_3.png", 3)
-    cockpit.set_sequence_time(0, 2, 800, True)
+    cockpit.set_sequence(0, 2, True)
+    cockpit.set_total_duration(400)
     fundo = GameImage("Assets\Sprites\Intro\Asset_Sky_Extended.png")
     poeiras = [Sprite("Assets\Sprites\Intro\Asset_Dust_Extended.png", 1), Sprite("Assets\Sprites\Intro\Asset_Dust_Extended.png", 1)]
     poeiras[0].set_position(0, 0)
@@ -43,9 +44,9 @@ def cockpit_scene():
 
         # muda o conteúdo da tela da nave quando blinky chega perto dela
         if blinky.x + blinky.width >= janela.width/2:
-            cockpit.set_initial_frame(2)
-            cockpit.set_final_frame(0)
-            cockpit.set_sequence_time(0, 2, 200, True)
+            cockpit.set_sequence(2, 3)
+            if(teclado.key_pressed("SPACE")):
+                play_outro()
 
         # movimenta as estrelas
         for estrela in estrelas:
@@ -70,9 +71,6 @@ def cockpit_scene():
         blinky.draw()
         blinky.update()
         janela.update()
-
-        if(teclado.key_pressed("Q")):
-            play_outro()
 
 def play_outro():
     janela = Window(1280, 720)
