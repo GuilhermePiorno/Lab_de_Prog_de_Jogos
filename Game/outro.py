@@ -25,9 +25,6 @@ def cockpit_scene():
     velocidade_poeira = 1000
     velocidade_estrelas = 10
 
-    pacman_piloto = Sprite("Assets\Sprites\Outro\pacman_piloto_200.png", 1)
-    pacman_piloto.set_position(650, 450)
-
     blinky = Sprite("Assets\Sprites\Outro\\blinky_cockpit.png", 2)
     blinky.set_sequence_time(0, 2, 100, True)
     blinky.set_position(-blinky.width, janela.height - blinky.height)
@@ -67,7 +64,6 @@ def cockpit_scene():
             estrela.draw()
         cockpit.draw()
         cockpit.update()
-        pacman_piloto.draw()
         blinky.draw()
         blinky.update()
         janela.update()
@@ -141,6 +137,7 @@ def play_outro():
 
         if sair:
             vx_nave += 5
+            vy_nave = 0
             
         if nave.x > janela.width:
             janela.close()
