@@ -38,6 +38,7 @@ def create_pacmans(janela, maze, numero_inimigos, save):
             pacman = Enemy(f"pac_{i}", janela, maze, save, "Assets/Sprites/Characters/pacman_angry.png", 22)
             pacman.base_speed *= 1.2
             pacman.base_fear_time *= 0.5
+            pacman.type = "aggressive variant"
         else:
             pacman = Enemy(f"pac_{i}", janela, maze, save, "Assets/Sprites/Characters/pacman.png", 22)
 

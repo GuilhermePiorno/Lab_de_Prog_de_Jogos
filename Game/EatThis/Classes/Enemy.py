@@ -34,6 +34,7 @@ class Enemy(Sprite):
         self.death_instant = 0
         self.distance_list = []
         self.nearest_point = self.get_next_closest_point()
+        self.type = "normal variant"
 
     def move1(self, target):
         if target.is_dead:
@@ -116,7 +117,7 @@ class Enemy(Sprite):
             direct_distance += self.relative_position_of_target(target)[1]**2
             direct_distance = direct_distance**0.5
 
-            if direct_distance <= 100 and target.state != "vulnerable":
+            if direct_distance <= 100 and target.state != "vulnerable" and self.type != "aggressive variant":
                 self.fear_timer = self.base_fear_time
                 self.state = "afraid"
 
