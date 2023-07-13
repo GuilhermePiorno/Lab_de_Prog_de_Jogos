@@ -1,7 +1,3 @@
-# https://br.freepik.com/fotos-vetores-gratis/spaceship-cockpit
-# https://br.freepik.com/vetores-gratis/ponte-de-capitaes-de-espaconave-futura-desenhos-animados-interior-de-posto-de-comando_3685433.htm#query=spaceship%20cockpit&position=13&from_view=keyword&track=ais
-# <a href="https://br.freepik.com/vetores-gratis/ponte-de-capitaes-de-espaconave-futura-desenhos-animados-interior-de-posto-de-comando_3685433.htm#query=spaceship%20cockpit&position=13&from_view=keyword&track=ais">Imagem de vectorpouch</a> no Freepik
-
 from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.gameimage import *
@@ -98,6 +94,8 @@ def play_outro():
     while True:
 
         dt = janela.delta_time()
+        if dt > 0.1:
+            dt = 0
         
         # usado para adicionar aleatoriedade nos intervalos entre ejeções de pacmans
         if not escolheu_pacman_dt:
