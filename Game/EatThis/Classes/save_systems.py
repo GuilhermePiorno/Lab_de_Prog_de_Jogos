@@ -22,7 +22,7 @@ class SaveFile:
         self._has_bomb_ability = 0
         self.has_bomb_ability = self._has_bomb_ability
         #   Bomb quantity
-        self._max_bombs = 1
+        self._max_bombs = 2
         self.max_bombs = self._max_bombs
         #   Bomb range
         self._bomb_range_upgrade = 3
@@ -95,7 +95,17 @@ class SaveFile:
             self.SFX_vol = data[0][2]
             # Linha 1 => [has_shoes]
             self.has_shoes = data[1][0]
+            # Linha 2 => [piggy_bank]
             self.piggy_bank = data[2][0]
+            # Linha 3 => [has_bomb_ability]
+            self.has_bomb_ability = data[3][0]
+            # Linha 4 => [has_fireball_ability]
+            self.has_fireball_ability = data[4][0]
+            if self.has_fireball_ability:
+                self.fireball_ammo = self._fireball_ammo
+            if self.has_bomb_ability:
+                self.bomb_range_upgrade = self._bomb_range_upgrade
+                self.max_bombs = self._max_bombs
             print("Loaded Save Data.")
             return True
         else:
@@ -111,6 +121,8 @@ class SaveFile:
             fout.write(f'{self.Master_vol} {self.BGM_vol} {self.SFX_vol} \n')
             fout.write(f'{+self.has_shoes} \n')     # +var faz com que True retorne 1 e False retorne 0
             fout.write(f'{self.piggy_bank} \n')     # upgrade permanente de manter fracão do dinheiro.
+            fout.write(f'{+self.has_bomb_ability} \n')
+            fout.write(f'{+self.has_fireball_ability} \n')
         print("Game was saved.")
 
     def reset_save_data(self):
@@ -164,11 +176,11 @@ class SaveFile:
         self.grip_factor = self._grip_factor
         self.speed_upgrade = self._speed_upgrade
 
-        self.has_bomb_ability = self._has_bomb_ability
+        # self.has_bomb_ability = self._has_bomb_ability
         self.max_bombs = self._max_bombs
         self.bomb_range_upgrade = self._bomb_range_upgrade
 
-        self.has_fireball_ability = self._has_fireball_ability
+        # self.has_fireball_ability = self._has_fireball_ability
         self.fireball_ammo = self._fireball_ammo
         self.fireball_mult_spd = self._fireball_mult_spd
 

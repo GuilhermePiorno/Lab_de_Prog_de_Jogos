@@ -89,6 +89,7 @@ def play_game(screen_width, screen_height, save):
     bullet_time_active = False
     bullet_time_cooldown_clock = -save.bullet_time_cooldown
     bullet_time_duration_clock = -save.bullet_time_duration
+    BT_CoolDown_Elapsed = level_clock - bullet_time_cooldown_clock
     time_ratio = 1
     pause = False
     shots_list = []
@@ -311,8 +312,14 @@ def play_game(screen_width, screen_height, save):
         if save.has_bullet_time != 0:
             bullet_time_icon = Sprite("Assets/Sprites/UI Icons/bullet_time_box.png")
             bullet_time_icon.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            bullet_time_Visual_CD = Sprite('Assets/Sprites/UI Icons/Cooldown_Visual_Timer_grey.png', 40)
+            bullet_time_Visual_CD.set_position(370 + len(upgrade_draw_list) * 22, 670)
+            if BT_CoolDown_Elapsed < save.bullet_time_cooldown:
+                bullet_time_Visual_CD.set_curr_frame(int(BT_CoolDown_Elapsed // 0.25))
+            else:
+                bullet_time_Visual_CD.set_curr_frame(40)
             upgrade_draw_list.append(bullet_time_icon)
-            upgrade_draw_list.append(bullet_time_icon)
+            upgrade_draw_list.append(bullet_time_Visual_CD)
 
         if save.reverse_state != 0:
             reverse_icon = Sprite("Assets/Sprites/UI Icons/reverse_states0.png")
@@ -637,6 +644,7 @@ def play_game(screen_width, screen_height, save):
 
             # ===Abilidade Bullet-Time, key4============================================================================
             BT_CoolDown_Elapsed = level_clock - bullet_time_cooldown_clock
+
 
             if not key4_state and teclado.key_pressed(key4) and BT_CoolDown_Elapsed > save.bullet_time_cooldown and save.has_bullet_time:
                 bullet_time_cooldown_clock = level_clock

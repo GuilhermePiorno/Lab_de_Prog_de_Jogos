@@ -1,4 +1,5 @@
 from math import sin
+import pygame
 
 # Chama move_actor para cada item da lista e verifica se algum item é uma lista de atores.
 def update_actors(actor_list, dt, time, width, height):
@@ -13,7 +14,7 @@ def update_actors(actor_list, dt, time, width, height):
 def move_actor(actor, dt, time, width, height):
     if actor.f == "":  # Se não possuí função de movimento, usa física.
         actor.x += actor.vx * dt + (actor.ax * dt ** 2) / 2
-        actor.y += actor.vy * dt + + (actor.ay * dt ** 2) / 2
+        actor.y += actor.vy * dt + (actor.ay * dt ** 2) / 2
         actor.vx += actor.ax * dt
         actor.vy += actor.ax * dt
     else:
@@ -26,13 +27,24 @@ def ship_func(*args):
     dt = args[1]
     time = args[2]
     height = args[4]
-    if time > 3:  # 3 segundos de delay para a nave aparecer
+    if 3 < time < 32:  # 3 segundos de delay para a nave aparecer
         if actor.vx > 0:
             actor.x += actor.vx * dt + (actor.ax * dt ** 2) / 2
             actor.vx += actor.ax * dt
+            # actor.rect = actor.image.get_rect(center=(actor.x, actor.y))
+            actor.rect = pygame.Rect(actor.x, actor.y, actor.width, actor.height)
         else:
+            actor.change_size(3)
             actor.vx = 0
             actor.ax = 0
+            alpha = 255
+            if 30 < time < 32:
+                alpha = 255*((-1*0.5*time)+16)
+                if alpha < 0:
+                    alpha = 0
+            elif time >= 30:
+                alpha = 0
+            actor.change_transparency(alpha)
 
     amplitude = 500 / time
     actor.y = height / 2 - actor.height / 2 + amplitude * sin(time)
