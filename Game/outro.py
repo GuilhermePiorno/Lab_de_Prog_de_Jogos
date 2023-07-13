@@ -2,9 +2,10 @@ from PPlay.window import *
 from PPlay.sprite import *
 from PPlay.gameimage import *
 from PPlay.sound import *
+from credits import *
 import random
 
-def cockpit_scene():
+def cockpit_scene(screen_width, screen_height, save):
     janela = Window(1080, 720)
     teclado = janela.get_keyboard()
 
@@ -39,7 +40,7 @@ def cockpit_scene():
         if blinky.x + blinky.width >= janela.width/2:
             cockpit.set_sequence(2, 3)
             if(teclado.key_pressed("SPACE")):
-                play_outro()
+                play_outro(screen_width, screen_height, save)
 
         # movimenta as estrelas
         for estrela in estrelas:
@@ -64,7 +65,7 @@ def cockpit_scene():
         blinky.update()
         janela.update()
 
-def play_outro():
+def play_outro(screen_width, screen_height, save):
     janela = Window(1280, 720)
     teclado = janela.get_keyboard()
     nave = Sprite("Assets\Sprites\Intro\SpaceShip_Scaled.png", 1)
@@ -88,6 +89,7 @@ def play_outro():
     pacman_timer_ejecao = 0
 
     som_pacman_morte = Sound("Assets\SFX\PacmanDeath.ogg")
+    som_pacman_morte.set_volume(save.SFX_vol * save.Master_vol)
 
     pacmans_ejetados = []
 
@@ -138,7 +140,7 @@ def play_outro():
             vy_nave = 0
             
         if nave.x > janela.width:
-            janela.close()
+            play_credits(screen_width, screen_height, save)
 
         # ejeta um pacman de algum lugar da nave
         if pacman_timer_ejecao > pacman_dt:
@@ -175,4 +177,4 @@ def play_outro():
             pacman[0].draw()
         janela.update()
 
-cockpit_scene()
+

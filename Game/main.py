@@ -7,6 +7,7 @@ from EatThis.Classes.Shot import *
 from EatThis.Classes.Trap import *
 from EatThis.Classes.Bomb import *
 from EatThis.a_star import *
+from outro import *
 from EatThis.debug import *
 from EatThis.enemy_spawn import *
 from time import *
@@ -99,7 +100,7 @@ def play_game(screen_width, screen_height, save):
     level_finished = False
 
     # Variáveis que impactam dificuldade.
-    powerups_no = save.stage_no - 1
+    powerups_no = 1 + save.stage_no//2
     numero_inimigos = 1 + save.stage_no//2
 
     # Background Music.
@@ -751,6 +752,8 @@ def play_game(screen_width, screen_height, save):
             blinky.hide()
             if blackout.get_curr_frame() == 9:
                 bgm.stop()
+                if save.stage_no == 10:
+                    cockpit_scene(screen_width, screen_height, save)
                 if save.stage_no % 3 == 0:
                     return ["shop", save]
                 return ["play", save]
