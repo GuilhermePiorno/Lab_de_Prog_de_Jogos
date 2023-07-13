@@ -1,7 +1,7 @@
 from PPlay.window import *
 from PPlay.gameimage import *
 from PPlay.sound import *
-
+from credits import *
 
 def open_options(screen_width, screen_height, save):
     janela = Window(screen_width, screen_height)
@@ -27,11 +27,12 @@ def open_options(screen_width, screen_height, save):
 
     # SFX init.
     sfx_select = Sound('Assets/SFX/Select_0.ogg')
-    sfx_select.set_volume(save.SFX_vol)
+    sfx_select.set_volume(save.SFX_vol * save.Master_vol)
     sfx_confirm = Sound('Assets/SFX/Confirm_0.ogg')
-    sfx_confirm.set_volume(save.SFX_vol)
+    sfx_confirm.set_volume(save.SFX_vol * save.Master_vol)
     sfx_cancel = Sound('Assets/SFX/Cancel_0.ogg')
-    sfx_cancel.set_volume(save.SFX_vol)
+    sfx_cancel.set_volume(save.SFX_vol * save.Master_vol)
+
 
     # Text init.
     font = pygame.font.Font('Assets/Fonts/MinimalPixel v2.ttf', 30)
@@ -53,6 +54,9 @@ def open_options(screen_width, screen_height, save):
     controlling_master_volume = False
     controlling_SFX_volume = False
     controlling_BGM_volume = False
+    controlling_Credits = False
+    thanks = "Thank you for playing!"
+    thanks_surface = small_font.render(thanks, True, 'white')
 
     while in_options:
         sfx_select.set_volume(save.SFX_vol * save.Master_vol)
@@ -144,6 +148,7 @@ def open_options(screen_width, screen_height, save):
                 button_state = True
                 last_input = "return"
                 if options_items[nav_level][option_item_select] == "Back":
+                    controlling_Credits = False
                     print("Back selected")
                     sfx_cancel.play()
                     if nav_level > 0:
@@ -159,10 +164,12 @@ def open_options(screen_width, screen_height, save):
                     option_item_select = 0  # retorna cursor para a primeira opção
                     print("Volume selected")
                 if options_items[nav_level][option_item_select] == "Credits":
-                    sfx_confirm.play()
+                    #sfx_confirm.play()
+                    controlling_Credits = not controlling_Credits
                     # nav_level recebe a "coluna" da opção, como 'Credits' é o terceiro item da lista, nav_level = 2.
                     nav_level = options_items[nav_level].index(options_items[nav_level][option_item_select])
                     option_item_select = 0  # retorna cursor para a primeira opção
+                    play_credits(screen_width, screen_height, save)
                     print("Credits selected")
                 if options_items[nav_level][option_item_select] == "Master Volume":
                     sfx_confirm.play()
@@ -181,6 +188,7 @@ def open_options(screen_width, screen_height, save):
                 if controlling_SFX_volume or controlling_master_volume or controlling_BGM_volume:
                     controlling_master_volume = controlling_SFX_volume = controlling_BGM_volume = False
                 else:
+                    controlling_Credits = False
                     if nav_level > 0:
                         option_item_select = 0  # retorna cursor para a primeira opção
                         nav_level = 0  # Volta ao inicio do options (pode ser feito porque nenhum menu tem mais de 1 de profundidade)
@@ -241,7 +249,6 @@ def open_options(screen_width, screen_height, save):
             vol_bar_layer2.draw()
             aux_surface = small_font.render(str(save.BGM_vol), True, 'white')
             janela.screen.blit(aux_surface, (630, 350))
-
         elif controlling_SFX_volume:
             for i in range(len(options_item_text)):
                 janela.screen.blit(options_item_text[i],
@@ -261,6 +268,8 @@ def open_options(screen_width, screen_height, save):
                 janela.screen.blit(options_item_text[i],
                                    ((janela.width - options_item_text[longest_word_ind].get_width()) / 2,
                                     200 + 50 * i))
+        if controlling_Credits:
+            janela.screen.blit(thanks_surface, (0.41*janela.width, 0.5*janela.height))
 
         moldura.draw()
         janela.update()
