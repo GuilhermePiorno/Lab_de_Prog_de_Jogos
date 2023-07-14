@@ -4,6 +4,11 @@ from main import *
 from options import *
 from go_shopping import *
 from EatThis.Classes.save_systems import *
+import os
+import sys
+
+if getattr(sys, 'frozen', False):
+    os.chdir(sys._MEIPASS)
 
 screen_width = 1280
 screen_height = 720
@@ -24,6 +29,7 @@ while next_step[0] != "close":
     if next_step[0] == "shop":
         next_step = go_shopping(screen_width, screen_height, save)
     if next_step[0] == "play":
+        # save.credits = 9999
         # next_step = go_shopping(screen_width, screen_height, save)
         next_step = play_game(screen_width, screen_height, save)
     if next_step[0] == "options":

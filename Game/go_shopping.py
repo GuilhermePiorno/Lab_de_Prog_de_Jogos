@@ -12,12 +12,15 @@ def can_purchase(save, shop_inventory, selection):
         "bomb amount": 9,
         "bomb range": 9,
         "fireball ammo": 9,
-        "fireball speed": 0.5,
+        "fireball speed": 1.5,
         "teleport": 1,
         "poison pill": 1,
         "piggy_bank": 0.5,
         "bullet_time": 1,
-        "reverse_states": 5
+        "reverse_states": 5,
+        "fireball": 1,
+        "bomb": 1,
+        "shoes":1
     }
 
     attribute = shop_inventory[selection][0]
@@ -95,6 +98,25 @@ def can_purchase(save, shop_inventory, selection):
         else:
             return False
 
+    if attribute == "fireball":
+        if not save.has_fireball_ability:
+            return True
+        else:
+            return False
+
+    if attribute == "bomb":
+        if not save.has_bomb_ability:
+            return True
+        else:
+            return False
+
+    if attribute == "shoes":
+        if not save.has_shoes:
+            return True
+        else:
+            return False
+
+
 
 def purchase_item(item, save):
     name = item[0]
@@ -124,6 +146,12 @@ def purchase_item(item, save):
         save.has_bullet_time = 1
     elif name == "reverse_states":
         save.reverse_state += 1
+    elif name == "fireball":
+        save.has_fireball_ability = 1
+    elif name == "bomb":
+        save.has_bomb_ability = 1
+    elif name == "shoes":
+        save.has_shoes = 1
 
 
 def measure_longest_message(msg, font_name='Assets/Fonts/MinimalPixel v2.ttf', size=24):
@@ -165,18 +193,22 @@ def talk(who, what, janela, text_box, font_name='Assets/Fonts/MinimalPixel v2.tt
 def get_possible_upgrades(save, stock_size):
     set_upgrades = {"speed",
                     "vul_res",
-                    "grip_factor",
                     "teleport",
                     "poison pill",
                     "piggy_bank",
                     "bullet_time",
                     "reverse_states",
+                    "fireball",
+                    "bomb",
+                    "shoes"
                     }
 
     if save.has_bomb_ability:
         set_upgrades.update({"bomb amount", "bomb range"})
     if save.has_fireball_ability:
         set_upgrades.update({"fireball ammo", "fireball speed"})
+    if save.has_shoes:
+        set_upgrades.update({"grip_factor"})
 
     shopping_list = []
     for i in range(stock_size):
@@ -200,7 +232,10 @@ def get_shop_inventory(save, stock_size):
         "poison pill": 10,
         "piggy_bank":200,
         "bullet_time":100,
-        "reverse_states": 300
+        "reverse_states": 300,
+        "bomb": 500,
+        "fireball": 500,
+        "shoes": 500
     }
     offer_list = get_possible_upgrades(save, stock_size)
     for i in range(stock_size):
@@ -225,7 +260,10 @@ def go_shopping(screen_width, screen_height, save):
         "poison pill": "Poison_Pill.png",
         "piggy_bank": "Piggy_Bank.png",
         "bullet_time": "bullet_time_box.png",
-        "reverse_states": "reverse_states0.png"
+        "reverse_states": "reverse_states0.png",
+        "bomb": "bomb_box.png",
+        "fireball":"fireball_box.png",
+        "shoes":"boots_box.png"
     }
 
     tempo = 0
@@ -716,7 +754,10 @@ def go_shopping(screen_width, screen_height, save):
             "poison pill": "Habilidade de pilula de veneno",
             "piggy_bank": "Habilidade permanente: Guarda uma parcela dos creditos ao morrer.",
             "bullet_time": "\"There is no spoon\"",
-            "reverse_states": "Habilidade: Troca imediatamente estado de vulnerabilidade (com cargas)."
+            "reverse_states": "Habilidade: Troca imediatamente estado de vulnerabilidade (com cargas).",
+            "fireball": "Fireball Ability",
+            "bomb": "Ability to plant bombs!",
+            "shoes": "Get your shoes on!"
         }
 
         if in_dialogue and not text_box.is_playing():
@@ -745,3 +786,4 @@ def go_shopping(screen_width, screen_height, save):
                 janela.screen.blit(surface_select_name, ((janela.width - surface_select_name.get_width())/2, 220))
 
         janela.update()
+

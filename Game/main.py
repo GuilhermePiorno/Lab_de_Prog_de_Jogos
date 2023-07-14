@@ -513,7 +513,8 @@ def play_game(screen_width, screen_height, save):
             maze = Maze(walltype, janela, powerups_no)
             blinky.maze = maze  # Atualiza o level do blinky
 
-            for i in range(numero_inimigos):
+            # print(numero_inimigos)
+            for i in range(numero_inimigos-1):
                 enemies_list[i].maze = maze
                 enemies_list[i].get_next_closest_point()
                 enemies_list[i].maze.level[enemies_list[i].nearest_point[1][0]][
